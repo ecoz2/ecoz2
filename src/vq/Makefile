@@ -5,6 +5,7 @@ SOURCE_FILES=\
 	distortion.c  \
 	report.c  \
 	sigma.c \
+	inertia.c \
 	quantize.c
 
 cc=gcc

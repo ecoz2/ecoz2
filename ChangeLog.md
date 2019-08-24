@@ -1,5 +1,6 @@
 2019-09
 
+- add inertia calculation
 - prd.show/cb.show: allow for coefficient range selection and generate csv
 
 2018-09-27
