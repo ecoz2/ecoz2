@@ -46,16 +46,13 @@ static char codebook_className[MAX_CLASS_NAME_LEN] = "_";
 
 static long tot_vecs;
 
-/**
-  * Computes `dpc / avgDistortion`, the sigma ratio for a given codebook,
-  * where `dpc` is the average inter-cell distortion
-  * and `avgDistortion` is the average intra-cell distortion
-  */
 sample_t calculateSigma(sample_t *codebook, sample_t *cells, int codebookSize, int P, sample_t avgDistortion);
+
+sample_t calculateInertia(sample_t **allVectors, long tot_vecs, sample_t *codebook, int codebookSize, int P);
 
 void prepare_report(char *, long, double);
 
-void report_cbook(char *, int, sample_t, sample_t, int, int *, sample_t *);
+void report_cbook(char *, int, sample_t, sample_t, sample_t, int, int *, sample_t *);
 
 void close_report(void);
 
@@ -199,7 +196,7 @@ static void growCodebook(int P) {
 static void learn(sample_t **allVectors, sample_t eps) {
     int pass = 0;
 
-    sprintf(cb_filename, "%s_%04d.cbook", prefix, num_raas);
+    sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
     printf("%s\n", cb_filename);
 
     sample_t DDprv = SAMPLE_MAX;
@@ -226,8 +223,10 @@ static void learn(sample_t **allVectors, sample_t eps) {
             addToCell(raa_min, rxg, ddmin);
         }
 
+        const sample_t avgDistortion = DD / tot_vecs;
+
         printf("\tDP=%g\tDDprv=%g\tDD=%g\t%-15g\r",
-               DD / tot_vecs, DDprv, DD, ((DDprv - DD) / DD));
+               avgDistortion, DDprv, DD, ((DDprv - DD) / DD));
 
         reviewCells();
 
@@ -237,9 +236,10 @@ static void learn(sample_t **allVectors, sample_t eps) {
             // codebook saved with reflections
             cb_save(codebook_className, reflections, num_raas, P, cb_filename);
 
-            sample_t sigma = calculateSigma(codebook, cells, num_raas, P, DD / tot_vecs);
+            sample_t sigma = calculateSigma(codebook, cells, num_raas, P, avgDistortion);
+            sample_t inertia = calculateInertia(allVectors,  tot_vecs, codebook, num_raas, P);
 
-            report_cbook(cb_filename, pass + 1, DD / tot_vecs, sigma, num_raas, cardd, discel);
+            report_cbook(cb_filename, pass + 1, avgDistortion, sigma, inertia, num_raas, cardd, discel);
             printf("\n");
 
             if (num_raas >= MAX_CODEBOOK_SIZE) {
@@ -248,7 +248,7 @@ static void learn(sample_t **allVectors, sample_t eps) {
 
             pass = 0;
             growCodebook(P);
-            sprintf(cb_filename, "%s_%04d.cbook", prefix, num_raas);
+            sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
             printf("%s\n", cb_filename);
         }
         else {
@@ -323,7 +323,7 @@ int main(int argc, char *argv[]) {
     static char class_dir[2048];
     sprintf(class_dir, "%s/%s", dir_codebooks, codebook_className);
     mk_dirs(class_dir);
-    sprintf(prefix, "%s/eps_%g_", class_dir, eps);
+    sprintf(prefix, "%s/eps_%g", class_dir, eps);
 
     allocateCodebook();
     initialCodebook();
