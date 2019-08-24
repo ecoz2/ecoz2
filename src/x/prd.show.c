@@ -8,36 +8,106 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <getopt.h>
+
 
 static void usage() {
     printf("\
 \n\
 ECOZ System\n\
 \n\
-	prd.show - Show predictors\n\
+	prd.show - Show predictor\n\
 \n\
-	prd.show <predictor> ...\n\
+	prd.show [ options ] <predictor>\n\
+\n\
+    Options:\n\
+      -k             Show reflection coefficients\n\
+      -r from-to     Coefficient range selection\n\
 \n"
     );
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
+    int show_reflections = 0;
+    int from = -1;
+    int to = -1;
+
+    int opc;
+    while (EOF != (opc = getopt(argc, argv, "kr:h"))) {
+        switch (opc) {
+            case 'k':
+                show_reflections = 1;
+                break;
+            case 'r':
+                if (sscanf(optarg, "%d-%d", &from, &to) == 0 || from < 0 || from > to) {
+                    fprintf(stderr, "invalid range: '%s'\n", optarg);
+                    return 1;
+                }
+                break;
+            case 'h': case '?':
+                usage();
+                return 0;
+        }
+    }
+
+    if (optind >= argc) {
+        printf("missing predictor file\n");
         usage();
         return 1;
     }
 
-    for (int i = 1; i < argc; i++) {
-        Predictor *predictor = prd_load(argv[i]);
-        if (!predictor) {
-            printf(": error loading %s.\n", argv[i]);
-            continue;
+    char *filename = argv[optind];
+
+    Predictor *predictor = prd_load(filename);
+    if (!predictor) {
+        printf(": error loading %s.\n", filename);
+        return 2;
+    }
+
+    if (from < 0) {
+        from = 1;
+    }
+    if (to < 0 || to > predictor->P) {
+        to = predictor->P;
+    }
+
+    printf("# %s:\n", filename);
+    printf("# className='%s', T=%d, P=%d\n",
+           predictor->className, predictor->T, predictor->P);
+
+    const char *comma = "";
+    for (int k = from; k <= to; k++) {
+        printf("%s%c%d", comma, show_reflections ? 'k' : 'r', k);
+        comma = ",";
+    }
+    printf("\n");
+
+    sample_t refl[predictor->P + 1];
+    sample_t pred[predictor->P + 1];
+    sample_t errPred;
+
+    for (int t = 0; t < predictor->T; t++) {
+        sample_t *coeffs;
+
+        sample_t *vector = predictor->vectors[t];
+        if (show_reflections) {
+            lpca_r(predictor->P, vector, refl, pred, &errPred);
+            coeffs = refl;
+        }
+        else {
+            coeffs = vector;
         }
 
-        printf("%s:\n", argv[i]);
-        prd_show(predictor);
-        prd_destroy(predictor);
+        comma = "";
+        for (int p = from; p <= to; p++) {
+            printf("%s%g", comma, coeffs[p]);
+            comma = ",";
+        }
+        printf("\n");
     }
+
+    prd_destroy(predictor);
 
     return 0;
 }
