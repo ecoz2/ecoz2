@@ -31,6 +31,11 @@ Sgn *sgn_load(char *filename) {
     //printf("  numSamples:    %llu\n", numSamples);
 
     sample_t *samples = (sample_t *) malloc(numSamples * sizeof(sample_t));
+    if (!samples) {
+        fprintf(stderr, "Cannot allocate memory for %s\n", filename);
+        drwav_free(pSampleData);
+        return 0;
+    }
 
     for (int j = 0; j < numSamples; j++) {
         samples[j] = pSampleData[j];
