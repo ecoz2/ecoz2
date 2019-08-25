@@ -33,7 +33,7 @@ def plot_csv(filename):
     plot(sizes, df['σ'], r'$\sigma$ ratio')
 
     plt.subplot(313)
-    plot(sizes, df['inertia'], 'Inertia', xlabel='Codebook size')
+    plot(sizes, df['inertia'], 'Inertia', xlabel='Codebook size (log scale)')
 
     fig.savefig('cb_evaluation.png', bbox_inches='tight')
     # fig.savefig('cb_evaluation.pdf', bbox_inches='tight')
