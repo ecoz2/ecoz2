@@ -13,7 +13,7 @@ Except as indicated in a couple of places, and apart from some style
 adjustments and modernization (in particular, better alignment with C99),
 the implementation of the various algorithms is essentially as
 originally written.
-A significant improvement in this revision is the use of scaling
+A significant improvement in this revision, however, is the use of scaling
 factors[^shen] [^stamp] in HMM operations such that the system can
 deal with larger models, longer observation sequences, and
 larger vocabulary sizes.
@@ -32,7 +32,7 @@ considered at all.
 But you can take a look at how the programs are used in some exercises
 under https://github.com/ecoz2/.
 
-*References*  Some key literature references are already mentioned here
+*References.*  Some key literature references are already mentioned here
 and in some parts of the code, but I haven't really addressed this
 aspect in any systematic way, so I'm likely missing some!
 (This would be a straightforward task if I had a copy of my BS thesis
@@ -80,6 +80,29 @@ There's no program installation per se, but you can simply include
 
 ```
 $ export PATH=`pwd`/_out/bin:$PATH
+```
+
+I have added some [plotting utilities](src/py/). 
+These are python based requiring `pandas` and `matplotlib`:
+
+```
+$ pip install pandas matplotlib 
+``` 
+
+You may want to add `src/py` to your `$PATH` as well:
+
+```
+$ export PATH=`pwd`/src/py:$PATH
+```
+
+Codebook related:
+
+```
+cb.plot_evaluation.py        - Distortion, σ-ratio, inertia
+cb.plot_cards_dists.py       - Cell cardinality and distortions
+cb.plot_cards_dists_hist.py  - Histograms of the above
+cb.plot_reflections.py       - Reflection coefficient scatter plot
+                               to visualize clusters and centroids
 ```
 
 ----
