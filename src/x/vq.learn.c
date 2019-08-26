@@ -52,7 +52,7 @@ sample_t calculateInertia(sample_t **allVectors, long tot_vecs, sample_t *codebo
 
 void prepare_report(char *, long, double);
 
-void report_cbook(char *, int, sample_t, sample_t, sample_t, int, int *, sample_t *);
+void report_cbook(char *, int, sample_t, sample_t, sample_t, int, int *, sample_t *, CodewordAndMinDist *);
 
 void close_report(void);
 
@@ -194,6 +194,10 @@ static void growCodebook(int P) {
 }
 
 static void learn(sample_t **allVectors, sample_t eps) {
+    // to maintain and report codeword and minimum distortion for
+    // each training vector against each trained codebook size:
+    CodewordAndMinDist minDists[tot_vecs];
+
     int pass = 0;
 
     sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
@@ -213,12 +217,14 @@ static void learn(sample_t **allVectors, sample_t eps) {
 
             sample_t *raa = codebook;
             for (int i = 0; i < num_raas; i++, raa += (1 + P)) {
-                sample_t dd = distortion((sample_t *) rxg, raa, P);
+                sample_t dd = distortion(rxg, raa, P);
                 if (dd < ddmin) {
                     ddmin = dd;
                     raa_min = i;
                 }
             }
+            minDists[v].codeword = raa_min;
+            minDists[v].minDist = ddmin - 1;
             DD += ddmin - 1;
             addToCell(raa_min, rxg, ddmin);
         }
@@ -239,7 +245,9 @@ static void learn(sample_t **allVectors, sample_t eps) {
             sample_t sigma = calculateSigma(codebook, cells, num_raas, P, avgDistortion);
             sample_t inertia = calculateInertia(allVectors,  tot_vecs, codebook, num_raas, P);
 
-            report_cbook(cb_filename, pass + 1, avgDistortion, sigma, inertia, num_raas, cardd, discel);
+            report_cbook(cb_filename, pass + 1, avgDistortion, sigma, inertia, num_raas, cardd, discel,
+                         minDists);
+
             printf("\n");
 
             if (num_raas >= MAX_CODEBOOK_SIZE) {

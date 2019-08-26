@@ -1,5 +1,8 @@
 2019-09
 
+- vq.learn: report codeword and minimum distortion for each training vector against
+  each generated codebook
+  
 - additions/adjustments for more organized codebook evaluation report.
   
     Let's do a complete exercise starting from a single sound file.

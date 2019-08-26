@@ -49,6 +49,11 @@ void cbook_destroy(Codebook *cbook);
   */
 sample_t distortion(sample_t *rxg, sample_t *raa, int P);
 
+typedef struct {
+    int      codeword;
+    sample_t minDist;
+} CodewordAndMinDist;
+
 /**
  * Does quantization of the vectors in the given predictor.
  *

@@ -71,7 +71,7 @@ def cb_plot_reflections(df_training, df_codebook):
 if __name__ == "__main__":
     from sys import argv
     if len(argv) < 2:
-        print('USAGE: cb.plot_evaluation.py <training-csv> [ <codebook-csv> ]')
+        print('USAGE: cb.plot_reflections.py <training-reflections> [ <codebook-reflections> ]')
         exit(1)
 
     df_training = read_csv(argv[1])

@@ -2,14 +2,18 @@
  */
 
 #include "lpc.h"
+#include "vq.h"
 
 #include <stdio.h>
 #include <string.h>
 
+static long tot_vecs = 0;
 static FILE *file = 0;
 static FILE *file_csv = 0;
 
-void prepare_report(char *rpt_filename, long tot_vecs, double eps) {
+void prepare_report(char *rpt_filename, long tot_vecs_, double eps) {
+    tot_vecs = tot_vecs_;
+
     printf("Report: %s\n", rpt_filename);
 
     if (0 == (file = fopen(rpt_filename, "w"))) {
@@ -33,7 +37,9 @@ void prepare_report(char *rpt_filename, long tot_vecs, double eps) {
 
 void report_cbook(char *cb_filename, int num_pas,
                   sample_t DDprm, sample_t sigma, sample_t inertia,
-                  int M, int *cardd, sample_t *discel) {
+                  int M, int *cardd, sample_t *discel,
+                  CodewordAndMinDist *minDists
+                  ) {
 
     if (!file) {
         return;
@@ -76,8 +82,8 @@ void report_cbook(char *cb_filename, int num_pas,
     fprintf(file, "\n\n");
     fflush(file);
 
+    // CELLS
     char cells_csv[2048];
-
     FILE *cells_file;
     sprintf(cells_csv, "%s.cards_dists.csv", cb_filename);
     if (0 == (cells_file = fopen(cells_csv, "w"))) {
@@ -95,6 +101,22 @@ void report_cbook(char *cb_filename, int num_pas,
                 fprintf(cells_file, "NaN\n");
             }
         }
+        fclose(cells_file);
+    }
+
+    // MIN DISTORTIONS
+    char min_dists_csv[2048];
+    FILE *min_dists_file;
+    sprintf(min_dists_csv, "%s.min_dists.csv", cb_filename);
+    if (0 == (min_dists_file = fopen(min_dists_csv, "w"))) {
+        printf("error creating %s\n", min_dists_csv);
+    }
+    else {
+        fprintf(min_dists_file, "%s\n", "codeword,minDistortion");
+        for (int v = 0; v < tot_vecs; v++) {
+            fprintf(min_dists_file, "%d,%f\n", minDists[v].codeword, minDists[v].minDist);
+        }
+        fclose(min_dists_file);
     }
 }
 
