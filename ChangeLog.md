@@ -2,7 +2,7 @@
 
 - vq.learn: report codeword and minimum distortion for each training vector against
   each generated codebook
-- initial `cb.plot_cell_shapes.py` to display the above info
+- `cb.plot_cell_shapes.py` utility to display the above info
   
 - additions/adjustments for more organized codebook evaluation report.
   
