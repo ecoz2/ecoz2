@@ -343,6 +343,10 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < numPredictors; i++) {
         char *prdFilename = argv[optind + i];
         predictors[i] = prd_load(prdFilename);
+        if (!predictors[i]) {
+            fprintf(stderr, "error loading predictor %s\n", prdFilename);
+            return 2;
+        }
         tot_vecs += predictors[i]->T;
     }
     printf("%ld training vectors (ε=%g)\n", tot_vecs, eps);

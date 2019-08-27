@@ -68,6 +68,10 @@ int main(int argc, char *argv[]) {
 
         char *prd_filename = argv[opt];
         Predictor *prd = prd_load(prd_filename);
+        if (!prd) {
+            fprintf(stderr, "%s: error loading predictor.\n", prd_filename);
+            return 2;
+        }
 
         int T = prd->T;
 
