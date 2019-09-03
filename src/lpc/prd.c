@@ -31,7 +31,7 @@ void prd_destroy(Predictor *p) {
     }
 }
 
-Predictor *prd_load(char *nom_prd) {
+Predictor *prd_load(const char *nom_prd) {
     FILE *file;
     char className[MAX_CLASS_NAME_LEN];
 

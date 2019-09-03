@@ -70,4 +70,9 @@ sample_t quantize(sample_t *raas,
                  );
 
 
+int vq_learn(int prediction_order, sample_t epsilon,
+             const char *codebook_class_name,
+             const char *predictor_filenames[], int num_predictors
+            );
+
 #endif

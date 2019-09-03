@@ -72,7 +72,7 @@ void reflections_to_raas(sample_t *reflections, sample_t *raas, int num_raas, in
 
 Predictor *prd_create(int T, int P, const char *className);
 
-Predictor *prd_load(char *nom_prd);
+Predictor *prd_load(const char *nom_prd);
 
 void prd_destroy(Predictor *prd);
 

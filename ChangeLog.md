@@ -1,5 +1,7 @@
 2019-09
 
+- vq.learn: extract main function into library 
+
 - vq.learn: report codeword and minimum distortion for each training vector against
   each generated codebook
 - `cb.plot_cell_shapes.py` utility to display the above info

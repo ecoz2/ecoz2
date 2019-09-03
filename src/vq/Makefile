@@ -1,6 +1,7 @@
 # ECOZ System
 
 SOURCE_FILES=\
+	vq_learn.c \
 	vq.c \
 	distortion.c  \
 	report.c  \
