@@ -2,13 +2,8 @@
  * Codebook generation according to Juang et al (1982).
  */
 
-#include <math.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <float.h>
 #include <malloc.h>
-#include <getopt.h>
 
 #include "lpc.h"
 #include "vq.h"
@@ -45,17 +40,7 @@ static const char *codebook_className;
 
 static long tot_vecs;
 
-sample_t calculateSigma(sample_t *codebook, sample_t *cells, int codebookSize, int P, sample_t avgDistortion);
-
-sample_t calculateInertia(sample_t **allVectors, long tot_vecs, sample_t *codebook, int codebookSize, int P);
-
-void prepare_report(char *, long, double);
-
-void report_cbook(char *, int, sample_t, sample_t, sample_t, int, int *, sample_t *, CodewordAndMinDist *);
-
-void close_report(void);
-
-static void allocateCodebook() {
+static void allocate_codebook() {
     const long maxCbSizeInBytes = MAX_CODEBOOK_SIZE * (1 + P) * sizeof(sample_t);
 
     if (0 == (codebook = (sample_t *) malloc(maxCbSizeInBytes))
@@ -73,7 +58,7 @@ static void allocateCodebook() {
     }
 }
 
-static void releaseCodebook() {
+static void release_codebook() {
     free(reflections);
     free(cells);
     free(codebook);
@@ -83,7 +68,7 @@ static void releaseCodebook() {
  initial codebook corresponding to 2 reflection vectors [_, ±0.5, 0, ...].
  note: first entry (0) of reflection vector is ignored.
 */
-static void initialCodebook() {
+static void initial_codebook() {
     num_raas = 2;
 
     sample_t *refl0 = reflections + 1;
@@ -99,7 +84,7 @@ static void initialCodebook() {
     reflections_to_raas(reflections, codebook, num_raas, P);
 }
 
-static void initCells() {
+static void init_cells() {
     // set (1+P)*num_raas values to zero:
     sample_t *cel = cells;
     for (int i = 0; i < (1 + P) * num_raas; i++, cel++) {
@@ -114,7 +99,7 @@ static void initCells() {
 
 // adds autocorrelation rx to i-th cell and
 // accumulates the distortion associated to such cell
-static void addToCell(int i, sample_t *rx, sample_t ddmin) {
+static void add_to_cell(int i, sample_t *rx, sample_t ddmin) {
     sample_t *cell = cells + (1 + P) * i;
     for (int n = 0; n < (1 + P); n++, cell++, rx++) {
         *cell += *rx;
@@ -123,7 +108,7 @@ static void addToCell(int i, sample_t *rx, sample_t ddmin) {
     discel[i] += ddmin - 1;
 }
 
-static void reviewCells(void) {
+static void review_cells(void) {
     int numEmpty = 0;
     for (int i = 0; i < num_raas; i++) {
         if (0 == cardd[i]) {
@@ -131,7 +116,7 @@ static void reviewCells(void) {
         }
     }
     if (numEmpty > 0) {
-        printf("\nWARN: reviewCells: %d empty cell(s) for codebook size %d)\n",
+        printf("\nWARN: review_cells: %d empty cell(s) for codebook size %d)\n",
                numEmpty, num_raas);
     }
 }
@@ -141,7 +126,7 @@ static void reviewCells(void) {
   * coefficients by solving the LPC equations corresponding to
   * the average autocorrelation.
   */
-static void calculateReflections() {
+static void calculate_reflections() {
     sample_t errPred, pred[1 + P];
 
     sample_t *raa = codebook;
@@ -176,7 +161,7 @@ static void calculateReflections() {
 /**
  * Grows the codebook by perturbing each reflector with the pert1 and pert0 factors.
  */
-static void growCodebook(int P) {
+static void grow_codebook(int P) {
     sample_t *rex = reflections + (1 + P) * num_raas - 1;    // start with last coefficient
     sample_t *rex1 = rex + (1 + P) * num_raas;            // new coeff with pert1
     sample_t *rex0 = rex1 - (1 + P);                    // new coeff with pert0
@@ -205,7 +190,7 @@ static void learn(sample_t **allVectors, sample_t eps) {
     sample_t DDprv = SAMPLE_MAX;
     for (;;) {
         printf("(%d)", pass);
-        initCells();
+        init_cells();
 
         sample_t DD = 0;
 
@@ -225,7 +210,7 @@ static void learn(sample_t **allVectors, sample_t eps) {
             minDists[v].codeword = raa_min;
             minDists[v].minDist = ddmin - 1;
             DD += ddmin - 1;
-            addToCell(raa_min, rxg, ddmin);
+            add_to_cell(raa_min, rxg, ddmin);
         }
 
         const sample_t avgDistortion = DD / tot_vecs;
@@ -233,9 +218,9 @@ static void learn(sample_t **allVectors, sample_t eps) {
         printf("\tDP=%g\tDDprv=%g\tDD=%g\t%-15g\r",
                avgDistortion, DDprv, DD, ((DDprv - DD) / DD));
 
-        reviewCells();
+        review_cells();
 
-        calculateReflections();
+        calculate_reflections();
 
         if (pass > 0 && ((DDprv - DD) / DD) < eps) {
             // codebook saved with reflections
@@ -254,7 +239,7 @@ static void learn(sample_t **allVectors, sample_t eps) {
             }
 
             pass = 0;
-            growCodebook(P);
+            grow_codebook(P);
             sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
             printf("%s\n", cb_filename);
         }
@@ -283,8 +268,8 @@ int vq_learn(int prediction_order, sample_t epsilon,
     mk_dirs(class_dir);
     sprintf(prefix, "%s/eps_%g", class_dir, eps);
 
-    allocateCodebook();
-    initialCodebook();
+    allocate_codebook();
+    initial_codebook();
 
     // load predictors
     Predictor *predictors[num_predictors];
@@ -316,6 +301,6 @@ int vq_learn(int prediction_order, sample_t epsilon,
 
     close_report();
 
-    releaseCodebook();
+    release_codebook();
     return 0;
 }
