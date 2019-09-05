@@ -99,8 +99,7 @@ Codebook related:
 
 ```
 cb.plot_evaluation.py        - Distortion, σ-ratio, inertia
-cb.plot_cards_dists.py       - Cell cardinality and distortions
-cb.plot_cards_dists_hist.py  - Histograms of the above
+cb.plot_cards_dists.py       - Cell cardinality and distortion plots
 cb.plot_reflections.py       - Reflection coefficient scatter plot
                                to visualize clusters and centroids
 ```

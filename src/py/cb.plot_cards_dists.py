@@ -4,11 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def cb_plot_cards_dists(filename):
-    csv = pd.read_csv(filename, comment='#')
-
-    df = pd.DataFrame(csv)
-    # print(df)
+def cb_plot_cards_dists_twinx(filename, df):
     index = df['index']
 
     fig, ax1 = plt.subplots()
@@ -34,11 +30,46 @@ def cb_plot_cards_dists(filename):
     plt.show(block=True)
 
 
-if __name__ == "__main__":
-    from sys import argv
-    if len(argv) < 2:
-        print('USAGE: cb.plot_cards_dists.py <csv-filename>')
-        exit(1)
+def cb_plot_cards_dists_scatter(filename, df):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_xlabel('Distortion')
+    ax.set_ylabel('Cardinality')
+    ax.scatter(df['distortion'], df['cardinality'], color='black', alpha=.3, marker='o')
+    fig.tight_layout()
+    plt.title(filename)
+    fig.savefig('cb_cards_dists_scatter.png', bbox_inches='tight')
+    plt.show(block=True)
 
-    csv_filename = argv[1]
-    cb_plot_cards_dists(csv_filename)
+
+def cb_plot_cards_dists_hist(filename, df):
+    fig, ax1 = plt.subplots()
+    df.hist(['cardinality', 'distortion'],
+            ax=ax1,
+            bins=100, grid=False,
+            histtype='step'
+            )
+    fig.savefig('cb_cards_dists_hist.png', bbox_inches='tight')
+    plt.show(block=True)
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Plot cell cardinality/distortion.')
+    parser.add_argument('--scatter', action='store_true', help='Scatter plot')
+    parser.add_argument('--hist', action='store_true', help='Histograms')
+    parser.add_argument('filename')
+
+    args = parser.parse_args()
+
+    csv = pd.read_csv(args.filename, comment='#')
+    df = pd.DataFrame(csv)
+    # print(df)
+
+    if args.scatter:
+        cb_plot_cards_dists_scatter(args.filename, df)
+    elif args.hist:
+        cb_plot_cards_dists_hist(args.filename, df)
+    else:
+        cb_plot_cards_dists_twinx(args.filename, df)
