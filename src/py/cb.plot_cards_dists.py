@@ -25,9 +25,9 @@ def cb_plot_cards_dists_twinx(filename, df):
 
     fig.tight_layout()
     plt.title(filename)
+    plt.show(block=True)
 
     fig.savefig('cb_cards_dists.png', bbox_inches='tight')
-    plt.show(block=True)
 
 
 def cb_plot_cards_dists_scatter(filename, df):
@@ -38,8 +38,8 @@ def cb_plot_cards_dists_scatter(filename, df):
     ax.scatter(df['distortion'], df['cardinality'], color='black', alpha=.3, marker='o')
     fig.tight_layout()
     plt.title(filename)
-    fig.savefig('cb_cards_dists_scatter.png', bbox_inches='tight')
     plt.show(block=True)
+    fig.savefig('cb_cards_dists_scatter.png')
 
 
 def cb_plot_cards_dists_hist(filename, df):
@@ -49,8 +49,8 @@ def cb_plot_cards_dists_hist(filename, df):
             bins=100, grid=False,
             histtype='step'
             )
-    fig.savefig('cb_cards_dists_hist.png', bbox_inches='tight')
     plt.show(block=True)
+    fig.savefig('cb_cards_dists_hist.png', bbox_inches='tight')
 
 
 if __name__ == "__main__":

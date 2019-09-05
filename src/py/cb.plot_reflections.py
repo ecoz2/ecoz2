@@ -43,8 +43,7 @@ def cb_plot_reflections(df_training, df_codebook):
     ax.set_xlabel('$k_1$')
     ax.set_ylabel('$k_2$')
 
-    color = 'lightgrey'
-    ax.scatter(*tk, color=color, marker='.')
+    ax.scatter(*tk, color='grey', alpha=.2, marker='o', )
 
     if df_codebook is not None:
         csz = len(df_codebook)
@@ -55,17 +54,16 @@ def cb_plot_reflections(df_training, df_codebook):
             ck3 = df_codebook['k3']
             ck.append(ck3)
 
-        color = 'darkred'
-        ax.scatter(*ck, color=color)
+        ax.scatter(*ck, color='darkred', alpha=.7, marker='o')
         print('df_codebook points = %s' % csz)
         filename += '_codebook_%d' % csz
 
     fig.tight_layout()
     plt.title('$k_1$ vs. $k_2$' + (' vs. $k_3$' if tk3 is not None else ''))
 
+    plt.show(block=True)
     filename += '.png'
     fig.savefig(filename, bbox_inches='tight')
-    plt.show(block=True)
 
 
 if __name__ == "__main__":
