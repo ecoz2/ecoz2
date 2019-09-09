@@ -180,7 +180,7 @@ static void grow_codebook(int P) {
 static void learn(sample_t **allVectors, sample_t eps) {
     // to maintain and report codeword and minimum distortion for
     // each training vector against each trained codebook size:
-    CodewordAndMinDist minDists[tot_vecs];
+    CodewordAndMinDist *minDists = (CodewordAndMinDist *) calloc(tot_vecs, sizeof(CodewordAndMinDist));
 
     int pass = 0;
 
@@ -249,6 +249,7 @@ static void learn(sample_t **allVectors, sample_t eps) {
 
         DDprv = DD;
     }
+    free(minDists);
 }
 
 int vq_learn(int prediction_order, sample_t epsilon,
@@ -272,7 +273,7 @@ int vq_learn(int prediction_order, sample_t epsilon,
     initial_codebook();
 
     // load predictors
-    Predictor *predictors[num_predictors];
+    Predictor **predictors = (Predictor **) calloc(num_predictors, sizeof(Predictor*));
     tot_vecs = 0;
     for (int i = 0; i < num_predictors; i++) {
         const char *prdFilename = predictor_filenames[i];
@@ -285,7 +286,7 @@ int vq_learn(int prediction_order, sample_t epsilon,
     }
     printf("%ld training vectors (ε=%g)\n", tot_vecs, eps);
 
-    sample_t *allVectors[tot_vecs];
+    sample_t **allVectors = (sample_t **) calloc(tot_vecs, sizeof(sample_t *));
     int v = 0;
     for (int i = 0; i < num_predictors; i++) {
         for (int t = 0; t < predictors[i]->T; t++) {
@@ -298,6 +299,14 @@ int vq_learn(int prediction_order, sample_t epsilon,
     prepare_report(nom_rpt, tot_vecs, eps);
 
     learn(allVectors, eps);
+
+    // FIXME(mem leak) release allVectors[v]
+    free(allVectors);
+
+    for (int i = 0; i < num_predictors; i++) {
+        prd_destroy(predictors[i]);
+    }
+    free(predictors);
 
     close_report();
 

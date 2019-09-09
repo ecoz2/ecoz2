@@ -1,5 +1,6 @@
 2019-09
 
+- vq.learn: allocate some stuff on the heap to allow bigger input data 
 - vq.learn: extract main function into library 
 
 - vq.learn: report codeword and minimum distortion for each training vector against
