@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 
 
 def read_csv(filename):
-    csv = pd.read_csv(filename, comment='#')
-    df = pd.DataFrame(csv)
+    df = pd.read_csv(filename, comment='#')
     # print(df)
     return df
 

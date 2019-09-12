@@ -63,8 +63,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    csv = pd.read_csv(args.filename, comment='#')
-    df = pd.DataFrame(csv)
+    df = pd.read_csv(args.filename, comment='#')
     # print(df)
 
     if args.scatter:

@@ -18,9 +18,7 @@ def plot(sizes, metric, metric_label, xlabel=None, title=None):
 
 
 def plot_csv(filename):
-    csv = pd.read_csv(filename, comment='#')
-
-    df = pd.DataFrame(csv)
+    df = pd.read_csv(filename, comment='#')
     print(df)
     sizes = df['M']
 
