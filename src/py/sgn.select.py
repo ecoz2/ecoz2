@@ -1,11 +1,14 @@
 #!/usr/bin/env python3.7
 # coding=utf-8
-import soundfile as sf
-import pandas as pd
+from math import ceil, floor
+
 import numpy as np
+import pandas as pd
+import soundfile as sf
 
 
 def show_counts(min_dists):
+    cw_value_counts = min_dists['codeword'].value_counts()
     cb_size = min_dists['codeword'].max() + 1
     print('Codebook size: %d' % cb_size)
     print('Counts:')
@@ -43,57 +46,156 @@ def do_select(wav_filename, win_length_ms, off_length_ms,
     sf.write(res_filename, selected_samples, sample_rate)
 
 
-def get_codeword_sequence(wav_filename, off_length_ms,
-                          start_time_ms, duration_ms,
-                          min_dists):
+def get_codewords_and_min_dists(sample_rate, off_length_ms,
+                                start_time_ms, duration_ms,
+                                min_dists):
 
-    print('- getting codewords')
-    sample_rate = sf.info(wav_filename).samplerate
+    print('- getting sequence of codewords and min distortions in time interval')
 
     offset = int(off_length_ms * sample_rate / 1000)
     print('offset = %d' % offset)
 
-    from math import ceil, floor
     num_wins = ceil(duration_ms / off_length_ms)
 
     start_sample = floor(start_time_ms * sample_rate / 1000)
     start_index = floor(start_sample / offset)
 
+    if start_index + num_wins > len(min_dists):
+        num_wins = len(min_dists) - start_index
+
+    # print('len(min_dists) = %d' % len(min_dists))
+    print('num_wins = %d' % num_wins)
     print('start_sample = %d' % start_sample)
     print('start_index = %d' % start_index)
 
-    codeword_sequence = []
+    sequence = []
     codewords = min_dists['codeword']
+    min_dists = min_dists['minDistortion']
     for _ in range(num_wins):
         codeword = codewords[start_index]
-        codeword_sequence.append((start_index, codeword, start_time_ms))
+        min_dist = min_dists[start_index]
+        sequence.append((start_index, codeword, min_dist, start_time_ms))
         start_index += 1
         start_time_ms += off_length_ms
 
-    return codeword_sequence
+    return sequence
 
 
-def do_intersect(wav_filename, off_length_ms,
+def do_intersect(sample_rate, off_length_ms,
                  start_time_ms, duration_ms,
                  min_dists):
 
-    codeword_sequence = get_codeword_sequence(wav_filename, off_length_ms,
-                                              start_time_ms, duration_ms,
-                                              min_dists)
+    sequence = get_codewords_and_min_dists(sample_rate, off_length_ms,
+                                           start_time_ms, duration_ms,
+                                           min_dists)
     print('  %5s %8s %8s' % ('index', 'codeword', 'ms'))
-    for start_index, codeword, start_time_ms in codeword_sequence:
+    for start_index, codeword, _, start_time_ms in sequence:
         print('  %5s %8s %8s' % (start_index, codeword, start_time_ms))
 
 
-def show_unique_codewords(wav_filename, off_length_ms,
+def show_unique_codewords(sample_rate, off_length_ms,
                           start_time_ms, duration_ms,
                           min_dists):
 
-    codeword_sequence = get_codeword_sequence(wav_filename, off_length_ms,
-                                              start_time_ms, duration_ms,
-                                              min_dists)
-    only_keywords = set([str(codeword) for (_, codeword, _) in codeword_sequence])
+    sequence = get_codewords_and_min_dists(sample_rate, off_length_ms,
+                                           start_time_ms, duration_ms,
+                                           min_dists)
+    only_keywords = set([str(codeword) for (_, codeword, _, _) in sequence])
     print('codewords: %s' % ' '.join(only_keywords))
+
+
+def do_plot(wav_filename, off_length_ms,
+            start_time_ms, duration_ms,
+            min_dists, suffix_out_name):
+
+    import matplotlib.pyplot as plt
+    from matplotlib import cm
+    from matplotlib import gridspec
+    import librosa
+    from librosa import display
+
+    info = sf.info(wav_filename)
+    sample_rate = info.samplerate
+
+    tot_samples = int(info.duration * sample_rate)
+    print('tot_duration = %s  tot_samples = %s' % (info.duration, tot_samples))
+    tot_duration_ms = 1000 * info.duration
+
+    if start_time_ms + duration_ms >= tot_duration_ms:
+        print('ERROR: interval beyond signal length')
+        exit()
+
+    cb_size = min_dists['codeword'].max() + 1
+
+    def get_signal_segment():
+        start_sample = floor(start_time_ms * sample_rate / 1000)
+        num_samples = ceil(duration_ms * sample_rate / 1000)
+
+        print('Loading %s samples starting at %s' % (num_samples, start_sample))
+        samples, _ = sf.read(wav_filename, start=start_sample, frames=num_samples)
+        print(' Loaded %s samples' % len(samples))
+        return samples
+
+    def plot_spectrogram(signal):
+        def compute_stft(window_size, offset):
+            stft = np.abs(librosa.stft(y=signal, n_fft=window_size, hop_length=offset))
+            stft = librosa.amplitude_to_db(stft, ref=np.max)
+            return stft
+
+        def spectrogram(stft):
+            display.specshow(stft, y_axis='mel', x_axis='time', sr=sample_rate,
+                             cmap='Blues', fmin=50, fmax=2000)
+
+        stft = compute_stft(1024, 512)
+        spectrogram(stft)
+
+    def plot_quantization_and_distortion(fig):
+        sequence = get_codewords_and_min_dists(sample_rate, off_length_ms,
+                                               start_time_ms, duration_ms,
+                                               min_dists)
+
+        def plot_quantization():
+            codewords = [codeword for _, codeword, _, _ in sequence]
+
+            ind = np.arange(len(codewords))
+            color_map = cm.get_cmap(name='hsv', lut=cb_size)
+            color = [color_map(val / cb_size) for val in codewords]
+            plt.bar(x=ind, height=2, width=1, color=color, align='edge')
+            plt.xlim(xmin=0, xmax=len(codewords))
+
+        def plot_distortion(ax):
+            mindists = [mindist for _, _, mindist, _ in sequence]
+            # trick to see last step:
+            # a) repeat last value: (https://stackoverflow.com/a/53854732/830737)
+            mindists.append(mindists[-1])
+            ind = np.arange(len(mindists))
+            plt.step(ind, mindists, where='post')
+            # b) and set xmax with len -1:
+            plt.xlim(xmin=0, xmax=len(mindists) - 1)
+
+        fig.add_subplot(gs[1])
+        plot_quantization()
+
+        ax_d = fig.add_subplot(gs[2])
+        plot_distortion(ax_d)
+
+    samples = get_signal_segment()
+
+    fig = plt.figure(figsize=(16, 8))
+    gs = gridspec.GridSpec(3, 1, height_ratios=[7, 1, 2])
+
+    # spectrogram:
+    plt.subplot(gs[0])
+    plot_spectrogram(samples)
+
+    # quantization and distortion:
+    plot_quantization_and_distortion(fig)
+
+    plt.tight_layout()
+    plt.show()
+    target_file = 'spectrogram_and_quantization_M_%d_%s' % (cb_size, suffix_out_name)
+    print('Saving {}.png'.format(target_file))
+    fig.savefig(target_file + '.png', dpi=120)
 
 
 # Adapted from https://stackoverflow.com/a/4628148/830737
@@ -162,10 +264,15 @@ def parse_args():
                         help='Show unique codewords in this signal time interval.'
                              '\nExample: --unique 1h57m39.828s 1.932s')
 
+    parser.add_argument('--plot', nargs=2,  metavar=('start', 'duration'),
+                        help='Plot spectrogram of this signal time interval along with\n'
+                             'associated codeword and minimum distortion.'
+                             '\nExample: --plot 1h57m39.828s 1.932s')
+
     args = parser.parse_args()
 
-    if not args.counts and not args.codewords and not args.intersect and not args.unique:
-        print('Indicate at least one of: --counts, --codewords, --intersect, --unique')
+    if not args.counts and not args.codewords and not args.intersect and not args.unique and not args.plot:
+        print('Indicate at least one of: --counts, --codewords, --intersect, --unique, --plot')
         exit()
 
     return args
@@ -177,8 +284,6 @@ if __name__ == "__main__":
     md_filename = args.mindists
     print('- loading %s' % md_filename)
     min_dists = pd.read_csv(md_filename, comment='#')
-
-    cw_value_counts = min_dists['codeword'].value_counts()
 
     win_length_ms = int(args.W)
     off_length_ms = int(args.O)
@@ -196,7 +301,8 @@ if __name__ == "__main__":
         print('args.intersect', args.intersect)
         start_time_ms, duration_ms = parse_start_and_duration(args.intersect)
 
-        do_intersect(args.signal, off_length_ms,
+        sample_rate = sf.info(args.signal).samplerate
+        do_intersect(sample_rate, off_length_ms,
                      start_time_ms, duration_ms,
                      min_dists)
 
@@ -204,6 +310,16 @@ if __name__ == "__main__":
         print('args.unique', args.unique)
         start_time_ms, duration_ms = parse_start_and_duration(args.unique)
 
-        show_unique_codewords(args.signal, off_length_ms,
+        sample_rate = sf.info(args.signal).samplerate
+        show_unique_codewords(sample_rate, off_length_ms,
                               start_time_ms, duration_ms,
                               min_dists)
+
+    if args.plot:
+        print('args.plot', args.plot)
+        start_time_ms, duration_ms = parse_start_and_duration(args.plot)
+
+        suffix_out_name = '%s_%s' % (args.plot[0], args.plot[1])
+        do_plot(args.signal, off_length_ms,
+                start_time_ms, duration_ms,
+                min_dists, suffix_out_name)

@@ -1,5 +1,8 @@
 2019-09
 
+- add `--plot` option to `sgn.select.py` to generate plot of spectrogram
+  in given signal interval, as well as codewords (using basic color mapping), 
+  and distortion in corresponding given csv file.
 - add `sgn.select.py` utility
 
 - vq.learn: allocate some stuff on the heap to allow bigger input data 
