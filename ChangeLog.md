@@ -1,5 +1,7 @@
 2019-09
 
+- add `sgn.select.py` utility
+
 - vq.learn: allocate some stuff on the heap to allow bigger input data 
 - vq.learn: extract main function into library 
 
