@@ -144,7 +144,7 @@ def do_plot(wav_filename, off_length_ms,
 
         def spectrogram(stft):
             display.specshow(stft, y_axis='mel', x_axis='time', sr=sample_rate,
-                             cmap='Blues', fmin=50, fmax=2000)
+                             cmap='Blues', fmin=0, fmax=16000)
 
         stft = compute_stft(1024, 512)
         spectrogram(stft)
@@ -154,12 +154,19 @@ def do_plot(wav_filename, off_length_ms,
                                                start_time_ms, duration_ms,
                                                min_dists)
 
+        def get_color_map():
+            return cm.get_cmap(name='hsv', lut=cb_size)
+            # from palettable.colorbrewer.diverging import BrBG_4 as cm
+            # from palettable.colorbrewer.diverging import RdYlBu_9 as cm
+            # from palettable.scientific.diverging import Berlin_20 as cm
+            # return cm.get_mpl_colormap()
+
         def plot_quantization():
             codewords = [codeword for _, codeword, _, _ in sequence]
 
-            ind = np.arange(len(codewords))
-            color_map = cm.get_cmap(name='hsv', lut=cb_size)
+            color_map = get_color_map()
             color = [color_map(val / cb_size) for val in codewords]
+            ind = np.arange(len(codewords))
             plt.bar(x=ind, height=2, width=1, color=color, align='edge')
             plt.xlim(xmin=0, xmax=len(codewords))
 
@@ -181,7 +188,7 @@ def do_plot(wav_filename, off_length_ms,
 
     samples = get_signal_segment()
 
-    fig = plt.figure(figsize=(16, 8))
+    fig = plt.figure(figsize=(8, 8))
     gs = gridspec.GridSpec(3, 1, height_ratios=[7, 1, 2])
 
     # spectrogram:
