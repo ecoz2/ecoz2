@@ -104,9 +104,9 @@ def show_unique_codewords(sample_rate, off_length_ms,
     print('codewords: %s' % ' '.join(only_keywords))
 
 
-def do_plot(wav_filename, off_length_ms,
+def do_plot(wav_filename, interval, off_length_ms,
             start_time_ms, duration_ms,
-            min_dists, suffix_out_name):
+            min_dists):
 
     import matplotlib.pyplot as plt
     from matplotlib import cm
@@ -169,6 +169,9 @@ def do_plot(wav_filename, off_length_ms,
             ind = np.arange(len(codewords))
             plt.bar(x=ind, height=2, width=1, color=color, align='edge')
             plt.xlim(xmin=0, xmax=len(codewords))
+            plt.ylabel('codeword')
+            plt.xlabel('window index')
+            plt.yticks([])
 
         def plot_distortion(ax):
             mindists = [mindist for _, _, mindist, _ in sequence]
@@ -179,6 +182,8 @@ def do_plot(wav_filename, off_length_ms,
             plt.step(ind, mindists, where='post')
             # b) and set xmax with len -1:
             plt.xlim(xmin=0, xmax=len(mindists) - 1)
+            plt.ylabel('distortion')
+            plt.xlabel('window index')
 
         fig.add_subplot(gs[1])
         plot_quantization()
@@ -195,11 +200,14 @@ def do_plot(wav_filename, off_length_ms,
     plt.subplot(gs[0])
     plot_spectrogram(samples)
 
+    plt.title('$M=%d$ Codebook. Interval: @%s +%s' % (cb_size, interval[0], interval[1]))
+
     # quantization and distortion:
     plot_quantization_and_distortion(fig)
 
     plt.tight_layout()
     plt.show()
+    suffix_out_name = '%s_%s' % (interval[0], interval[1])
     target_file = 'spectrogram_and_quantization_M_%d_%s' % (cb_size, suffix_out_name)
     print('Saving {}.png'.format(target_file))
     fig.savefig(target_file + '.png', dpi=120)
@@ -326,7 +334,6 @@ if __name__ == "__main__":
         print('args.plot', args.plot)
         start_time_ms, duration_ms = parse_start_and_duration(args.plot)
 
-        suffix_out_name = '%s_%s' % (args.plot[0], args.plot[1])
-        do_plot(args.signal, off_length_ms,
+        do_plot(args.signal, args.plot, off_length_ms,
                 start_time_ms, duration_ms,
-                min_dists, suffix_out_name)
+                min_dists)
