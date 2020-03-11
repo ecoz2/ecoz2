@@ -35,6 +35,19 @@ enum hmm_modes_init {
 // value of epsilon restriction for B matrix (default, 1.e-5):
 extern prob_t hmm_epsilon;
 
+// maximum number of training sequences
+#define MAX_SEQS 4096
+
+int hmm_learn(
+        int N_,
+        int model_type_,
+        const char* sequence_filenames[],
+        int num_sequences,
+        long double hmm_epsilon_,
+        long double val_auto_,
+        int max_iterations
+        );
+
 
 Hmm *hmm_create(const char *className, int N, int M);
 
