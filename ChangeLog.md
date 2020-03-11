@@ -1,3 +1,7 @@
+2020-03
+
+- vq.quantize: extract main function into library
+
 2019-09
 
 - add `--plot` option to `sgn.select.py` to generate plot of spectrogram

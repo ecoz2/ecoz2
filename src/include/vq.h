@@ -75,6 +75,10 @@ int vq_learn(int prediction_order, sample_t epsilon,
              const char *predictor_filenames[], int num_predictors
             );
 
+int vq_quantize(const char *nom_raas,
+                const char *predictor_filenames[], int num_predictors
+               );
+
 sample_t calculateSigma(sample_t *codebook, sample_t *cells, int codebookSize, int P, sample_t avgDistortion);
 
 sample_t calculateInertia(sample_t **allVectors, long tot_vecs, sample_t *codebook, int codebookSize, int P);
