@@ -68,8 +68,8 @@ int hmm_learn(
         int model_type_,
         const char* sequence_filenames[],
         int num_sequences,
-        long double hmm_epsilon_,
-        long double val_auto_,
+        double hmm_epsilon_,
+        double val_auto_,
         int max_iterations
         ) {
 

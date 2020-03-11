@@ -39,12 +39,12 @@ extern prob_t hmm_epsilon;
 #define MAX_SEQS 4096
 
 int hmm_learn(
-        int N_,
-        int model_type_,
+        int N,
+        int model_type,
         const char* sequence_filenames[],
         int num_sequences,
-        long double hmm_epsilon_,
-        long double val_auto_,
+        double hmm_epsilon,
+        double val_auto,
         int max_iterations
         );
 
