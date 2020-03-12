@@ -1,5 +1,7 @@
 2020-03
 
+- hmm.classify: extract main function into library
+
 - hmm.learn: extract main function into library.
   NOTE: I had a bug before: was skipping the first given sequence!
 

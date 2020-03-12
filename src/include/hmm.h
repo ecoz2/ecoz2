@@ -38,6 +38,8 @@ extern prob_t hmm_epsilon;
 // maximum number of training sequences
 #define MAX_SEQS 4096
 
+#define MAX_MODELS 256
+
 int hmm_learn(
         int N,
         int model_type,
@@ -48,6 +50,13 @@ int hmm_learn(
         int max_iterations
         );
 
+int hmm_classify(
+        char **model_names,
+        int num_model_names,
+        char **seq_filenames,
+        int num_seq_filenames,
+        int show_ranked_
+        );
 
 Hmm *hmm_create(const char *className, int N, int M);
 

@@ -3,6 +3,7 @@
 SOURCE_FILES=\
 	hmm.c  \
 	hmm_learn.c \
+	hmm_classify.c \
 	hmm_adjustb.c \
 	hmm_file.c  \
 	hmm_refinement.c \
