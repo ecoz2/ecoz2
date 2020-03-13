@@ -6,7 +6,7 @@ EXECUTABLE_NAMES=\
 	lpc.c \
 	prd.show.c \
     vq.learn.c \
-    cb.show.c \
+    vq.show.c \
     vq.quantize.c \
 	hmm.learn.c \
 	hmm.classify.c \

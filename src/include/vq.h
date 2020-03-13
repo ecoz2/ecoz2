@@ -79,6 +79,9 @@ int vq_quantize(const char *nom_raas,
                 const char *predictor_filenames[], int num_predictors
                );
 
+int vq_show(char *codebook_filename, int from, int to);
+
+
 sample_t calculateSigma(sample_t *codebook, sample_t *cells, int codebookSize, int P, sample_t avgDistortion);
 
 sample_t calculateInertia(sample_t **allVectors, long tot_vecs, sample_t *codebook, int codebookSize, int P);

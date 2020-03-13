@@ -68,7 +68,7 @@ Other utilities:
  sgn.show       - Displays info about wav file
  sgn.endp       - Performs endpoint detection
  prd.show       - Displays info about generated predictor files
- cb.show        - Displays info about generated codebook
+ vq.show        - Displays info about generated codebook
  hmm.show       - Displays info about generated HMM
  seq.show       - Displays info about observation and state sequences
 ```
