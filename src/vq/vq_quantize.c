@@ -22,7 +22,7 @@ int vq_quantize(const char *nom_raas,
     int P;
     int num_raas;
     char codebook_className[MAX_CLASS_NAME_LEN];
-    sample_t *reflections = cb_load(nom_raas, &P, &num_raas, codebook_className);
+    sample_t *reflections = cb_load((char*) nom_raas, &P, &num_raas, codebook_className);
     if (!reflections) {
         printf("error loading codebook (%d).\n", cb_errnum);
         return 1;
@@ -46,7 +46,7 @@ int vq_quantize(const char *nom_raas,
     ddprm_total = 0.f;
 
     for (int i = 0; i < num_predictors; i++) {
-        const char *prd_filename = predictor_filenames[i];
+        char *prd_filename = (char *) predictor_filenames[i];
 
         sample_t ddprm;
 

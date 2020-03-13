@@ -22,7 +22,6 @@
 // loaded models
 static Hmm *models[MAX_MODELS];
 
-
 // row index for the totals:
 #define    TOTAL        (MAX_CLASSES-1)
 
@@ -235,6 +234,9 @@ int hmm_classify(
 
     printf("\nLoading models:\n");
 
+    // load first model:
+
+    printf("%2d: %s\n", 0, model_names[0]);
     models[0] = hmm_load(model_names[0]);
     if (!models[0]) {
         fprintf(stderr, "%s: error loading model\n", model_names[0]);
@@ -243,11 +245,10 @@ int hmm_classify(
 
     Mcmp = models[0]->M;
 
-    printf("%2d: %s\n", 0, model_names[0]);
-
     // load the other models:
 
     for (int i = 1; i < num_model_names; ++i) {
+        printf("%2d: %s\n", 0, model_names[i]);
         models[i] = hmm_load(model_names[i]);
         if (!models[i]) {
             fprintf(stderr, "could not load model %s\n", model_names[i]);

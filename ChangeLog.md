@@ -1,5 +1,7 @@
 2020-03
 
+- remove some warnings as reported in rust project
+
 - hmm.classify: extract main function into library
 
 - hmm.learn: extract main function into library.

@@ -26,19 +26,19 @@ int hmm_save(Hmm *hmm, char *filename) {
     if (1 != fwrite(&hmm->M, sizeof(hmm->M), 1, file))
         return 5;
 
-    if (hmm->N != fwrite(hmm->pi, sizeof(prob_t), hmm->N, file))
+    if ((size_t) hmm->N != fwrite(hmm->pi, sizeof(prob_t), hmm->N, file))
         return 5;
 
     // N rows of A
     for (int i = 0; i < hmm->N; i++) {
-        if (hmm->N != fwrite(hmm->A[i], sizeof(prob_t), hmm->N, file)) {
+        if ((size_t) hmm->N != fwrite(hmm->A[i], sizeof(prob_t), hmm->N, file)) {
             return 6;
         }
     }
 
     // N rows of B
     for (int j = 0; j < hmm->N; j++) {
-        if (hmm->M != fwrite(hmm->B[j], sizeof(prob_t), hmm->M, file)) {
+        if ((size_t) hmm->M != fwrite(hmm->B[j], sizeof(prob_t), hmm->M, file)) {
             return 7;
         }
     }
@@ -74,14 +74,14 @@ Hmm *hmm_load(char *filename) {
 
     hmm = hmm_create(className, N, M);
 
-    if (N != fread(hmm->pi, sizeof(prob_t), N, file)) {
+    if ((size_t) N != fread(hmm->pi, sizeof(prob_t), N, file)) {
         hmm_destroy(hmm);
         hmm = 0;
         goto done;
     }
 
     for (int i = 0; i < N; i++) {
-        if (N != fread(hmm->A[i], sizeof(prob_t), N, file)) {
+        if ((size_t) N != fread(hmm->A[i], sizeof(prob_t), N, file)) {
             hmm_destroy(hmm);
             hmm = 0;
             goto done;
@@ -89,7 +89,7 @@ Hmm *hmm_load(char *filename) {
     }
 
     for (int j = 0; j < N; j++) {
-        if (M != fread(hmm->B[j], sizeof(prob_t), M, file)) {
+        if ((size_t) M != fread(hmm->B[j], sizeof(prob_t), M, file)) {
             hmm_destroy(hmm);
             hmm = 0;
             goto done;
