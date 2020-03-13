@@ -52,14 +52,5 @@ int main(int argc, char *argv[]) {
 
     char *filename = argv[optind];
 
-    Hmm *hmm = hmm_load(filename);
-    if (!hmm) {
-        printf("%s: error loading model\n", filename);
-        return 2;
-    }
-
-    hmm_show(hmm, format);
-
-    hmm_destroy(hmm);
-    return 0;
+    return hmm_show(filename, format);
 }

@@ -58,6 +58,8 @@ int hmm_classify(
         int show_ranked_
         );
 
+int hmm_show(char *filename, char *format);
+
 Hmm *hmm_create(const char *className, int N, int M);
 
 Hmm *hmm_load(char *filename);
@@ -97,7 +99,7 @@ prob_t hmm_log_prob(Hmm *hmm, Symbol *O, int T);
  */
 prob_t hmm_genQopt(Hmm *, Symbol *O, int T, int *Qopt);
 
-void hmm_show(Hmm *, char *fmt);
+void hmm_show_model(Hmm *, char *fmt);
 
 /**
  * Generates a state sequence

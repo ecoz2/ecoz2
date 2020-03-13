@@ -65,7 +65,7 @@ void hmm_init(Hmm *hmm, int mode) {
     }
 }
 
-void hmm_show(Hmm *hmm, char *fto) {
+void hmm_show_model(Hmm *hmm, char *fto) {
     printf("className: '%s'  N=%d  M=%d\n", hmm->className, hmm->N, hmm->M);
 
     printf("\npi = ");
