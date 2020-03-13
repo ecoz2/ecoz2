@@ -248,7 +248,7 @@ int hmm_classify(
     // load the other models:
 
     for (int i = 1; i < num_model_names; ++i) {
-        printf("%2d: %s\n", 0, model_names[i]);
+        printf("%2d: %s\n", i, model_names[i]);
         models[i] = hmm_load(model_names[i]);
         if (!models[i]) {
             fprintf(stderr, "could not load model %s\n", model_names[i]);
