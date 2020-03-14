@@ -10,6 +10,17 @@
 
 #include <float.h>
 
+int lpc_signals(
+        int P,
+        int windowLengthMs,
+        int offsetLengthMs,
+        int minpc,
+        float split,
+        char *sgn_filenames[],
+        int num_signals
+        );
+
+
 /**
  * Predictor representation
  */

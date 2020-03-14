@@ -1,6 +1,7 @@
 # ECOZ System
 
 SOURCE_FILES=\
+	lpc_signals.c \
 	lpca.c \
     lpaOnSignal.c \
     prd.c \

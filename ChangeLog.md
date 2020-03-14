@@ -1,5 +1,7 @@
 2020-03
 
+- lpc: extract main function into library
+
 - rename cb.show to vq.show and extract main function into library
 
 - hmm.show: extract main function into library
