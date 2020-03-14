@@ -37,7 +37,7 @@ Sgn *sgn_load(char *filename) {
         return 0;
     }
 
-    for (int j = 0; j < numSamples; j++) {
+    for (unsigned int j = 0; j < numSamples; j++) {
         samples[j] = pSampleData[j];
     }
 
@@ -69,7 +69,7 @@ int sgn_save(Sgn *s, char *filename) {
         floats[i] = (float) s->samples[i];
     }
     drwav_uint64 samplesWritten = drwav_write(pWav, s->numSamples, floats);
-    if (samplesWritten != s->numSamples) {
+    if (samplesWritten != (drwav_uint64) s->numSamples) {
         fprintf(stderr, "WARN: samplesWritten=%llu != %d\n", samplesWritten, s->numSamples);
     }
 
