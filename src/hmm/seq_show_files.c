@@ -13,16 +13,21 @@
 int seq_show_files(
         int with_prob,
         int gen_Qopt,
-        int show_sequence,
+        int no_sequence,
         char* hmm_filename,
         char* seq_filenames[],
         int num_seq_filenames
         ) {
 
+    printf(
+            "\nseq_show_files: with_prob=%d gen_Qopt=%d no_sequence=%d hmm_filename_opt=%s num_seq_filenames=%d\n",
+            with_prob, gen_Qopt, no_sequence, hmm_filename, num_seq_filenames
+    );
+
     Hmm *hmm = 0;
 
     if (with_prob || gen_Qopt) {
-        assert(hmm_filename != 0);
+        assert(hmm_filename != 0 && hmm_filename[0] != 0);
 
         hmm = hmm_load(hmm_filename);
         if (!hmm) {
@@ -45,7 +50,7 @@ int seq_show_files(
 
         printf("\n%8s : '%s'", nom_cad, className);
 
-        if (show_sequence) {
+        if (!no_sequence) {
             printf("\n  M=%-4d O = ", M);
             seq_show(seq, T);
             printf("\n");

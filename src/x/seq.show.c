@@ -34,14 +34,14 @@ int main(int argc, char *argv[]) {
 
     int with_prob = 0;
     int gen_Qopt = 0;
-    int show_sequence = 1;
+    int no_sequence = 0;
     int test = 0;
 
     int opc;
     while (EOF != (opc = getopt(argc, argv, "cPQt"))) {
         switch (opc) {
             case 'c':
-                show_sequence = 0;
+                no_sequence = 1;
                 break;
             case 'P':
                 with_prob = 1;
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     return seq_show_files(
             with_prob,
             gen_Qopt,
-            show_sequence,
+            no_sequence,
             hmm_filename,
             seq_filenames,
             num_seq_filenames

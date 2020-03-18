@@ -63,7 +63,7 @@ int hmm_show(char *filename, char *format);
 int seq_show_files(
         int with_prob,
         int gen_Qopt,
-        int show_sequence,
+        int no_sequence,
         char* hmm_filename,
         char* seq_filenames[],
         int num_seq_filenames
