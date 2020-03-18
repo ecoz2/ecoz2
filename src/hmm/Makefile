@@ -12,6 +12,7 @@ SOURCE_FILES=\
 	hmm_genQopt.c \
 	hmm_estimateB.c  \
 	hmm_gen.c \
+	seq_show_files.c  \
 	symbol.c  \
 	distr.c
 

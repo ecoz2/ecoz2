@@ -1,5 +1,7 @@
 2020-03
 
+- seq.show: extract main function into library
+
 - prd.show: extract main function into library
 
 - lpc: extract main function into library

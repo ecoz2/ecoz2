@@ -60,6 +60,15 @@ int hmm_classify(
 
 int hmm_show(char *filename, char *format);
 
+int seq_show_files(
+        int with_prob,
+        int gen_Qopt,
+        int show_sequence,
+        char* hmm_filename,
+        char* seq_filenames[],
+        int num_seq_filenames
+      );
+
 Hmm *hmm_create(const char *className, int N, int M);
 
 Hmm *hmm_load(char *filename);
