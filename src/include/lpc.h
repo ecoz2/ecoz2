@@ -81,6 +81,13 @@ Predictor *lpaOnSignal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn);
 void reflections_to_raas(sample_t *reflections, sample_t *raas, int num_raas, int P);
 
 
+int prd_show_file(
+        char *filename,
+        int show_reflections,
+        int from,
+        int to
+        );
+
 Predictor *prd_create(int T, int P, const char *className);
 
 Predictor *prd_load(const char *nom_prd);

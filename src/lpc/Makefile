@@ -2,6 +2,7 @@
 
 SOURCE_FILES=\
 	lpc_signals.c \
+	prd_show_file.c \
 	lpca.c \
     lpaOnSignal.c \
     prd.c \
