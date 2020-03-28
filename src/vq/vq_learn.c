@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <malloc.h>
+#include <string.h>
 
 #include "lpc.h"
 #include "vq.h"
@@ -36,7 +37,7 @@ static sample_t discel[MAX_CODEBOOK_SIZE];    // distortions per cell
 
 static char prefix[2048] = "";    // to name report and codebooks
 static char cb_filename[2048];
-static const char *codebook_className;
+static char codebook_className[2048];
 
 static long tot_vecs;
 
@@ -252,16 +253,18 @@ static void learn(sample_t **allVectors, sample_t eps) {
     free(minDists);
 }
 
-int vq_learn(int prediction_order, sample_t epsilon,
+int vq_learn(int prediction_order,
+        sample_t epsilon,
         const char *codebook_class_name,
         const char *predictor_filenames[], int num_predictors
         ) {
 
     P = prediction_order;
     eps = epsilon;
-    codebook_className = codebook_class_name;
+    strcpy(codebook_className, codebook_class_name);
 
     printf("\nCodebook generation:\n\n");
+    printf("P=%d eps=%g  class='%s'\n\n", P, eps, codebook_className);
 
     const char *dir_codebooks = "data/codebooks";
     static char class_dir[2048];
