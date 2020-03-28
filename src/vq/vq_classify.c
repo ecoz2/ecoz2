@@ -165,17 +165,17 @@ static void _sort_dists(sample_t *dists, int *ordp, int num_models) {
 }
 
 int vq_classify(
-        char **model_names,
-        int num_model_names,
+        char **cb_filenames,
+        int num_codebooks,
         char **prd_filenames,
-        int num_prd_filenames,
+        int num_predictors,
         int show_ranked_
         ) {
 
-    assert(0 < num_model_names && num_model_names < MAX_MODELS);
-    assert(0 < num_prd_filenames);
+    assert(0 < num_codebooks && num_codebooks < MAX_MODELS);
+    assert(0 < num_predictors);
 
-    num_models = num_model_names;
+    num_models = num_codebooks;
     show_ranked = show_ranked_;
 
     // to verify conformance
@@ -194,10 +194,10 @@ int vq_classify(
 
     // load first model:
 
-    printf("%2d: %s\n", 0, model_names[0]);
-    models[0] = cbook_load(model_names[0]);
+    printf("%2d: %s\n", 0, cb_filenames[0]);
+    models[0] = cbook_load(cb_filenames[0]);
     if (!models[0]) {
-        fprintf(stderr, "%s: error loading model\n", model_names[0]);
+        fprintf(stderr, "%s: error loading model\n", cb_filenames[0]);
         return 1;
     }
 
@@ -205,11 +205,11 @@ int vq_classify(
 
     // load the other models:
 
-    for (int i = 1; i < num_model_names; ++i) {
-        printf("%2d: %s\n", i, model_names[i]);
-        models[i] = cbook_load(model_names[i]);
+    for (int i = 1; i < num_codebooks; ++i) {
+        printf("%2d: %s\n", i, cb_filenames[i]);
+        models[i] = cbook_load(cb_filenames[i]);
         if (!models[i]) {
-            fprintf(stderr, "could not load model %s\n", model_names[i]);
+            fprintf(stderr, "could not load model %s\n", cb_filenames[i]);
             return 1;
         }
 
@@ -223,7 +223,7 @@ int vq_classify(
 
     init_results();
     printf("\n");
-    for (int i = 0; i < num_prd_filenames; ++i) {
+    for (int i = 0; i < num_predictors; ++i) {
         char *filename = prd_filenames[i];
         predictor = prd_load(filename);
         if (!predictor) {
@@ -268,7 +268,7 @@ int vq_classify(
                 printf("  [%2d] %1s %-60s : %e  : '%s'\n",
                         index,
                         mark,
-                        model_names[ordp[r]],
+                        cb_filenames[ordp[r]],
                         dists[ordp[r]],
                         models[ordp[r]]->className
                 );

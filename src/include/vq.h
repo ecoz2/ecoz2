@@ -85,11 +85,11 @@ int vq_quantize(const char *nom_raas,
 int vq_show(char *codebook_filename, int from, int to);
 
 int vq_classify(
-        char **model_names,
-        int num_model_names,
+        char **cb_filenames,
+        int num_codebooks,
         char **prd_filenames,
-        int num_prd_filenames,
-        int show_ranked_
+        int num_predictors,
+        int show_ranked
         );
 
 sample_t calculateSigma(sample_t *codebook, sample_t *cells, int codebookSize, int P, sample_t avgDistortion);
