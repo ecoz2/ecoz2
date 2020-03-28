@@ -13,23 +13,6 @@
 #include <getopt.h>
 
 
-static int ends_with(char* filename, char* str) {
-    const int len_i = strlen(filename);
-    const int len_j = strlen(str);
-    if (len_i < len_j) {
-        return 0;
-    }
-    const int num_checks = len_j;
-    int i = len_i - 1;
-    int j = len_j - 1;
-    for (int k = 0; k < num_checks; ++k) {
-        if (filename[i] != str[j]) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
 static void usage() {
     printf("\
 \n\
@@ -104,7 +87,7 @@ int main(int argc, char *argv[]) {
         for (int i = 0; i < num_models; ++i) {
             printf("  %s\n", model_names[i]);
         }
-        printf("models: (%d)\n", num_seq_filenames);
+        printf("sequences: (%d)\n", num_seq_filenames);
         for (int i = 0; i < num_seq_filenames; ++i) {
             printf("  %s\n", seq_filenames[i]);
         }

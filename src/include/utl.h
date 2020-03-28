@@ -14,6 +14,8 @@
 #define MAX_CLASS_NAME_LEN 96
 
 
+int ends_with(char* filename, char* str);
+
 int write_file_ident(FILE *file, const char *ident);
 
 int read_file_ident(FILE *file, const char *ident);

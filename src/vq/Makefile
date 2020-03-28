@@ -4,6 +4,7 @@ SOURCE_FILES=\
 	vq_learn.c \
 	vq_quantize.c \
 	vq_show.c \
+	vq_classify.c \
 	vq.c \
 	distortion.c  \
 	report.c  \

@@ -1,5 +1,7 @@
 2020-03
 
+- vq.classify: extract main function into library
+
 - seq.show: extract main function into library
 
 - prd.show: extract main function into library

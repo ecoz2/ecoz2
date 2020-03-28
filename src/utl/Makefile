@@ -1,6 +1,7 @@
 # ECOZ System
 
 SOURCE_FILES=\
+	utl.c \
 	fileutil.c \
 	memutil.c \
 	list.c
