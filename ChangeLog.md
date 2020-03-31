@@ -1,5 +1,7 @@
 2020-03
 
+- preps to facilitate python binding
+
 - vq.classify: extract main function into library
 
 - seq.show: extract main function into library
