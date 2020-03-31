@@ -1,7 +1,7 @@
 # ECOZ System
 
 SOURCE_FILES=\
-	ecoz.c
+	ecoz2.c
 
 cc=gcc
 cdebug=-g -O3 -Wall
