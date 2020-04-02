@@ -100,7 +100,7 @@ int hmm_learn(
 
     // load first training sequence:
 
-    // fprintf(stderr, "%s", sequence_filenames[0]);
+    fprintf(stderr, "%3d: %s\n", 0, sequence_filenames[0]);
     sequences[0] = seq_load(sequence_filenames[0], T, &M, sequence_className);
 
     if (!sequences[0]) {
@@ -132,7 +132,7 @@ int hmm_learn(
         // to check all sequences come from same codebook size:
         int Mcmp;
 
-        // fprintf(stderr, "%s", sequence_filenames[r]);
+        fprintf(stderr, "%3d: %s\n", r, sequence_filenames[r]);
         sequences[num_seqs] = seq_load(sequence_filenames[r], T + num_seqs, &Mcmp, sequence_className);
 
         if (!sequences[num_seqs]) {
