@@ -185,7 +185,7 @@ static void gen_alpha_beta(Symbol *O, int T) {
             alphaH[t][i] = c[t] * alpha2[t][i];
         }
 
-        if (0) {
+        if ((0)) {
             prob_t sum = 0;
             for (int i = 0; i < N; i++) {
                 sum += alphaH[t][i];
