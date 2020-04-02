@@ -4,21 +4,21 @@
 #include <string.h>
 
 const char *ecoz2_version() {
-    return "ECOZ 2";
+    return "0.2.0";
 }
 
-static char ecoz2_foo_result[256];
-
-const char *ecoz2_foo(const char *name) {
+// for wrapper testing purposes
+static char ecoz2_hi_result[256];
+const char *ecoz2_hi(const char *name) {
     const char *prefix = "Hi ";
-    strcpy(ecoz2_foo_result, prefix);
-    strncat(ecoz2_foo_result, name, sizeof(ecoz2_foo_result) - 10);
-    return ecoz2_foo_result;
+    strcpy(ecoz2_hi_result, prefix);
+    strncat(ecoz2_hi_result, name, sizeof(ecoz2_hi_result) - 10);
+    return ecoz2_hi_result;
 }
-
 int ecoz2_baz() {
     return 142857;
 }
+
 
 int ecoz2_lpc_signals(
         int P,

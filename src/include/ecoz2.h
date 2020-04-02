@@ -10,9 +10,10 @@ extern "C" {
 
 const char *ecoz2_version();
 
-const char *ecoz_foo(const char *name);
+// for test purposes
+const char *ecoz2_hi(const char *name);
+int ecoz2_baz();
 
-int ecoz_baz();
 
 int ecoz2_lpc_signals(
         int P,
