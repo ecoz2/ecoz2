@@ -111,6 +111,7 @@ HMM training\n\
         num_sequences,
         hmm_epsilon,
         val_auto,
-        max_iterations
+        max_iterations,
+        0  // hmm_learn_callback_t
     );
 }

@@ -1,5 +1,6 @@
 #include "ecoz2.h"
 #include "lpc.h"
+#include "hmm.h"
 
 #include <string.h>
 
@@ -53,5 +54,28 @@ int ecoz2_prd_show_file(
             show_reflections,
             from,
             to
+    );
+}
+
+int ecoz2_hmm_learn(
+        int N,
+        int model_type,
+        const char* sequence_filenames[],
+        int num_sequences,
+        double hmm_epsilon,
+        double val_auto,
+        int max_iterations,
+        hmm_learn_callback_t callback
+        ) {
+
+    return hmm_learn(
+            N,
+            model_type,
+            sequence_filenames,
+            num_sequences,
+            hmm_epsilon,
+            val_auto,
+            max_iterations,
+            callback
     );
 }

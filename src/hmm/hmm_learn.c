@@ -70,7 +70,8 @@ int hmm_learn(
         int num_sequences,
         double hmm_epsilon_,
         double val_auto_,
-        int max_iterations
+        int max_iterations,
+        hmm_learn_callback_t callback
         ) {
 
     assert(num_sequences > 0);
@@ -215,6 +216,10 @@ int hmm_learn(
         if (sum_log_prob >= 0) {
             fprintf(stderr, "\nWARNING: sum_log_prob non negative\n");
             break;
+        }
+
+        if (callback != 0) {
+            callback("sum_log_prob", sum_log_prob);
         }
 
         // end iterations per -a parameter?

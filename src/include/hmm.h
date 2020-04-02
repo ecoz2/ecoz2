@@ -4,6 +4,7 @@
 #ifndef __ECOZ_HMM_H
 #define __ECOZ_HMM_H
 
+#include "ecoz2.h"
 #include "utl.h"
 #include "symbol.h"
 #include "prob_t.h"
@@ -47,7 +48,8 @@ int hmm_learn(
         int num_sequences,
         double hmm_epsilon,
         double val_auto,
-        int max_iterations
+        int max_iterations,
+        hmm_learn_callback_t callback
         );
 
 int hmm_classify(

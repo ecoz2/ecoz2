@@ -1,3 +1,7 @@
+2020-04
+
+- preliminary hmm_learn_callback_t
+
 2020-03
 
 - preps to facilitate python binding
