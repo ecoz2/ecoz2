@@ -75,8 +75,13 @@ int hmm_learn(
         ) {
 
     assert(num_sequences > 0);
+    assert(num_sequences <= MAX_SEQS);
 
-    fprintf(stderr, "num_sequences = %d\n", num_sequences);
+    fprintf(stderr, "hmm_learn: num_sequences = %d\n", num_sequences);
+
+    // for (int r = 0; r < num_sequences; r++) {
+    //     fprintf(stderr, "%3d: %s\n", r, sequence_filenames[r]);
+    // }
 
     N = N_;
     model_type = model_type_;
