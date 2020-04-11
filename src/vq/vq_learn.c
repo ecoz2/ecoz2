@@ -303,7 +303,6 @@ int vq_learn(int prediction_order,
 
     learn(allVectors, eps);
 
-    // FIXME(mem leak) release allVectors[v]
     free(allVectors);
 
     for (int i = 0; i < num_predictors; i++) {
