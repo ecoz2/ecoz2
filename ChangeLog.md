@@ -1,5 +1,8 @@
 2020-04
 
+- expose other main functions for wrapping purposes.
+  All with `ecoz2_` prefix, and wrappers to include only ecoz2.h
+
 - new HmmProb struct and functions to improve performance of
   multiple log_prob calculation wrt to same model
     - used in hmm_classify

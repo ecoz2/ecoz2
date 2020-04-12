@@ -3,7 +3,7 @@
 OUTDIR=_out
 
 SUBDIRS=src/utl \
-        src/ecoz \
+        src/ecoz2 \
         src/sgn \
         src/lpc \
         src/vq \
