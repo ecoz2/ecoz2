@@ -23,6 +23,7 @@ int ecoz2_baz() {
 }
 
 void ecoz2_set_random_seed(int seed) {
+    printf("ecoz2_set_random_seed: seed=%d\n", seed);
     if (seed < 0) {
         sranddev();
     }
