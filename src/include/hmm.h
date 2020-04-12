@@ -103,6 +103,24 @@ int hmm_refinement_step();
 
 void hmm_refinement_destroy();
 
+/**
+ * Helper for multiple hmm_log_prob calculations wrt same model.
+ */
+typedef struct {
+    Hmm *hmm;
+
+    int T;
+    prob_t **alpha;
+    prob_t **alpha2;
+    prob_t **alphaH;
+} HmmProb;
+
+HmmProb *hmmprob_create(Hmm *hmm);
+
+void hmmprob_destroy(HmmProb *);
+
+prob_t hmmprob_log_prob(HmmProb *hmmprob, Symbol *O, int T);
+
 prob_t hmm_log_prob(Hmm *hmm, Symbol *O, int T);
 
 /**

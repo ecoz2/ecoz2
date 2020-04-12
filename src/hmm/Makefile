@@ -8,6 +8,7 @@ SOURCE_FILES=\
 	hmm_adjustb.c \
 	hmm_file.c  \
 	hmm_refinement.c \
+	hmm_prob.c \
 	hmm_log_prob.c \
 	hmm_genQopt.c \
 	hmm_estimateB.c  \

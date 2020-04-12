@@ -232,6 +232,8 @@ int hmm_classify(
     // className of the sequence
     char seq_className[MAX_CLASS_NAME_LEN];
 
+    static HmmProb *hmmprob_objects[MAX_MODELS];
+
     printf("\nLoading models:\n");
 
     // load first model:
@@ -244,6 +246,8 @@ int hmm_classify(
     }
 
     Mcmp = models[0]->M;
+
+    hmmprob_objects[0] = hmmprob_create(models[0]);
 
     // load the other models:
 
@@ -259,6 +263,8 @@ int hmm_classify(
             fprintf(stderr, ": conformity error.\n");
             return 1;
         }
+
+        hmmprob_objects[i] = hmmprob_create(models[i]);
     }
 
     // do classifications:
@@ -291,7 +297,7 @@ int hmm_classify(
         result[classId][0]++;
 
         for (int r = 0; r < num_models; r++) {
-            probs[r] = hmm_log_prob(models[r], sequence, T);
+            probs[r] = hmmprob_log_prob(hmmprob_objects[r], sequence, T);
         }
         _sort_probs(probs, ordp, num_models);
 
@@ -353,5 +359,11 @@ int hmm_classify(
     release_not_loaded_models_list();
 
     report_results();
+
+    for (int r = 0; r < num_models; r++) {
+        hmmprob_destroy(hmmprob_objects[r]);
+        hmm_destroy(models[r]);
+    }
+
     return 0;
 }

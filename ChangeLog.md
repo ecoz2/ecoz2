@@ -1,5 +1,9 @@
 2020-04
 
+- new HmmProb struct and functions to improve performance of
+  multiple log_prob calculation wrt to same model
+    - used in hmm_classify
+  
 - preliminary hmm_learn_callback_t
 
 2020-03
