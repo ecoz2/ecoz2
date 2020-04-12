@@ -224,7 +224,7 @@ int hmm_learn(
         }
 
         if (callback != 0) {
-            callback("sum_log_prob", sum_log_prob);
+            callback("sum_log_prob", (double) sum_log_prob);
         }
 
         // end iterations per -a parameter?
