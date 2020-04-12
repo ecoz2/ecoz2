@@ -4,6 +4,7 @@
 #include "hmm.h"
 
 #include <string.h>
+#include <stdlib.h>  // sranddev, srand
 
 const char *ecoz2_version() {
     return "0.2.0";
@@ -21,6 +22,14 @@ int ecoz2_baz() {
     return 142857;
 }
 
+void ecoz2_set_random_seed(int seed) {
+    if (seed < 0) {
+        sranddev();
+    }
+    else {
+        srand((unsigned) seed);
+    }
+}
 
 int ecoz2_lpc_signals(
         int P,

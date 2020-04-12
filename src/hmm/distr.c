@@ -4,25 +4,13 @@
 #include "distr.h"
 
 #include <stdlib.h>
-#include <time.h>
 
 #ifndef min
 #define min(x, y) ( (x) < (y) ? (x) : (y) )
 #endif
 
 
-// to control initialization of random value generation:
-
-static int do_randomize = 1;
-static int randomize_inited = 0;
-
-static prob_t randomValue() {
-    if (!randomize_inited) {
-        randomize_inited = 1;
-        if (do_randomize) {
-            srand(clock());
-        }
-    }
+static inline prob_t randomValue() {
     return (prob_t) rand() / RAND_MAX;
 }
 
