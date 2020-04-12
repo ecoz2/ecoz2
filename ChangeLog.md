@@ -3,6 +3,8 @@
 - new HmmProb struct and functions to improve performance of
   multiple log_prob calculation wrt to same model
     - used in hmm_classify
+    - TODO use in hmm_learn (and other places)
+    - TODO maybe even remove previous hmm_log_prob 
   
 - preliminary hmm_learn_callback_t
 
