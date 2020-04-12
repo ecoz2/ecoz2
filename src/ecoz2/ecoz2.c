@@ -61,7 +61,8 @@ int ecoz2_vq_learn(
         sample_t epsilon,
         const char *codebook_class_name,
         const char *predictor_filenames[],
-        int num_predictors
+        int num_predictors,
+        vq_learn_callback_t callback
         ) {
 
     return vq_learn(
@@ -69,7 +70,8 @@ int ecoz2_vq_learn(
             epsilon,
             codebook_class_name,
             predictor_filenames,
-            num_predictors
+            num_predictors,
+            callback
     );
 }
 

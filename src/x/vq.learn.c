@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
 
     return vq_learn(P, eps, codebook_className,
                     (const char **) predictor_filenames,
-                    numPredictors
+                    numPredictors,
+                    0  // callback
     );
 }

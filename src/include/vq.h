@@ -4,6 +4,7 @@
 #ifndef __ECOZ_VQ_H
 #define __ECOZ_VQ_H
 
+#include "ecoz2.h"
 #include "lpc.h"
 #include "symbol.h"
 
@@ -73,9 +74,12 @@ sample_t quantize(sample_t *raas,
                  );
 
 
-int vq_learn(int prediction_order, sample_t epsilon,
+int vq_learn(int prediction_order,
+             sample_t epsilon,
              const char *codebook_class_name,
-             const char *predictor_filenames[], int num_predictors
+             const char *predictor_filenames[],
+             int num_predictors,
+             vq_learn_callback_t callback
             );
 
 int vq_quantize(const char *nom_raas,

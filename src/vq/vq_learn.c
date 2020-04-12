@@ -178,7 +178,11 @@ static void grow_codebook(int P) {
     reflections_to_raas(reflections, codebook, num_raas, P);
 }
 
-static void learn(sample_t **allVectors, sample_t eps) {
+static void learn(sample_t **allVectors,
+                  sample_t eps,
+                  vq_learn_callback_t callback
+                  ) {
+
     // to maintain and report codeword and minimum distortion for
     // each training vector against each trained codebook size:
     CodewordAndMinDist *minDists = (CodewordAndMinDist *) calloc(tot_vecs, sizeof(CodewordAndMinDist));
@@ -191,6 +195,8 @@ static void learn(sample_t **allVectors, sample_t eps) {
     sample_t DDprv = SAMPLE_MAX;
     for (;;) {
         printf("(%d)", pass);
+        fflush(stdout);
+
         init_cells();
 
         sample_t DD = 0;
@@ -216,8 +222,13 @@ static void learn(sample_t **allVectors, sample_t eps) {
 
         const sample_t avgDistortion = DD / tot_vecs;
 
-        printf("\tDP=%g\tDDprv=%g\tDD=%g\t%-15g\r",
+        if (callback != 0) {
+            callback("avgDistortion", (double) avgDistortion);
+        }
+
+        printf("\tDP=%g\tDDprv=%g\tDD=%g\t(DDprv-DD)/DD=%g\r",
                avgDistortion, DDprv, DD, ((DDprv - DD) / DD));
+        fflush(stdout);
 
         review_cells();
 
@@ -254,9 +265,11 @@ static void learn(sample_t **allVectors, sample_t eps) {
 }
 
 int vq_learn(int prediction_order,
-        sample_t epsilon,
-        const char *codebook_class_name,
-        const char *predictor_filenames[], int num_predictors
+             sample_t epsilon,
+             const char *codebook_class_name,
+             const char *predictor_filenames[],
+             int num_predictors,
+             vq_learn_callback_t callback
         ) {
 
     P = prediction_order;
@@ -301,7 +314,7 @@ int vq_learn(int prediction_order,
     sprintf(nom_rpt, "%s.rpt", prefix);
     prepare_report(nom_rpt, tot_vecs, eps);
 
-    learn(allVectors, eps);
+    learn(allVectors, eps, callback);
 
     free(allVectors);
 

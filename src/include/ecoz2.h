@@ -31,12 +31,15 @@ int ecoz2_prd_show_file(
         int to
         );
 
+typedef void (*vq_learn_callback_t)(char*, double);
+
 int ecoz2_vq_learn(
         int prediction_order,
         double epsilon,
         const char *codebook_class_name,
         const char *predictor_filenames[],
-        int num_predictors
+        int num_predictors,
+        vq_learn_callback_t callback
         );
 
 int ecoz2_vq_quantize(
