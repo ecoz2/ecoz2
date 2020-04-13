@@ -1,6 +1,7 @@
 2020-04
 
 - preliminary vq_learn_callback_t
+  reporting (M, avgDistortion, sigma, inertia) for each codebook size
 - expose ecoz2_set_random_seed
 - expose other main functions for wrapping purposes.
   All with `ecoz2_` prefix, and wrappers to include only ecoz2.h

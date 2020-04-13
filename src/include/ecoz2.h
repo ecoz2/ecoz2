@@ -31,7 +31,7 @@ int ecoz2_prd_show_file(
         int to
         );
 
-typedef void (*vq_learn_callback_t)(char*, double);
+typedef void (*vq_learn_callback_t)(int M, double avgDistortion, double sigma, double inertia);
 
 int ecoz2_vq_learn(
         int prediction_order,

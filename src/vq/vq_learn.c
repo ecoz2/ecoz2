@@ -222,10 +222,6 @@ static void learn(sample_t **allVectors,
 
         const sample_t avgDistortion = DD / tot_vecs;
 
-        if (callback != 0) {
-            callback("avgDistortion", (double) avgDistortion);
-        }
-
         printf("\tDP=%g\tDDprv=%g\tDD=%g\t(DDprv-DD)/DD=%g\r",
                avgDistortion, DDprv, DD, ((DDprv - DD) / DD));
         fflush(stdout);
@@ -240,6 +236,10 @@ static void learn(sample_t **allVectors,
 
             sample_t sigma = calculateSigma(codebook, cells, num_raas, P, avgDistortion);
             sample_t inertia = calculateInertia(allVectors,  tot_vecs, codebook, num_raas, P);
+
+            if (callback != 0) {
+                callback(num_raas, avgDistortion, sigma, inertia);
+            }
 
             report_cbook(cb_filename, pass + 1, avgDistortion, sigma, inertia, num_raas, cardd, discel,
                          minDists);
