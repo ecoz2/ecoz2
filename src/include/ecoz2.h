@@ -24,6 +24,20 @@ int ecoz2_lpc_signals(
         int num_signals
         );
 
+/**
+ * Computes the predictor and reflection coefficients using the autocorrelation method.
+ * Implementation based on fortran version by Parsons (1987).
+ */
+int ecoz2_lpca(
+        double *x,        // the input signal
+        int N,            // number of samples in input signal
+        int P,            // prediction order
+        double *r,        // out: autocorrelation
+        double *rc,       // out: reflections
+        double *a,        // out: predictor
+        double *pe        // out: prediction error
+        );
+
 int ecoz2_prd_show_file(
         char *filename,
         int show_reflections,

@@ -1,5 +1,6 @@
 2020-04
 
+- expose lpca as ecoz2_lpca
 - some additions/adjs to facilitate comparison with rust output
 
 - preliminary vq_learn_callback_t

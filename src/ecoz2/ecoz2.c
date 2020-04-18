@@ -7,7 +7,7 @@
 #include <stdlib.h>  // sranddev, srand
 
 const char *ecoz2_version() {
-    return "0.2.0";
+    return "0.2.1";
 }
 
 void ecoz2_set_random_seed(int seed) {
@@ -39,6 +39,19 @@ int ecoz2_lpc_signals(
             sgn_filenames,
             num_signals
     );
+}
+
+int ecoz2_lpca(
+        double *x,
+        int N,
+        int P,
+        double *r,
+        double *rc,
+        double *a,
+        double *pe
+        ) {
+
+    return lpca(x, N, P, r, rc, a, pe);
 }
 
 int ecoz2_prd_show_file(
