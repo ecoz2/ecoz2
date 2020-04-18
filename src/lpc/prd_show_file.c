@@ -59,7 +59,7 @@ int prd_show_file(
 
         comma = "";
         for (int p = from; p <= to; p++) {
-            printf("%s%g", comma, coeffs[p]);
+            printf("%s%.5f", comma, coeffs[p]);
             comma = ",";
         }
         printf("\n");

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <time.h>  // clock_gettime
 
 int ends_with(char* filename, char* str) {
     const int len_i = strlen(filename);
@@ -24,4 +25,10 @@ int ends_with(char* filename, char* str) {
         }
     }
     return 1;
+}
+
+double measure_time_now_sec() {
+    struct timespec t;
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+    return (double) t.tv_sec + ((double) t.tv_nsec / 1.0e9);
 }

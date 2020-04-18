@@ -93,7 +93,14 @@ int lpc_signals(
             //printf("\n<%s>:\n", sgn_filename);
             //sgn_show(sgn);
 
+            const double measure_start_sec = measure_time_now_sec();
             Predictor *predictor = lpaOnSignal(P, windowLengthMs, offsetLengthMs, sgn);
+            const double measure_end_sec = measure_time_now_sec();
+            const double measure_elapsed_sec = measure_end_sec - measure_start_sec;
+            if (measure_elapsed_sec > 5) {
+                printf("processing took %.2fs\n", measure_elapsed_sec);
+            }
+
             if (!predictor) {
                 sgn_destroy(sgn);
                 printf("cannot create lpc predictor\n");

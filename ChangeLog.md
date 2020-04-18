@@ -1,5 +1,7 @@
 2020-04
 
+- some additions/adjs to facilitate comparison with rust output
+
 - preliminary vq_learn_callback_t
   reporting (M, avgDistortion, sigma, inertia) for each codebook size
 - expose ecoz2_set_random_seed
