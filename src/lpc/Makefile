@@ -4,7 +4,7 @@ SOURCE_FILES=\
 	lpc_signals.c \
 	prd_show_file.c \
 	lpca.c \
-    lpaOnSignal.c \
+    lpa_on_signal.c \
     prd.c \
 	ref2raas.c
 

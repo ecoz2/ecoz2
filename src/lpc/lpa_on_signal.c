@@ -1,4 +1,4 @@
-/* lpaOnSignal.c -- ECOZ System
+/* lpa_on_signal.c -- ECOZ System
  */
 
 #include <math.h>
@@ -50,7 +50,7 @@ static inline void applyHamming(sample_t *hamming, sample_t *frame, int numSampl
     }
 }
 
-Predictor *lpaOnSignal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn) {
+Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn) {
     sample_t *signal = sgn->samples;
     const long numSamples = sgn->numSamples;
     const long sampleRate = sgn->sampleRate;
@@ -62,7 +62,7 @@ Predictor *lpaOnSignal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn) 
     const int offset = (int) ((offsetLengthMs * sampleRate) / 1000);
 
     if (winSize > numSamples) {
-        fprintf(stderr, "ERROR: lpaOnSignal: signal too short\n");
+        fprintf(stderr, "ERROR: lpa_on_signal: signal too short\n");
         return 0;
     }
 
@@ -75,11 +75,11 @@ Predictor *lpaOnSignal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn) 
 
     Predictor *predictor = prd_create(T, P, ""); // "" = unknown className
     if (!predictor) {
-        fprintf(stderr, "lpaOnSignal: cannot get predictor object\n");
+        fprintf(stderr, "lpa_on_signal: cannot get predictor object\n");
         return 0;
     }
 
-    printf("lpaOnSignal: P=%d numSamples=%ld sampleRate=%ld winSize=%d offset=%d T=%d\n",
+    printf("lpa_on_signal: P=%d numSamples=%ld sampleRate=%ld winSize=%d offset=%d T=%d\n",
            P, numSamples, sampleRate, winSize, offset, T);
 
     sample_t reflex[P + 1];   // reflection coefficients
@@ -105,7 +105,7 @@ Predictor *lpaOnSignal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn) 
         sample_t *vector = predictor->vectors[t];
         int res_lpca = lpca(frame, winSize, P, vector, reflex, pred, &errPred);
         if (0 != res_lpca) {
-            fprintf(stderr, "ERROR: lpaOnSignal: lpca error = %d\n", res_lpca);
+            fprintf(stderr, "ERROR: lpa_on_signal: lpca error = %d\n", res_lpca);
             break;
         }
         // normalize autocorrelation sequence by gain:
@@ -114,6 +114,12 @@ Predictor *lpaOnSignal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn) 
                 vector[n] /= errPred;
             }
         }
+
+        if (t % 50000 == 0) {
+            printf("  %d frames processed\n", t);
+        }
+
+        printf("  %d total frames processed\n", T);
     }
 
     return predictor;

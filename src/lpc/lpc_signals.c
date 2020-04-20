@@ -94,7 +94,7 @@ int lpc_signals(
             //sgn_show(sgn);
 
             const double measure_start_sec = measure_time_now_sec();
-            Predictor *predictor = lpaOnSignal(P, windowLengthMs, offsetLengthMs, sgn);
+            Predictor *predictor = lpa_on_signal(P, windowLengthMs, offsetLengthMs, sgn);
             const double measure_end_sec = measure_time_now_sec();
             const double measure_elapsed_sec = measure_end_sec - measure_start_sec;
             if (measure_elapsed_sec > 5) {

@@ -1,5 +1,6 @@
 2020-04
 
+- rename to lpa_on_signal
 - expose lpca as ecoz2_lpca
 - some additions/adjs to facilitate comparison with rust output
 
@@ -74,7 +75,7 @@
         Number of classes: 1
         class '': 1
           HBSe_20161221T010133.wav
-        lpaOnSignal: P=36 numSamples=18368474 sampleRate=32000 winSize=1440 offset=480 T=38265
+        lpa_on_signal: P=36 numSamples=18368474 sampleRate=32000 winSize=1440 offset=480 T=38265
         data/predictors/_/HBSe_20161221T010133.prd: '': predictor saved
         
     This generates a single predictor file. Usually a predictor file is associated

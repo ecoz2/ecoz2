@@ -72,7 +72,7 @@ int lpca_rc(int P,          // prediction order
  * @param sgn             The signal
  * @return                Resulting predictor
  */
-Predictor *lpaOnSignal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn);
+Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn);
 
 /**
  * Gets the autocorrelation vectors (raas) corresponding to
