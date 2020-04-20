@@ -114,10 +114,6 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
                 vector[n] /= errPred;
             }
         }
-
-        if ((t + 1) % 50000 == 0) {
-            printf("  %d frames processed\n", t + 1);
-        }
     }
     printf("  %d total frames processed\n", T);
 
