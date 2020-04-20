@@ -13,13 +13,13 @@
 #define M_PI  3.14159265358979323846
 #endif
 
-static inline void fillFrame(sample_t *from, int numSamples, sample_t *to) {
+static inline void fill_frame(sample_t *from, int numSamples, sample_t *to) {
     for (int n = 0; n < numSamples; n++, from++, to++) {
         *to = *from;
     }
 }
 
-static inline void removeMean(sample_t *frame, int numSamples) {
+static inline void remove_mean(sample_t *frame, int numSamples) {
     sample_t sum = 0;
     sample_t *s = frame;
     for (int n = 0; n < numSamples; n++, s++) {
@@ -44,7 +44,7 @@ static inline void preemphasis(sample_t *frame, int numSamples) {
     }
 }
 
-static inline void applyHamming(sample_t *hamming, sample_t *frame, int numSamples) {
+static inline void apply_hamming(sample_t *hamming, sample_t *frame, int numSamples) {
     for (int n = 0; n < numSamples; n++, frame++) {
         *frame *= hamming[n];
     }
@@ -96,10 +96,10 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
     for (int t = 0; t < T; t++) {
         sample_t *samples = signal + t * offset;
 
-        fillFrame(samples, winSize, frame);
-        removeMean(frame, winSize);
+        fill_frame(samples, winSize, frame);
+        remove_mean(frame, winSize);
         preemphasis(frame, winSize);
-        applyHamming(hamming, frame, winSize);
+        apply_hamming(hamming, frame, winSize);
 
         // do LPA:
         sample_t *vector = predictor->vectors[t];
@@ -115,12 +115,11 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
             }
         }
 
-        if (t % 50000 == 0) {
-            printf("  %d frames processed\n", t);
+        if ((t + 1) % 50000 == 0) {
+            printf("  %d frames processed\n", t + 1);
         }
-
-        printf("  %d total frames processed\n", T);
     }
+    printf("  %d total frames processed\n", T);
 
     return predictor;
 }
