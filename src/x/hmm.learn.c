@@ -23,6 +23,8 @@ int main(int argc, char *argv[]) {
 
     int max_iterations = -1;
 
+    int seed = -1;
+
     if (argc < 2) {
         printf("\
 \n\
@@ -41,16 +43,17 @@ HMM training\n\
                     1: uniform distributions\n\
                     2: cascade-2; random B\n\
                     3: cascade-3; random B\n\
+    -s <val>      Seed for random numbers. Negative means random seed (%d, by default).\n\
     <sequence>... training sequences (max: %d)\n\
 \n\n",
-               N, val_auto, hmm_epsilon, model_type, MAX_SEQS
+               N, val_auto, hmm_epsilon, model_type, seed, MAX_SEQS
         );
         return 0;
     }
 
     int opc;
 
-    while (EOF != (opc = getopt(argc, argv, "N:t:e:a:I:"))) {
+    while (EOF != (opc = getopt(argc, argv, "N:t:e:a:I:s:"))) {
         switch (opc) {
             case 'I':
                 if (sscanf(optarg, "%u", &max_iterations) == 0) {
@@ -83,6 +86,12 @@ HMM training\n\
                     return 1;
                 }
                 break;
+            case 's':
+                if (sscanf(optarg, "%d", &seed) == 0) {
+                    fprintf(stderr, "invalid seed.\n");
+                    return 1;
+                }
+                break;
             case '?':
                 return 0;
         }
@@ -103,6 +112,8 @@ HMM training\n\
     }
 
     const char **sequence_filenames = (const char **)(argv + optind);
+
+    ecoz2_set_random_seed(seed);
 
     return hmm_learn(
         N,

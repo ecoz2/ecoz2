@@ -1,5 +1,7 @@
 2020-04
 
+- add `-s <seed>` option to `hmm.learn`
+
 - rename to lpa_on_signal
 - expose lpca as ecoz2_lpca
 - some additions/adjs to facilitate comparison with rust output
