@@ -25,6 +25,7 @@ int seq_show_files(
     );
 
     Hmm *hmm = 0;
+    HmmProb *hmmprob_object = 0;
 
     if (with_prob || gen_Qopt) {
         assert(hmm_filename != 0 && hmm_filename[0] != 0);
@@ -35,6 +36,10 @@ int seq_show_files(
             return 1;
         }
         printf("Loaded model for class: '%s'\n", hmm->className);
+
+        if (with_prob) {
+            hmmprob_object = hmmprob_create(hmm);
+        }
     }
 
     for (int i = 0; i < num_seq_filenames; ++i) {
@@ -57,7 +62,7 @@ int seq_show_files(
         }
 
         if (with_prob) {
-            prob_t prob = hmm_log_prob(hmm, seq, T);
+            prob_t prob = hmmprob_log_prob(hmmprob_object, seq, T);
             printf(" log(P) = %Le", prob);
         }
 
@@ -83,5 +88,10 @@ int seq_show_files(
 
         printf("\n");
     }
+
+    if (hmmprob_object) {
+        hmmprob_destroy(hmmprob_object);
+    }
+
     return 0;
 }

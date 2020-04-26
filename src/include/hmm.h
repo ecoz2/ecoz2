@@ -113,6 +113,7 @@ typedef struct {
     prob_t **alpha;
     prob_t **alpha2;
     prob_t **alphaH;
+    prob_t *c;
 } HmmProb;
 
 HmmProb *hmmprob_create(Hmm *hmm);

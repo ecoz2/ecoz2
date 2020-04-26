@@ -19,6 +19,7 @@ static const int incrementT = 512;
 
 void release_HmmProb_members(HmmProb *hmmprob) {
     if (hmmprob->T != 0) {
+        del_vector(hmmprob->c);
         del_matrix(hmmprob->alphaH);
         del_matrix(hmmprob->alpha2);
         del_matrix(hmmprob->alpha);
@@ -34,6 +35,8 @@ static void allocate_HmmProb_members(HmmProb *hmmprob, int T) {
     hmmprob->alpha = (prob_t **) new_matrix(T, hmm->N, sizeof(prob_t));
     hmmprob->alpha2 = (prob_t **) new_matrix(T, hmm->N, sizeof(prob_t));
     hmmprob->alphaH = (prob_t **) new_matrix(T, hmm->N, sizeof(prob_t));
+
+    hmmprob->c = (prob_t *) new_vector(T, sizeof(prob_t));
 
     if (!hmmprob->alpha || !hmmprob->alpha2 || !hmmprob->alphaH) {
         fprintf(stderr, "not enough memory for hmmprob_create\n");
@@ -75,13 +78,6 @@ void hmmprob_destroy(HmmProb *hmmprob) {
 prob_t hmmprob_log_prob(HmmProb *hmmprob, Symbol *O, int T) {
     reallocate_HmmProb_members_if_needed(hmmprob, T);
 
-    prob_t *c = (prob_t *) new_vector(T, sizeof(prob_t));
-    if (!c) {
-        fprintf(stderr, "not enough memory for sequence in hmmprob_log_prob\n");
-        exit(1);
-        return 0;
-    }
-
     Hmm *hmm = hmmprob->hmm;
     const int N = hmm->N;
     prob_t *pi = hmm->pi;
@@ -91,6 +87,7 @@ prob_t hmmprob_log_prob(HmmProb *hmmprob, Symbol *O, int T) {
     prob_t **alpha  = hmmprob->alpha;
     prob_t **alpha2 = hmmprob->alpha2;
     prob_t **alphaH = hmmprob->alphaH;
+    prob_t *c = hmmprob->c;
 
     prob_t sumAlpha2 = 0.;
     for (int i = 0; i < N; i++) {
@@ -129,8 +126,6 @@ prob_t hmmprob_log_prob(HmmProb *hmmprob, Symbol *O, int T) {
     for (int t = 0; t < T; t++) {
         log_prob -= logl(c[t]);
     }
-
-    del_vector(c);
 
     return log_prob;
 }
