@@ -1,5 +1,8 @@
 2020-04
 
+- some makefile and code adjustments while compiling with
+  gcc (Homebrew GCC 9.3.0_1) FSF
+
 - use HmmProb is seq_show_files
 - TODO use HmmProb also in hmm_learn?
 

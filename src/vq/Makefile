@@ -1,5 +1,7 @@
 # ECOZ System
 
+include ../make.def
+
 SOURCE_FILES=\
 	vq_learn.c \
 	vq_quantize.c \
@@ -11,10 +13,6 @@ SOURCE_FILES=\
 	sigma.c \
 	inertia.c \
 	quantize.c
-
-cc=gcc
-cdebug=-g -O3 -Wall
-cflags= -c -DDEBUG -O3 -ffast-math -std=c99
 
 INCLUDE= -I ../include -I ../sgn
 

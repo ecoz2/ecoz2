@@ -1,14 +1,12 @@
 # ECOZ System
 
+include ../make.def
+
 SOURCE_FILES=\
 	utl.c \
 	fileutil.c \
 	memutil.c \
 	list.c
-
-cc=gcc
-cdebug=-g -O3 -Wall
-cflags= -c -DDEBUG -O3 -ffast-math -std=c99
 
 INCLUDE= -I ../include
 

@@ -1,5 +1,7 @@
 # ECOZ System
 
+include ../make.def
+
 SOURCE_FILES=\
 	hmm.c  \
 	hmm_learn.c \
@@ -18,8 +20,8 @@ SOURCE_FILES=\
 	distr.c
 
 cc=gcc
-cdebug=-g -O3 -Wall
-cflags= -c -DDEBUG -O3 -ffast-math -std=c99
+#cdebug=-g -DDEBUG
+cflags=-c -O3 -Wall -ffast-math -std=c99
 
 INCLUDE= -I ../include
 

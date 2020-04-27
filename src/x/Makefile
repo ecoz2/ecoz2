@@ -1,5 +1,7 @@
 # ECOZ System
 
+include ../make.def
+
 EXECUTABLE_NAMES=\
 	sgn.show.c \
 	sgn.endp.c \
@@ -23,11 +25,13 @@ EXECUTABLE_FILES = $(EXECUTABLE_NAMES:%.c=$(BIN)/%)
 
 build: $(EXECUTABLE_FILES)
 
-cflags= -Wall -g -DDEBUG -O3 -ffast-math -std=c99 -I ../include -I ../sgn
+cflags= -Wall -g -DDEBUG -O3 -ffast-math -std=c99
+
+INCLUDE= -I ../include -I ../sgn
 
 $(EXECUTABLE_FILES): $(BIN)/% : %.c $(libecoz)
 	@mkdir -p $(BIN)
-	gcc $(cflags) -o $@ $^ -lm
+	gcc $(cdebug) $(cflags) $(INCLUDE) -o $@ $^ -lm
 
 tidy:
 	rm -f *.o *~

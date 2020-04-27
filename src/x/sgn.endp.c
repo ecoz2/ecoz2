@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
             strcpy(no_ext, filename);
             camext(no_ext, "");
             char e_filename[2048];
+            #pragma GCC diagnostic ignored "-Wformat-overflow"
             sprintf(e_filename, "%s__S%ld_L%d$.wav", no_ext, start, e->numSamples);
             sgn_save(e, e_filename);
 

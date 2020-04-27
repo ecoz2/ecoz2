@@ -79,7 +79,7 @@ int hmm_learn(
 
     fprintf(stderr, "hmm_learn: num_sequences = %d\n", num_sequences);
 
-    // for (int r = 0; r < num_sequences; r++) {
+    // for (int r = 0; r < num_sequences; ++r) {
     //     fprintf(stderr, "%3d: %s\n", r, sequence_filenames[r]);
     // }
 
@@ -133,10 +133,11 @@ int hmm_learn(
                 val_auto);
     }
     mk_dirs(hmmDir);
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(model_filename, "%s/%s.hmm", hmmDir, model_className);
 
     num_seqs = 1;
-    for (int r = 1; r < num_sequences; r++) {
+    for (int r = 1; r < num_sequences; ++r) {
         // to check all sequences come from same codebook size:
         int Mcmp;
 
@@ -187,15 +188,15 @@ int hmm_learn(
     if (show_probs) fprintf(stderr, "\n[Ini]: ");
     sum_log_prob = 0.;
 
-    for (int r = 0; r < num_seqs; r++) {
+    for (int r = 0; r < num_seqs; ++r) {
         prob = hmm_log_prob(hmm, sequences[r], T[r]);
         sum_log_prob += prob;
         if (show_probs) fprintf(stderr, "%2.1Le ", prob);
     }
 
 //    HmmProb *hmmprob_object = hmmprob_create(hmm);
-//    for (int r = 0; r < num_seqs; r++) {
-//        prob = hmmprob_log_prob(hmmprob_object, seqs[r], T[r]);
+//    for (int r = 0; r < num_seqs; ++r) {
+//        prob = hmmprob_log_prob(hmmprob_object, sequences[r], T[r]);
 //        sum_log_prob += prob;
 //        if (show_probs) fprintf(stderr, "%2.1Le ", prob);
 //    }
@@ -213,6 +214,9 @@ int hmm_learn(
     num_refinements = 0;
     prob_t sum_log_prob_prev = sum_log_prob;
     while (max_iterations < 0 || num_refinements < max_iterations) {
+
+        const double measure_ref_start_sec = measure_time_now_sec();
+
         if (hmm_refinement_step()) {
             fprintf(stderr, "refinement error\n");
             return 2;
@@ -225,15 +229,15 @@ int hmm_learn(
         if (show_probs) fprintf(stderr, "\n[%03d]: ", num_refinements);
         sum_log_prob = 0.;
 
-        for (int r = 0; r < num_seqs; r++) {
+        for (int r = 0; r < num_seqs; ++r) {
             prob = hmm_log_prob(hmm, sequences[r], T[r]);
             sum_log_prob += prob;
             if (show_probs) fprintf(stderr, "%2.1Le ", prob);
         }
 
 //        hmmprob_object = hmmprob_create(hmm);
-//        for (int r = 0; r < num_seqs; r++) {
-//            prob = hmmprob_log_prob(hmmprob_object, seqs[r], T[r]);
+//        for (int r = 0; r < num_seqs; ++r) {
+//            prob = hmmprob_log_prob(hmmprob_object, sequences[r], T[r]);
 //            sum_log_prob += prob;
 //            if (show_probs) fprintf(stderr, "%2.1Le ", prob);
 //        }
@@ -243,8 +247,14 @@ int hmm_learn(
 
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
-        fprintf(stderr, " %d: Δ = %+Lg  sum_log_prob = %+Lg sum_log_prob_prev = %+Lg  '%s'\n",
-                num_refinements, change, sum_log_prob, sum_log_prob_prev, model_className);
+
+        const double measure_ref_end_sec = measure_time_now_sec();
+        const double measure_ref_elapsed_sec = measure_ref_end_sec - measure_ref_start_sec;
+
+        fprintf(stderr, " %d: Δ = %+Lg  sum_log_prob = %+Lg sum_log_prob_prev = %+Lg  '%s'  (%.3fs)\n",
+                num_refinements, change, sum_log_prob, sum_log_prob_prev, model_className,
+                measure_ref_elapsed_sec
+                );
 
         if (sum_log_prob >= 0) {
             fprintf(stderr, "\nWARNING: sum_log_prob non negative\n");

@@ -4,8 +4,8 @@ SOURCE_FILES=\
 	ecoz2.c
 
 cc=gcc
-cdebug=-g -O3 -Wall
-cflags= -c -DDEBUG -O3 -ffast-math -std=c99
+#cdebug=-g -DDEBUG
+cflags=-c -O3 -Wall -ffast-math -std=c99
 
 INCLUDE= -I ../include
 

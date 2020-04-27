@@ -1,13 +1,11 @@
 # ECOZ System
 
+include ../make.def
+
 SOURCE_FILES=\
 	dr_wav.c \
 	sgn.c \
 	endpoint.c
-
-cc=gcc
-cdebug=-g -O3 -Wall
-cflags= -c -DDEBUG -O3 -ffast-math -std=c99
 
 INCLUDE= -I ../include -I .
 

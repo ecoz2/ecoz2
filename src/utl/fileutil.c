@@ -49,6 +49,7 @@ void get_output_filename(char *from, const char *base_dir, const char *ext, char
         strcpy(simple, tmp);
     }
     char classDir[2048];
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(classDir, "data/%s/%s", base_dir, className);
     int res = mk_dirs(classDir);
     if (res) {

@@ -25,6 +25,7 @@ void prepare_report(char *rpt_filename, long tot_vecs_, double eps) {
     }
 
     char csv_filename[2048];
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(csv_filename, "%s.csv", rpt_filename);
     if (0 == (file_csv = fopen(csv_filename, "w"))) {
         printf("error creating report file %s\n", csv_filename);
@@ -85,6 +86,7 @@ void report_cbook(char *cb_filename, int num_pas,
     // CELLS
     char cells_csv[2048];
     FILE *cells_file;
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(cells_csv, "%s.cards_dists.csv", cb_filename);
     if (0 == (cells_file = fopen(cells_csv, "w"))) {
         printf("error creating %s\n", cells_csv);
@@ -107,6 +109,7 @@ void report_cbook(char *cb_filename, int num_pas,
     // MIN DISTORTIONS
     char min_dists_csv[2048];
     FILE *min_dists_file;
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(min_dists_csv, "%s.min_dists.csv", cb_filename);
     if (0 == (min_dists_file = fopen(min_dists_csv, "w"))) {
         printf("error creating %s\n", min_dists_csv);

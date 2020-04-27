@@ -189,6 +189,7 @@ static void learn(sample_t **allVectors,
 
     int pass = 0;
 
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
     printf("%s\n", cb_filename);
 
@@ -283,6 +284,7 @@ int vq_learn(int prediction_order,
     static char class_dir[2048];
     sprintf(class_dir, "%s/%s", dir_codebooks, codebook_className);
     mk_dirs(class_dir);
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(prefix, "%s/eps_%g", class_dir, eps);
 
     allocate_codebook();
