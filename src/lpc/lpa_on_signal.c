@@ -5,6 +5,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//#undef PAR
+#define PAR 1
+
+#ifdef PAR
+    #include <omp.h>
+#endif
+
 #include "lpc.h"
 #include "utl.h"
 
@@ -82,19 +89,31 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
     printf("lpa_on_signal: P=%d numSamples=%ld sampleRate=%ld winSize=%d offset=%d T=%d\n",
            P, numSamples, sampleRate, winSize, offset, T);
 
-    sample_t reflex[P + 1];   // reflection coefficients
-    sample_t pred[P + 1];     // prediction coefficients
-    sample_t errPred;         // prediction error
-
     sample_t hamming[winSize];
     for (int n = 0; n < winSize; n++) {
         hamming[n] = .54 - .46 * cos((n * 2 * M_PI) / (winSize - 1));
     }
 
-    // perform linear prediction to each frame:
-    sample_t frame[winSize];
-    for (int t = 0; t < T; t++) {
+#ifdef PAR
+    const int desired_threads = omp_get_max_threads();
+    omp_set_num_threads(desired_threads);
+    printf("(desired_threads=%d", desired_threads);
+    #pragma omp parallel
+    {
+    int id = omp_get_thread_num();
+    int actual_threads = omp_get_num_threads();
+    if (id == 0) {
+        printf(" actual_threads=%d)\n", actual_threads);
+    }
+    #pragma omp parallel for
+    for (int t = id; t < T; t += actual_threads) {
+#else
+    for (int t = 0; t < T; ++t) {
+#endif
         sample_t *samples = signal + t * offset;
+
+        // perform linear prediction to each frame:
+        sample_t frame[winSize];
 
         fill_frame(samples, winSize, frame);
         remove_mean(frame, winSize);
@@ -102,11 +121,15 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
         apply_hamming(hamming, frame, winSize);
 
         // do LPA:
+        sample_t reflex[P + 1];   // reflection coefficients
+        sample_t pred[P + 1];     // prediction coefficients
+        sample_t errPred;         // prediction error
+
         sample_t *vector = predictor->vectors[t];
         int res_lpca = lpca(frame, winSize, P, vector, reflex, pred, &errPred);
         if (0 != res_lpca) {
             fprintf(stderr, "ERROR: lpa_on_signal: lpca error = %d\n", res_lpca);
-            break;
+            //break;  error: break statement used with OpenMP for loop
         }
         // normalize autocorrelation sequence by gain:
         if (errPred != 0.) {
@@ -115,6 +138,9 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
             }
         }
     }
+#ifdef PAR
+    }
+#endif
     printf("  %d total frames processed\n", T);
 
     return predictor;

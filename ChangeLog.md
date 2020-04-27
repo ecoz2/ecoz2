@@ -1,5 +1,10 @@
 2020-04
 
+- initial parallelized version of lpa_on_signal using openmp.
+  This is for now conditioned by a PAR define in the source.
+  On my mac, with the 4.5 hr signal, lpc now takes
+  ~5.5s instead of ~21s with the serialized version.
+
 - some makefile and code adjustments while compiling with
   gcc (Homebrew GCC 9.3.0_1) FSF
 

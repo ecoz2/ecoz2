@@ -25,13 +25,11 @@ EXECUTABLE_FILES = $(EXECUTABLE_NAMES:%.c=$(BIN)/%)
 
 build: $(EXECUTABLE_FILES)
 
-cflags= -Wall -g -DDEBUG -O3 -ffast-math -std=c99
-
-INCLUDE= -I ../include -I ../sgn
+INCLUDE=-I ../include
 
 $(EXECUTABLE_FILES): $(BIN)/% : %.c $(libecoz)
 	@mkdir -p $(BIN)
-	gcc $(cdebug) $(cflags) $(INCLUDE) -o $@ $^ -lm
+	$(cc) $(cdebug) $(cflags) -fopenmp $(INCLUDE) -o $@ $^ -lm
 
 tidy:
 	rm -f *.o *~

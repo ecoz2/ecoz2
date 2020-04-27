@@ -1,11 +1,9 @@
 # ECOZ System
 
+include ../make.def
+
 SOURCE_FILES=\
 	ecoz2.c
-
-cc=gcc
-#cdebug=-g -DDEBUG
-cflags=-c -O3 -Wall -ffast-math -std=c99
 
 INCLUDE= -I ../include
 
@@ -17,4 +15,4 @@ build: $(OBJECT_FILES)
 
 $(OBJECT_FILES): $(OBJ)/%.o: %.c
 	@mkdir -p $(@D)
-	$(cc) $(cdebug) $(cflags) $(INCLUDE) -o $@ $<
+	$(cc) -c $(cdebug) $(cflags) $(INCLUDE) -o $@ $<

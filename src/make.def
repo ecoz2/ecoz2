@@ -1,3 +1,3 @@
 cc=gcc
 #cdebug=-g -DDEBUG
-cflags=-c -O3 -Wall -ffast-math -std=c99
+cflags=-O3 -Wall -ffast-math -fopenmp

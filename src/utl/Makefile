@@ -18,4 +18,4 @@ build: $(OBJECT_FILES)
 
 $(OBJECT_FILES): $(OBJ)/%.o: %.c
 	@mkdir -p $(@D)
-	$(cc) $(cdebug) $(cflags) $(INCLUDE) -o $@ $<
+	$(cc) -c $(cdebug) $(cflags) $(INCLUDE) -o $@ $<
