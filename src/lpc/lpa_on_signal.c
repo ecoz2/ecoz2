@@ -20,40 +20,61 @@
 #define M_PI  3.14159265358979323846
 #endif
 
-static inline void fill_frame(sample_t *from, int numSamples, sample_t *to) {
-    for (int n = 0; n < numSamples; n++, from++, to++) {
-        *to = *from;
+static inline void create_hamming(sample_t *hamming, int winSize) {
+    sample_t *h = hamming;
+    sample_t *const limit = hamming + winSize;
+    int n = 0;
+    while (h < limit) {
+        *h++ = .54 - .46 * cos((n++ * 2 * M_PI) / (winSize - 1));
+    }
+}
+
+static inline void fill_frame(sample_t *samples, int numSamples, sample_t *frame) {
+    sample_t *s = samples;
+    sample_t *f = frame;
+    sample_t *const limit = frame + numSamples;
+    while (f < limit) {
+        *f++ = *s++;
     }
 }
 
 static inline void remove_mean(sample_t *frame, int numSamples) {
+    sample_t *const limit = frame + numSamples;
+
     sample_t sum = 0;
-    sample_t *s = frame;
-    for (int n = 0; n < numSamples; n++, s++) {
-        sum += *s;
+
+    sample_t *f = frame;
+    while (f < limit) {
+        sum += *f++;
     }
     const sample_t mean = sum / numSamples;
-    s = frame;
-    for (int n = 0; n < numSamples; n++, s++) {
-        *s -= mean;
+
+    f = frame;
+    while (f < limit) {
+        *f++ -= mean;
     }
 }
 
 static inline void preemphasis(sample_t *frame, int numSamples) {
+    sample_t *const limit = frame + numSamples;
+
     // x[n]
-    sample_t *x_n = frame + numSamples - 1;
+    sample_t *x_n = limit - 1;
 
     // x[n-1]
     sample_t *x_n1 = x_n - 1;
 
-    for (long n = numSamples - 1; n > 0; n--, x_n--, x_n1--) {
-        *x_n = *x_n - .95 * *x_n1;
+    while (x_n > frame) {
+        *x_n-- -= .95 * *x_n1--;
     }
 }
 
 static inline void apply_hamming(sample_t *hamming, sample_t *frame, int numSamples) {
-    for (int n = 0; n < numSamples; n++, frame++) {
-        *frame *= hamming[n];
+    sample_t *f = frame;
+    sample_t *h = hamming;
+    sample_t *const limit = frame + numSamples;
+    while (f < limit) {
+        *f++ *= *h++;
     }
 }
 
@@ -90,9 +111,7 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
            P, numSamples, sampleRate, winSize, offset, T);
 
     sample_t hamming[winSize];
-    for (int n = 0; n < winSize; n++) {
-        hamming[n] = .54 - .46 * cos((n * 2 * M_PI) / (winSize - 1));
-    }
+    create_hamming(hamming, winSize);
 
 #ifdef PAR
     const int desired_threads = omp_get_max_threads();
@@ -133,8 +152,10 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
         }
         // normalize autocorrelation sequence by gain:
         if (errPred != 0.) {
-            for (int n = 0; n <= P; n++) {
-                vector[n] /= errPred;
+            sample_t *v = vector;
+            sample_t *const limit = v + P;
+            while (v <= limit) {
+                *v++ /= errPred;
             }
         }
     }
