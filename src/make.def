@@ -1,3 +1,13 @@
 cc=gcc
 #cdebug=-g -DDEBUG
 cflags=-O3 -Wall -ffast-math -fopenmp
+
+# Just came across -funsafe-loop-optimizations (and -Wunsafe-loop-optimizations)
+#    https://stackoverflow.com/a/20859128/830737
+# which looked like an interesting option. I even tried it using gcc 9.3.0_1 on my mac
+# (and with no complains from the compiler).
+# But seems like the option was removed from gcc in general.
+# (existed in gcc 4.4.3: https://gcc.gnu.org/onlinedocs/gcc-4.3.3/gcc/Optimize-Options.html).
+#
+# BTW, found a very interesting reference: https://github.com/flame/blis
+# (via a search hit at https://github.com/flame/blis/issues/300)
