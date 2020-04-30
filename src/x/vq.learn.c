@@ -7,16 +7,19 @@
 
 #include "vq.h"
 
-static void usage(sample_t eps) {
+static void usage(sample_t eps, int seed) {
     printf("\n\
 ECOZ System\n\
 Codebook training\n\
 \n\
-	vq.learn -P <prediction-order> [options] <predictor> ...\n\
+    vq.learn -P <prediction-order> [options] <predictor> ...\n\
 \n\
-	-w <className>  sets the className ID to associate to codebook.\n\
-	-e <epsilon>    sets the epsilon parameter for convergence (%g, by default).\n\n"\
-, eps
+    -w <className>  Sets the className ID to associate to codebook.\n\
+    -e <epsilon>    Sets the epsilon parameter for convergence (%g, by default).\n\
+    -s <val>        Seed for random numbers. Negative means random seed (%d, by default).\n\
+    <predictor>...  training predictor files\n\
+\n\n",
+    eps, seed
     );
 }
 
@@ -25,13 +28,15 @@ int main(int argc, char *argv[]) {
     sample_t eps = .05;
     char codebook_className[MAX_CLASS_NAME_LEN] = "_";
 
+    int seed = -1;
+
     if (argc < 2) {
-        usage(eps);
+        usage(eps, seed);
         return 0;
     }
 
     int opc;
-    while (EOF != (opc = getopt(argc, argv, "P:e:w:"))) {
+    while (EOF != (opc = getopt(argc, argv, "P:e:w:s:"))) {
         switch (opc) {
             case 'P':
                 if (sscanf(optarg, "%d", &P) == 0 || P <= 0) {
@@ -52,6 +57,12 @@ int main(int argc, char *argv[]) {
                 }
                 strcpy(codebook_className, optarg);
                 break;
+            case 's':
+                if (sscanf(optarg, "%d", &seed) == 0) {
+                    fprintf(stderr, "invalid seed.\n");
+                    return 1;
+                }
+                break;
             case '?':
                 return 0;
         }
@@ -65,6 +76,8 @@ int main(int argc, char *argv[]) {
         printf("predictors not provided\n");
         return 1;
     }
+
+    ecoz2_set_random_seed(seed);
 
     const int numPredictors = argc - optind;
     char **predictor_filenames = argv + optind;

@@ -1,6 +1,8 @@
 2020-04
 
+
 - `vq_learn`: measure processing time, globally and per codebook size
+- add `-s <seed>` option to `vq.learn`
 
 - measuring actual processing (CLOCK_REALTIME) time (ie, excluding file
   loading and other stuff), here's the updated results with lpc on the
