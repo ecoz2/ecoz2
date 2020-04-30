@@ -1,11 +1,29 @@
 2020-04
 
+- measuring actual processing (CLOCK_REALTIME) time (ie, excluding file
+  loading and other stuff), here's the updated results with lpc on the
+  4.5 hr signal, on my mac (3.1 GHz Intel Core i7):
+     PAR: ~1.8s; SER: ~10-12s,
+     so a >5x speedup.
+
+        $ lpc -X 0 -P 36 -W 45 -O 15 .../MARS_20161221_000046_SongSession_16kHz_HPF5Hz.wav
+        Number of classes: 1
+        class 'data': 1
+          .../MARS_20161221_000046_SongSession_16kHz_HPF5Hz.wav
+        lpa_on_signal: P=36 numSamples=266117287 sampleRate=16000 winSize=720 offset=240 T=1108820
+        (desired_threads=8 actual_threads=8)
+          1108820 total frames processed
+        processing took 1.77s
+        data/predictors/data/MARS_20161221_000046_SongSession_16kHz_HPF5Hz.prd: 'data': predictor saved
+
 - use `-march=native`.
-  Now, with the same run: PAR: ~3-4s;  SER: ~11-12s
+  Note: a strict binary comparison (via `cmp`) showed difference against
+  previously generated `.prd` file with no such option. However, a
+  comparison based on the output of `prd.show`, which uses `"%.5f"` as
+  format for the values, showed no differences at all.
+
 - initial parallelized version of lpa_on_signal using openmp.
   This is for now conditioned by a PAR define in the source.
-  On my mac, with the 4.5 hr signal, lpc now takes
-  ~5.5s instead of ~21s with the serialized version.
 
 - some makefile and code adjustments while compiling with
   gcc (Homebrew GCC 9.3.0_1) FSF

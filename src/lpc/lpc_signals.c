@@ -41,7 +41,8 @@ int lpc_signals(
         int minpc,
         float split,
         char *sgn_filenames[],
-        int num_signals
+        int num_signals,
+        float mintrpt
         ) {
 
     // predictor to be generated:
@@ -97,7 +98,7 @@ int lpc_signals(
             Predictor *predictor = lpa_on_signal(P, windowLengthMs, offsetLengthMs, sgn);
             const double measure_end_sec = measure_time_now_sec();
             const double measure_elapsed_sec = measure_end_sec - measure_start_sec;
-            if (measure_elapsed_sec > 5) {
+            if (measure_elapsed_sec >= mintrpt) {
                 printf("processing took %.2fs\n", measure_elapsed_sec);
             }
 

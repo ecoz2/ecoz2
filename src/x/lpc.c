@@ -13,8 +13,10 @@
 #include <getopt.h>
 #include <assert.h>
 
-static int default_windowLengthMs = 45;
-static int default_offsetLengthMs = 15;
+static const int default_windowLengthMs = 45;
+static const int default_offsetLengthMs = 15;
+
+static const float default_mintrpt = 5;
 
 static void usage() {
     printf("\
@@ -29,8 +31,10 @@ Linear Prediction Coding\n\
     -m #        Only process a class if it has at least this number of signals\n\
     -s <split>  Put the generated predictors into two different training\n\
                 and test subsets (with the given approx ratio)\n\
+    -X <secs>   Min time in secs to report processing time per signal (%.1f)\n\
 \n",
-           default_windowLengthMs, default_offsetLengthMs
+           default_windowLengthMs, default_offsetLengthMs,
+           default_mintrpt
     );
 };
 
@@ -46,8 +50,10 @@ int main(int argc, char **argv) {
     int minpc = 0;
     float split = 0;
 
+    float mintrpt = default_mintrpt;
+
     int opc;
-    while (EOF != (opc = getopt(argc, argv, "P:W:O:m:s:"))) {
+    while (EOF != (opc = getopt(argc, argv, "P:W:O:m:s:X:"))) {
         switch (opc) {
             case 'P':
                 if (sscanf(optarg, "%d", &P) == 0 || P <= 0) {
@@ -79,6 +85,12 @@ int main(int argc, char **argv) {
                     return 1;
                 }
                 break;
+            case 'X':
+                if (sscanf(optarg, "%f", &mintrpt) == 0) {
+                    fprintf(stderr, "invalid X value.\n");
+                    return 1;
+                }
+                break;
             case '?':
                 return 0;
         }
@@ -103,6 +115,7 @@ int main(int argc, char **argv) {
             minpc,
             split,
             sgn_filenames,
-            num_signals
+            num_signals,
+            mintrpt
     );
 }
