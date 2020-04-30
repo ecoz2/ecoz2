@@ -1,5 +1,7 @@
 2020-04
 
+- use `-march=native`.
+  Now, with the same run: PAR: ~3-4s;  SER: ~11-12s
 - initial parallelized version of lpa_on_signal using openmp.
   This is for now conditioned by a PAR define in the source.
   On my mac, with the 4.5 hr signal, lpc now takes

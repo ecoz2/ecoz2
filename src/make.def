@@ -1,6 +1,6 @@
 cc=gcc
 #cdebug=-g -DDEBUG
-cflags=-O3 -Wall -ffast-math -fopenmp
+cflags=-O3 -Wall -ffast-math -fopenmp -march=native
 
 # Just came across -funsafe-loop-optimizations (and -Wunsafe-loop-optimizations)
 #    https://stackoverflow.com/a/20859128/830737
