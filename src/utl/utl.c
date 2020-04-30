@@ -29,6 +29,6 @@ int ends_with(char* filename, char* str) {
 
 double measure_time_now_sec() {
     struct timespec t;
-    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+    clock_gettime(CLOCK_REALTIME, &t);
     return (double) t.tv_sec + ((double) t.tv_nsec / 1.0e9);
 }
