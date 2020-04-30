@@ -193,6 +193,12 @@ static void learn(sample_t **allVectors,
     sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
     printf("%s\n", cb_filename);
 
+    // for global processing time:
+    const double measure_start_sec = measure_time_now_sec();
+
+    // for particular codebook size:
+    double measure_start_cb_sec = measure_time_now_sec();
+
     sample_t DDprv = SAMPLE_MAX;
     for (;;) {
         printf("(%d)", pass);
@@ -232,6 +238,10 @@ static void learn(sample_t **allVectors,
         calculate_reflections();
 
         if (pass > 0 && ((DDprv - DD) / DD) < eps) {
+            // done with this codebook size.
+            printf("\n      (%d-cbook) processing took %.2fs\n",
+                    num_raas, measure_time_now_sec() - measure_start_cb_sec);
+
             // codebook saved with reflections
             cb_save(codebook_className, reflections, num_raas, P, cb_filename);
 
@@ -255,6 +265,8 @@ static void learn(sample_t **allVectors,
             grow_codebook(P);
             sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
             printf("%s\n", cb_filename);
+
+            measure_start_cb_sec = measure_time_now_sec();
         }
         else {
             pass++;
@@ -262,6 +274,8 @@ static void learn(sample_t **allVectors,
 
         DDprv = DD;
     }
+    printf("\nprocessing took %.2fs\n", measure_time_now_sec() - measure_start_sec);
+
     free(minDists);
 }
 

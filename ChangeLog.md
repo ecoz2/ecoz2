@@ -1,5 +1,7 @@
 2020-04
 
+- `vq_learn`: measure processing time, globally and per codebook size
+
 - measuring actual processing (CLOCK_REALTIME) time (ie, excluding file
   loading and other stuff), here's the updated results with lpc on the
   4.5 hr signal, on my mac (3.1 GHz Intel Core i7):
