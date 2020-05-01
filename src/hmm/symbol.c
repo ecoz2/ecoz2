@@ -86,9 +86,15 @@ Symbol *seq_load(const char *filename, int *T, int *M, char *className) {
 }
 
 void seq_show(Symbol *O, int T) {
-    printf("<");
+    const int lim = 40;
+    const int mrg = 10;
+    printf("<(%d): ", T);
     char *comma = "";
     for (int t = 0; t < T; t++) {
+        if (T > lim && t >= mrg && t < T - mrg) {
+            printf(", ...");
+            t = T - mrg;
+        }
         printf("%s%d", comma, O[t]);
         comma = ", ";
     }

@@ -1,5 +1,8 @@
 2020-05
 
+- `seq_show`: show size of sequence and abbreviate it with `...` if
+  if a bit too many: `<(size): s, s, s, ..., s, s, s>`
+
 - `vq_learn` code reorganized to incorporate parallel impl:
 
     - some common support routines put in a separate vq_learn.i
