@@ -1,5 +1,5 @@
 
-static void learn(const char *codebook_class_name,
+static void learn_ser(const char *codebook_class_name,
                   int P,
                   char *prefix,
                   int num_raas,
@@ -20,16 +20,16 @@ static void learn(const char *codebook_class_name,
     sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
     printf("%s\n", cb_filename);
 
+    int      cardd[MAX_CODEBOOK_SIZE];   // cardinalities
+    sample_t discel[MAX_CODEBOOK_SIZE];  // distortions per cell
+    sample_t cells[MAX_CODEBOOK_SIZE_IN_VALUES];  // classification on training vectors
+    sample_t DD;
+
     // for global processing time:
     const double measure_start_sec = measure_time_now_sec();
 
     // for particular codebook size:
     double measure_start_cb_sec = measure_time_now_sec();
-
-    int      cardd[MAX_CODEBOOK_SIZE];   // cardinalities
-    sample_t discel[MAX_CODEBOOK_SIZE];  // distortions per cell
-
-    sample_t cells[MAX_CODEBOOK_SIZE_IN_VALUES];
 
     sample_t DDprv = SAMPLE_MAX;
     for (;;) {
@@ -38,7 +38,7 @@ static void learn(const char *codebook_class_name,
 
         init_cells(P, cells, num_raas, cardd, discel);
 
-        sample_t DD = 0;
+        DD = 0;
 
         double measure_start_min_sec = measure_time_now_sec();
 
@@ -58,13 +58,10 @@ static void learn(const char *codebook_class_name,
             minDists[v].codeword = raa_min;
             minDists[v].minDist = ddmin - 1;
 
-            // the -1 here moved to `DD -= tot_vecs` after the loop
-            DD += ddmin;
+            DD += ddmin - 1;
 
             add_to_cell(P, cells, rxg, ddmin, cardd, discel, raa_min);
         }
-
-        DD -= tot_vecs;
 
         printf("\n      (pass=%d) min processing took %.2fs\n",
                pass, measure_time_now_sec() - measure_start_min_sec);

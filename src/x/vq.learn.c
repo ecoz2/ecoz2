@@ -17,6 +17,7 @@ Codebook training\n\
     -w <className>  Sets the className ID to associate to codebook.\n\
     -e <epsilon>    Sets the epsilon parameter for convergence (%g, by default).\n\
     -s <val>        Seed for random numbers. Negative means random seed (%d, by default).\n\
+    -S              Use serialized impl (parallel impl, by default).\n\
     <predictor>...  training predictor files\n\
 \n\n",
     eps, seed
@@ -29,6 +30,7 @@ int main(int argc, char *argv[]) {
     char codebook_className[MAX_CLASS_NAME_LEN] = "_";
 
     int seed = -1;
+    int use_par = 1;
 
     if (argc < 2) {
         usage(eps, seed);
@@ -36,7 +38,7 @@ int main(int argc, char *argv[]) {
     }
 
     int opc;
-    while (EOF != (opc = getopt(argc, argv, "P:e:w:s:"))) {
+    while (EOF != (opc = getopt(argc, argv, "P:e:w:s:S"))) {
         switch (opc) {
             case 'P':
                 if (sscanf(optarg, "%d", &P) == 0 || P <= 0) {
@@ -63,6 +65,9 @@ int main(int argc, char *argv[]) {
                     return 1;
                 }
                 break;
+            case 'S':
+                use_par = 0;
+                break;
             case '?':
                 return 0;
         }
@@ -85,6 +90,7 @@ int main(int argc, char *argv[]) {
     return vq_learn(P, eps, codebook_className,
                     (const char **) predictor_filenames,
                     numPredictors,
+                    use_par,
                     0  // callback
     );
 }

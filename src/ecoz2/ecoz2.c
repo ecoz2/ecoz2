@@ -86,6 +86,7 @@ int ecoz2_vq_learn(
             codebook_class_name,
             predictor_filenames,
             num_predictors,
+            1,  // use_par
             callback
     );
 }

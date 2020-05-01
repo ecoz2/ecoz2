@@ -55,7 +55,7 @@ void cbook_destroy(Codebook *cbook);
   * @param P    prediction order
   * @return  distortion
   */
-sample_t distortion(sample_t *rxg, sample_t *raa, int P);
+sample_t distortion(const sample_t *rxg, const sample_t *raa, int P);
 
 typedef struct {
     int      codeword;
@@ -83,6 +83,7 @@ int vq_learn(int prediction_order,
              const char *codebook_class_name,
              const char *predictor_filenames[],
              int num_predictors,
+             int use_par,
              vq_learn_callback_t callback
             );
 

@@ -1,6 +1,6 @@
 #include <omp.h>
 
-static void learn(const char *codebook_class_name,
+static void learn_par(const char *codebook_class_name,
                   int P,
                   char *prefix,
                   int num_raas,
@@ -58,7 +58,6 @@ static void learn(const char *codebook_class_name,
 
             t_DD[id] = 0;
 
-            #pragma omp parallel for
             for (int v = id; v < tot_vecs; v += actual_threads) {
                 sample_t *rxg = allVectors[v];
                 sample_t ddmin = SAMPLE_MAX;
@@ -75,15 +74,13 @@ static void learn(const char *codebook_class_name,
                 minDists[v].codeword = raa_min;
                 minDists[v].minDist = ddmin - 1;
 
-                // the -1 here moved to `-= tot_vecs` after the loop
-                t_DD[id] += ddmin;
+                t_DD[id] += ddmin - 1;
 
                 add_to_cell(P, t_cells[id], rxg, ddmin, t_cardd[id], t_discel[id], raa_min);
             }
-            t_DD[id] -= tot_vecs;
         }
 
-        printf("---- max_id=%d\n", max_id);
+        //printf("---- max_id=%d\n", max_id);
 
         //---------------------
         // consolidate thread info:
@@ -92,8 +89,6 @@ static void learn(const char *codebook_class_name,
         for (int i = 0; i < num_raas; i++) {
             cardd[i] = 0;
             discel[i] = 0.f;
-        }
-        for (int i = 0; i < num_raas; i++) {
             for (int id = 0; id <= max_id; ++id) {
                 cardd[i] += t_cardd[id][i];
                 discel[i] += t_discel[id][i];
@@ -106,12 +101,11 @@ static void learn(const char *codebook_class_name,
         }
 
         sample_t cells[MAX_CODEBOOK_SIZE_IN_VALUES];
-        for (int i = 0; i < (1 + P) * num_raas; ++i) {
-            cells[i] = (sample_t) 0.;
-        }
-        for (int i = 0; i < (1 + P) * num_raas; ++i) {
+        sample_t *cel = cells;
+        for (int i = 0; i < (1 + P) * num_raas; ++i, ++cel) {
+            *cel = (sample_t) 0.;
             for (int id = 0; id <= max_id; ++id) {
-                cells[i] += t_cells[id][i];
+                *cel += t_cells[id][i];
             }
         }
         //---------------------

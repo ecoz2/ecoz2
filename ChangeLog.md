@@ -1,10 +1,19 @@
+2020-05
+
+- `vq_learn` code reorganized to incorporate parallel impl:
+
+    - some common support routines put in a separate vq_learn.i
+    - vq_learn_ser.c with serialized version
+    - vq_learn_par.c with parallel version
+    - add option `-S` to indicate serialized impl (by default, parallel)
+    - TODO similar -S option for `lpc`
+
+- Results with initial parallelized version of `vq_learn`:
+    PAR: ~207s;  SER: ~634s.
+
+        $ vq.learn [-S] -P 36 -e 0.0005 data/predictors/data/MARS_20161221_000046_SongSession_16kHz_HPF5Hz.prd
+
 2020-04
-
-- `vq_learn` code reorg to eventually facilitate parallel impl:
-
-    - some support routines put in a separate vq_learn.i
-    - vq_learn_ser.c with serialized version OK
-    - vq_learn_par.c with parallel version still to be completed
 
 - `vq_learn`: measure processing time, globally and per codebook size
 - add `-s <seed>` option to `vq.learn`

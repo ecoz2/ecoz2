@@ -4,20 +4,15 @@
 
 #include "vq_learn.i"
 
-#undef PAR
-//#define PAR 1
-
-#ifdef PAR
-    #include "vq_learn_par.c"
-#else
-    #include "vq_learn_ser.c"
-#endif
+#include "vq_learn_par.c"
+#include "vq_learn_ser.c"
 
 int vq_learn(int prediction_order,
              sample_t epsilon,
              const char *codebook_class_name,
              const char *predictor_filenames[],
              int num_predictors,
+             int use_par,
              vq_learn_callback_t callback
         ) {
 
@@ -67,9 +62,19 @@ int vq_learn(int prediction_order,
     sprintf(nom_rpt, "%s.rpt", prefix);
     prepare_report(nom_rpt, tot_vecs, eps);
 
-    learn(codebook_class_name,
-          P, prefix,
-          num_raas, tot_vecs, allVectors, eps, callback);
+    if (use_par) {
+        learn_par(codebook_class_name,
+                  P, prefix,
+                  num_raas, tot_vecs, allVectors, eps, callback);
+
+    }
+    else {
+        printf("(using serialized impl)\n");
+        learn_ser(codebook_class_name,
+              P, prefix,
+              num_raas, tot_vecs, allVectors, eps, callback);
+    }
+
 
     free(allVectors);
 
