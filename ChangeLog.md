@@ -1,7 +1,10 @@
 2020-04
 
 - `vq_learn` code reorg to eventually facilitate parallel impl:
-  some support routines put in a separate vq_learn.i
+
+    - some support routines put in a separate vq_learn.i
+    - vq_learn_ser.c with serialized version OK
+    - vq_learn_par.c with parallel version still to be completed
 
 - `vq_learn`: measure processing time, globally and per codebook size
 - add `-s <seed>` option to `vq.learn`

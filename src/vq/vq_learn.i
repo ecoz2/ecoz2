@@ -14,9 +14,6 @@ static sample_t codebook[MAX_CODEBOOK_SIZE_IN_VALUES];
 // codebook entries as reflection vectors:
 static sample_t reflections[MAX_CODEBOOK_SIZE_IN_VALUES];
 
-// classification on training vectors:
-static sample_t cells[MAX_CODEBOOK_SIZE_IN_VALUES];
-
 static inline void init_codebook_and_reflections(int P) {
     sample_t *raa = codebook;
     sample_t *refl = reflections;
@@ -58,7 +55,7 @@ static inline void init_cells(int P, sample_t *cells, int num_raas, int *cardd, 
 
 /// adds autocorrelation rx to i-th cell, updates cardinality and
 /// accumulates the distortion associated to such cell
-static inline void add_to_cell(int P, sample_t *rx, sample_t ddmin, int *cardd, sample_t *discel, int i) {
+static inline void add_to_cell(int P, sample_t *cells, sample_t *rx, sample_t ddmin, int *cardd, sample_t *discel, int i) {
     sample_t *cell = cells + (1 + P) * i;
     for (int n = 0; n < (1 + P); n++, cell++, rx++) {
         *cell += *rx;
@@ -84,7 +81,7 @@ static inline void review_cells(int num_raas, int *cardd) {
 /// Updates each cell's centroid in the form of reflection
 /// coefficients by solving the LPC equations corresponding to
 /// the average autocorrelation.
-static void calculate_reflections(int P, int *cardd, int num_raas) {
+static void calculate_reflections(int P, sample_t *cells, int *cardd, int num_raas) {
     sample_t errPred, pred[1 + P];
 
     sample_t *raa = codebook;
