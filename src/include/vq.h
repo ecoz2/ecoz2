@@ -8,6 +8,10 @@
 #include "lpc.h"
 #include "symbol.h"
 
+#define MAX_CODEBOOK_SIZE 2048
+
+#define MAX_PREDICTION_ORDER 40
+
 
 #define MAX_CB_MODELS 256
 

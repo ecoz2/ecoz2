@@ -2,183 +2,14 @@
  * Codebook generation according to Juang et al (1982).
  */
 
-#include <stdlib.h>
-#include <malloc.h>
-#include <string.h>
+#include "vq_learn.i"
 
-#include "lpc.h"
-#include "vq.h"
-#include "utl.h"
-
-
-#define MAX_CODEBOOK_SIZE 2048
-
-// prediction order (required parameter)
-static int P = 0;
-
-// to examine convergence:
-static sample_t eps = .05;
-
-// factors to grow codebook:
-static const sample_t pert0 = 0.99f;
-static const sample_t pert1 = 1.01f;
-
-
-// Codebook:
-
-static sample_t *codebook;       // codebook entries as raas
-static sample_t *reflections;    // codebook entries as reflection vectors
-static int num_raas;          // current number of entries
-static sample_t *cells;          // classification on training vectors
-
-static int cardd[MAX_CODEBOOK_SIZE];   // cardinalities
-
-static sample_t discel[MAX_CODEBOOK_SIZE];    // distortions per cell
-
-static char prefix[2048] = "";    // to name report and codebooks
-static char cb_filename[2048];
-static char codebook_className[2048];
-
-static long tot_vecs;
-
-static void allocate_codebook() {
-    const long maxCbSizeInBytes = MAX_CODEBOOK_SIZE * (1 + P) * sizeof(sample_t);
-
-    if (0 == (codebook = (sample_t *) malloc(maxCbSizeInBytes))
-        || 0 == (cells = (sample_t *) malloc(maxCbSizeInBytes))
-        || 0 == (reflections = (sample_t *) malloc(maxCbSizeInBytes))
-            ) {
-        printf("not enough memory for codebook\n");
-        exit(1);
-    }
-
-    sample_t *raa = codebook;
-    sample_t *refl = reflections;
-    for (int i = 0; i < MAX_CODEBOOK_SIZE * (1 + P); i++, raa++, refl++) {
-        *raa = *refl = (sample_t) 0.;
-    }
-}
-
-static void release_codebook() {
-    free(reflections);
-    free(cells);
-    free(codebook);
-}
-
-/*
- initial codebook corresponding to 2 reflection vectors [_, ±0.5, 0, ...].
- note: first entry (0) of reflection vector is ignored.
-*/
-static void initial_codebook() {
-    num_raas = 2;
-
-    sample_t *refl0 = reflections + 1;
-    sample_t *refl1 = reflections + (1 + P) + 1;
-    *refl0++ = -(*refl1++ = (sample_t) .5);
-
-    // zero in all other entries:
-    for (int i = 1; i < P; i++) {
-        *refl0++ = *refl1++ = (sample_t) 0.;
-    }
-
-    // get the raas associated with these two reflection vectors:
-    reflections_to_raas(reflections, codebook, num_raas, P);
-}
-
-static void init_cells() {
-    // set (1+P)*num_raas values to zero:
-    sample_t *cel = cells;
-    for (int i = 0; i < (1 + P) * num_raas; i++, cel++) {
-        *cel = (sample_t) 0.;
-    }
-
-    for (int i = 0; i < num_raas; i++) {
-        cardd[i] = 0;
-        discel[i] = 0.f;
-    }
-}
-
-// adds autocorrelation rx to i-th cell and
-// accumulates the distortion associated to such cell
-static void add_to_cell(int i, sample_t *rx, sample_t ddmin) {
-    sample_t *cell = cells + (1 + P) * i;
-    for (int n = 0; n < (1 + P); n++, cell++, rx++) {
-        *cell += *rx;
-    }
-    cardd[i]++;
-    discel[i] += ddmin - 1;
-}
-
-static void review_cells(void) {
-    int numEmpty = 0;
-    for (int i = 0; i < num_raas; i++) {
-        if (0 == cardd[i]) {
-            numEmpty++;
-        }
-    }
-    if (numEmpty > 0) {
-        printf("\nWARN: review_cells: %d empty cell(s) for codebook size %d)\n",
-               numEmpty, num_raas);
-    }
-}
-
-/**
-  * Updates each cell's centroid in the form of reflection
-  * coefficients by solving the LPC equations corresponding to
-  * the average autocorrelation.
-  */
-static void calculate_reflections() {
-    sample_t errPred, pred[1 + P];
-
-    sample_t *raa = codebook;
-    sample_t *cel = cells;
-    sample_t *refl = reflections;
-
-    for (int i = 0; i < num_raas; i++, raa += (1 + P), cel += (1 + P), refl += (1 + P)) {
-        if (cardd[i] > 0) {
-            lpca_r(P, cel, refl, pred, &errPred);
-
-            // pred[] has the predictor coefficients; now get the corresponding
-            // autocorrelation as entry in the codebook:
-            for (int n = 0; n <= P; n++) {
-                sample_t sum = 0;
-                for (int k = 0; k <= P - n; k++) {
-                    sum += pred[k] * pred[k + n];
-                }
-                raa[n] = sum;
-            }
-
-            // normalize accumulated autocorrelation sequence by gain
-            // in this cell for the sigma ratio calculation:
-            if (errPred != 0.) {
-                for (int k = 0; k <= P; k++) {
-                    cel[k] /= errPred;
-                }
-            }
-        }
-    }
-}
-
-/**
- * Grows the codebook by perturbing each reflector with the pert1 and pert0 factors.
- */
-static void grow_codebook(int P) {
-    sample_t *rex = reflections + (1 + P) * num_raas - 1;    // start with last coefficient
-    sample_t *rex1 = rex + (1 + P) * num_raas;            // new coeff with pert1
-    sample_t *rex0 = rex1 - (1 + P);                    // new coeff with pert0
-
-    for (int i = 0; i < num_raas; i++, rex1 -= (1 + P), rex0 -= (1 + P)) {
-        for (int n = 0; n < (1 + P); n++, rex--, rex1--, rex0--) {
-            *rex1 = *rex * pert1;
-            *rex0 = *rex * pert0;
-        }
-    }
-    num_raas *= 2;
-
-    reflections_to_raas(reflections, codebook, num_raas, P);
-}
-
-static void learn(sample_t **allVectors,
+static void learn(const char *codebook_class_name,
+                  int P,
+                  char *prefix,
+                  int num_raas,
+                  long tot_vecs,
+                  sample_t **allVectors,
                   sample_t eps,
                   vq_learn_callback_t callback
                   ) {
@@ -189,6 +20,7 @@ static void learn(sample_t **allVectors,
 
     int pass = 0;
 
+    char cb_filename[2048];
     #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
     printf("%s\n", cb_filename);
@@ -199,12 +31,15 @@ static void learn(sample_t **allVectors,
     // for particular codebook size:
     double measure_start_cb_sec = measure_time_now_sec();
 
+    int      cardd[MAX_CODEBOOK_SIZE];   // cardinalities
+    sample_t discel[MAX_CODEBOOK_SIZE];  // distortions per cell
+
     sample_t DDprv = SAMPLE_MAX;
     for (;;) {
         printf("(%d)", pass);
         fflush(stdout);
 
-        init_cells();
+        init_cells(P, cells, num_raas, cardd, discel);
 
         sample_t DD = 0;
 
@@ -223,9 +58,14 @@ static void learn(sample_t **allVectors,
             }
             minDists[v].codeword = raa_min;
             minDists[v].minDist = ddmin - 1;
-            DD += ddmin - 1;
-            add_to_cell(raa_min, rxg, ddmin);
+
+            // the -1 here moved to `DD -= tot_vecs` after the loop
+            DD += ddmin;
+
+            add_to_cell(P, rxg, ddmin, cardd, discel, raa_min);
         }
+
+        DD -= tot_vecs;
 
         const sample_t avgDistortion = DD / tot_vecs;
 
@@ -233,9 +73,9 @@ static void learn(sample_t **allVectors,
                avgDistortion, DDprv, DD, ((DDprv - DD) / DD));
         fflush(stdout);
 
-        review_cells();
+        review_cells(num_raas, cardd);
 
-        calculate_reflections();
+        calculate_reflections(P, cardd, num_raas);
 
         if (pass > 0 && ((DDprv - DD) / DD) < eps) {
             // done with this codebook size.
@@ -243,7 +83,7 @@ static void learn(sample_t **allVectors,
                     num_raas, measure_time_now_sec() - measure_start_cb_sec);
 
             // codebook saved with reflections
-            cb_save(codebook_className, reflections, num_raas, P, cb_filename);
+            cb_save(codebook_class_name, reflections, num_raas, P, cb_filename);
 
             sample_t sigma = calculateSigma(codebook, cells, num_raas, P, avgDistortion);
             sample_t inertia = calculateInertia(allVectors,  tot_vecs, codebook, num_raas, P);
@@ -262,7 +102,7 @@ static void learn(sample_t **allVectors,
             }
 
             pass = 0;
-            grow_codebook(P);
+            num_raas = grow_codebook(num_raas, P);
             sprintf(cb_filename, "%s_M_%04d.cbook", prefix, num_raas);
             printf("%s\n", cb_filename);
 
@@ -287,26 +127,29 @@ int vq_learn(int prediction_order,
              vq_learn_callback_t callback
         ) {
 
-    P = prediction_order;
-    eps = epsilon;
-    strcpy(codebook_className, codebook_class_name);
+    const int P = prediction_order;
+    const sample_t eps = epsilon;
 
     printf("\nCodebook generation:\n\n");
-    printf("P=%d eps=%g  class='%s'\n\n", P, eps, codebook_className);
+    printf("P=%d eps=%g  class='%s'\n\n", P, eps, codebook_class_name);
 
     const char *dir_codebooks = "data/codebooks";
     static char class_dir[2048];
-    sprintf(class_dir, "%s/%s", dir_codebooks, codebook_className);
+    sprintf(class_dir, "%s/%s", dir_codebooks, codebook_class_name);
     mk_dirs(class_dir);
+
+    // to name report and codebooks
+    char prefix[2048];
     #pragma GCC diagnostic ignored "-Wformat-overflow"
     sprintf(prefix, "%s/eps_%g", class_dir, eps);
 
-    allocate_codebook();
-    initial_codebook();
+    init_codebook_and_reflections(P);
+
+    int num_raas = initial_codebook(P);
 
     // load predictors
     Predictor **predictors = (Predictor **) calloc(num_predictors, sizeof(Predictor*));
-    tot_vecs = 0;
+    long tot_vecs = 0;
     for (int i = 0; i < num_predictors; i++) {
         const char *prdFilename = predictor_filenames[i];
         predictors[i] = prd_load(prdFilename);
@@ -330,7 +173,9 @@ int vq_learn(int prediction_order,
     sprintf(nom_rpt, "%s.rpt", prefix);
     prepare_report(nom_rpt, tot_vecs, eps);
 
-    learn(allVectors, eps, callback);
+    learn(codebook_class_name,
+          P, prefix,
+          num_raas, tot_vecs, allVectors, eps, callback);
 
     free(allVectors);
 
@@ -341,6 +186,5 @@ int vq_learn(int prediction_order,
 
     close_report();
 
-    release_codebook();
     return 0;
 }
