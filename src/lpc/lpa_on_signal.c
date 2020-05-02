@@ -114,21 +114,9 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
     create_hamming(hamming, winSize);
 
 #ifdef PAR
-    const int desired_threads = omp_get_max_threads();
-    omp_set_num_threads(desired_threads);
-    printf("(desired_threads=%d", desired_threads);
-    #pragma omp parallel
-    {
-    int id = omp_get_thread_num();
-    int actual_threads = omp_get_num_threads();
-    if (id == 0) {
-        printf(" actual_threads=%d)\n", actual_threads);
-    }
-    #pragma omp parallel for
-    for (int t = id; t < T; t += actual_threads) {
-#else
-    for (int t = 0; t < T; ++t) {
+#pragma omp parallel for
 #endif
+    for (int t = 0; t < T; ++t) {
         sample_t *samples = signal + t * offset;
 
         // perform linear prediction to each frame:
@@ -159,9 +147,6 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
             }
         }
     }
-#ifdef PAR
-    }
-#endif
     printf("  %d total frames processed\n", T);
 
     return predictor;

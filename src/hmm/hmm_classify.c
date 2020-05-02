@@ -307,22 +307,11 @@ int hmm_classify(
         result[classId][0]++;
 
 #ifdef PAR
-        const int desired_threads = omp_get_max_threads();
-        omp_set_num_threads(desired_threads);
-        #pragma omp parallel
-        {
-            const int id = omp_get_thread_num();
-            const int actual_threads = omp_get_num_threads();
-
-            for (int r = id; r < num_models; r += actual_threads) {
-                probs[r] = hmmprob_log_prob(hmmprob_objects[r], sequence, T);
-            }
-        }
-#else
+#pragma omp parallel for
+#endif
         for (int r = 0; r < num_models; r++) {
             probs[r] = hmmprob_log_prob(hmmprob_objects[r], sequence, T);
         }
-#endif
         _sort_probs(probs, ordp, num_models);
 
         const int correct = classId == ordp[num_models - 1];
