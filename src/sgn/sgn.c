@@ -70,7 +70,9 @@ int sgn_save(Sgn *s, char *filename) {
     }
     drwav_uint64 samplesWritten = drwav_write(pWav, s->numSamples, floats);
     if (samplesWritten != (drwav_uint64) s->numSamples) {
-        fprintf(stderr, "WARN: samplesWritten=%llu != %d\n", samplesWritten, s->numSamples);
+        fprintf(stderr, "WARN: samplesWritten=%llu != %d\n",
+                (long long unsigned int) samplesWritten, // cast to avoid warn under -std=gnu99
+                s->numSamples);
     }
 
     drwav_close(pWav);
