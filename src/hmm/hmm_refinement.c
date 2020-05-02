@@ -42,7 +42,9 @@ static const prob_t one = (prob_t) 1.;
 #define obs(t) O[t]
 //#define obs(t) (O[(t)] < M ? O[(t)] : (printf("OOPS! O[%d]=%d >= M=%d T=%d\n", (t), O[(t)], M, T), seq_show(O, T), assert((t) < M), O[t]))
 
-int hmm_refinement_prepare(Hmm *_lmd, Symbol **_cads, int *_T, int _num_cads) {
+static void hmm_refinement_destroy(void);
+
+static int hmm_refinement_prepare(Hmm *_lmd, Symbol **_cads, int *_T, int _num_cads) {
     hmm = _lmd;
     seqs = _cads;
     T = _T;
@@ -81,7 +83,7 @@ int hmm_refinement_prepare(Hmm *_lmd, Symbol **_cads, int *_T, int _num_cads) {
     return 0;
 }
 
-void hmm_refinement_destroy() {
+static void hmm_refinement_destroy(void) {
     if (0 != betaH) {
         del_matrix(betaH);
         betaH = 0;
@@ -128,7 +130,7 @@ void hmm_refinement_destroy() {
     }
 }
 
-static void init_counters() {
+static void init_counters(void) {
     const int N = hmm->N;
     const int M = hmm->M;
 
@@ -259,7 +261,7 @@ static void gen_numB_denB(Symbol *O, int T) {
     }
 }
 
-static void refine_A() {
+static void refine_A(void) {
     const int N = hmm->N;
     prob_t **A = hmm->A;
 
@@ -270,7 +272,7 @@ static void refine_A() {
     }
 }
 
-static void refine_B() {
+static void refine_B(void) {
     const int N = hmm->N;
     const int M = hmm->M;
     prob_t **B = hmm->B;
@@ -283,7 +285,8 @@ static void refine_B() {
     hmm_adjustB(hmm, "refine_B");
 }
 
-int hmm_refinement_step() {
+static int hmm_refinement_step(void) {
+    //const double measure_start_sec = measure_time_now_sec();
     init_counters();
 
     // process each sequence:
@@ -298,5 +301,6 @@ int hmm_refinement_step() {
     refine_A();
     refine_B();
 
+    //printf("hmm_refinement_step took %.2fs\n", measure_time_now_sec() - measure_start_sec);
     return 0;
 }

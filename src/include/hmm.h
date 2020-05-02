@@ -95,15 +95,6 @@ void hmm_estimateB(Hmm *hmm, Symbol **O, int *T, int num_cads);
 void hmm_init(Hmm *, int mode);
 
 /**
- * HMM parameter refinement with scaling.
- */
-int hmm_refinement_prepare(Hmm *hmm, Symbol **seqs, int *T, int num_cads);
-
-int hmm_refinement_step();
-
-void hmm_refinement_destroy();
-
-/**
  * Helper for multiple hmm_log_prob calculations wrt same model.
  */
 typedef struct {

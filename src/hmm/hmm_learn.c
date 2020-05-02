@@ -11,6 +11,7 @@
 #include <math.h>
 #include <assert.h>
 
+#include "hmm_refinement.c"
 
 // for auto convergence
 static prob_t val_auto = 0.3;
@@ -47,7 +48,7 @@ static void _report_results(FILE *file) {
     fprintf(file, "\t          Σ log(P): %Le\n", sum_log_prob);
 }
 
-static void report_results() {
+static void report_results(void) {
     _report_results(stdout);
 
     char rpt_filename[2048];
@@ -248,12 +249,9 @@ int hmm_learn(
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
 
-        const double measure_ref_end_sec = measure_time_now_sec();
-        const double measure_ref_elapsed_sec = measure_ref_end_sec - measure_ref_start_sec;
-
         fprintf(stderr, " %d: Δ = %+Lg  sum_log_prob = %+Lg sum_log_prob_prev = %+Lg  '%s'  (%.3fs)\n",
                 num_refinements, change, sum_log_prob, sum_log_prob_prev, model_className,
-                measure_ref_elapsed_sec
+                measure_time_now_sec() - measure_ref_start_sec
                 );
 
         if (sum_log_prob >= 0) {
@@ -274,8 +272,7 @@ int hmm_learn(
     }
     fprintf(stderr, "\n");
 
-    const double measure_end_sec = measure_time_now_sec();
-    const double measure_elapsed_sec = measure_end_sec - measure_start_sec;
+    const double measure_elapsed_sec = measure_time_now_sec() - measure_start_sec;
 
     hmm_refinement_destroy();
 

@@ -1,5 +1,7 @@
 2020-05
 
+- minor hmm_learn code reorg
+
 - `seq_show`: show size of sequence and abbreviate it with `...` if
   if a bit too many: `<(size): s, s, s, ..., s, s, s>`
 

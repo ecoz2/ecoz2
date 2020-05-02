@@ -9,7 +9,6 @@ SOURCE_FILES=\
 	hmm_show.c \
 	hmm_adjustb.c \
 	hmm_file.c  \
-	hmm_refinement.c \
 	hmm_prob.c \
 	hmm_log_prob.c \
 	hmm_genQopt.c \
@@ -24,6 +23,8 @@ INCLUDE= -I ../include
 OBJ=../../_out/o
 
 OBJECT_FILES = $(SOURCE_FILES:%.c=$(OBJ)/%.o)
+
+$(OBJ)/hmm_learn.o: hmm_refinement.c
 
 build: $(OBJECT_FILES)
 
