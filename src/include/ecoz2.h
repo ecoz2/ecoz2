@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-const char *ecoz2_version();
+const char *ecoz2_version(void);
 
 /// Calls `sranddev()` if seed < 0;
 /// otherwise, calls `srand((unsigned) seed)`.

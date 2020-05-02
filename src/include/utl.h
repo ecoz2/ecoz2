@@ -16,7 +16,7 @@
 
 int ends_with(char* filename, char* str);
 
-double measure_time_now_sec();
+double measure_time_now_sec(void);
 
 int write_file_ident(FILE *file, const char *ident);
 
