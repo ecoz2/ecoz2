@@ -24,8 +24,6 @@ OBJ=../../_out/o
 
 OBJECT_FILES = $(SOURCE_FILES:%.c=$(OBJ)/%.o)
 
-$(OBJ)/hmm_learn.o: hmm_refinement.c
-
 build: $(OBJECT_FILES)
 
 $(OBJECT_FILES): $(OBJ)/%.o: %.c

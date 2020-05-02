@@ -1,5 +1,16 @@
 2020-05
 
+- parallelize `hmm_classify`.
+  This is only done in the inner loop that gets the R probabilities
+  for each sequence, where R is the number of models.
+  The current loop structure is basically: foreach-sequence: foreach-model.
+  TODO switching these loops might be even more performant.
+
+    Results with the following involving 20 64/2048 HMMs and 1060 sequences:
+      PAR: 4.24s;  SER: 13.66s => >3x speedup
+
+        $ hmm.classify data/hmms/N64__M2048_t3__a0.3/*hmm  data/sequences/TEST/M2048/*/*seq
+
 - minor hmm_learn code reorg
 
 - `seq_show`: show size of sequence and abbreviate it with `...` if

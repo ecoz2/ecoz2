@@ -12,6 +12,13 @@
 #include <float.h>
 #include <assert.h>
 
+#undef PAR
+//#define PAR 1
+
+#ifdef PAR
+#include <omp.h>
+#endif
+
 #define GREEN(s) "\x1b[32m" s "\x1b[0m"
 #define RED(s)   "\x1b[31m" s "\x1b[0m"
 
@@ -273,6 +280,9 @@ int hmm_classify(
 
     init_results();
     printf("\n");
+
+    const double measure_start_sec = measure_time_now_sec();
+
     for (int i = 0; i < num_seq_filenames; ++i) {
         const char *seq_filename = seq_filenames[i];
         sequence = seq_load(seq_filename, &T, &M, seq_className);
@@ -296,9 +306,23 @@ int hmm_classify(
         result[TOTAL][0]++;
         result[classId][0]++;
 
+#ifdef PAR
+        const int desired_threads = omp_get_max_threads();
+        omp_set_num_threads(desired_threads);
+        #pragma omp parallel
+        {
+            const int id = omp_get_thread_num();
+            const int actual_threads = omp_get_num_threads();
+
+            for (int r = id; r < num_models; r += actual_threads) {
+                probs[r] = hmmprob_log_prob(hmmprob_objects[r], sequence, T);
+            }
+        }
+#else
         for (int r = 0; r < num_models; r++) {
             probs[r] = hmmprob_log_prob(hmmprob_objects[r], sequence, T);
         }
+#endif
         _sort_probs(probs, ordp, num_models);
 
         const int correct = classId == ordp[num_models - 1];
@@ -356,6 +380,8 @@ int hmm_classify(
 
         free(sequence);
     }
+    const double measure_elapsed_sec = measure_time_now_sec() - measure_start_sec;
+
     release_not_loaded_models_list();
 
     report_results();
@@ -365,5 +391,6 @@ int hmm_classify(
         hmm_destroy(models[r]);
     }
 
+    printf("classification took %.2fs\n", measure_elapsed_sec);
     return 0;
 }
