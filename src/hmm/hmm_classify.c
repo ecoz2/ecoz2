@@ -12,8 +12,8 @@
 #include <float.h>
 #include <assert.h>
 
-#undef PAR
-//#define PAR 1
+//#undef PAR
+#define PAR 1
 
 #ifdef PAR
 #include <omp.h>
