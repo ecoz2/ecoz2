@@ -10,7 +10,7 @@ extern "C" {
 
 const char *ecoz2_version(void);
 
-/// Calls `sranddev()` if seed < 0;
+/// Calls `srand(rand())` if seed < 0;
 /// otherwise, calls `srand((unsigned) seed)`.
 void ecoz2_set_random_seed(int seed);
 

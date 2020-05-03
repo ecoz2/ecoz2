@@ -1,5 +1,8 @@
 2020-05
 
+- ecoz2_set_random_seed: use srand(rand()) instead of sranddev()
+  to facilitate build on macos and linux
+
 - parallelize `hmm_classify`.
   This is only done in the inner loop that gets the R probabilities
   for each sequence, where R is the number of models.

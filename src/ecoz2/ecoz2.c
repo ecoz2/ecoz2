@@ -4,7 +4,7 @@
 #include "hmm.h"
 
 #include <string.h>
-#include <stdlib.h>  // sranddev, srand
+#include <stdlib.h>  // rand, srand
 
 const char *ecoz2_version() {
     return "0.3.0";
@@ -13,7 +13,7 @@ const char *ecoz2_version() {
 void ecoz2_set_random_seed(int seed) {
     printf("ecoz2_set_random_seed: seed=%d\n", seed);
     if (seed < 0) {
-        sranddev();
+        srand(rand());
     }
     else {
         srand((unsigned) seed);
