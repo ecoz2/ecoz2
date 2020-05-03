@@ -3,20 +3,22 @@
 Linear Predictive Coding Vector Quantization and
 Hidden Markov Modeling for speech recognition.
 
-This project is a revision of an implementation I did as part
+This project is a general revision of an implementation I did as part
 of my BS thesis[^ecoz] on isolated word speech recognition
 using LPC vector quantization[^juang82] and HMM[^rab83] [^rab89].
-This implementation was directly based on the algorithms
-described in the literature.
+The implementation was directly based on the algorithms described
+in the literature.
 
-Except as indicated in a couple of places, and apart from some style
-adjustments and modernization (in particular, better alignment with C99),
-the implementation of the various algorithms is essentially as
-originally written.
-A significant improvement in this revision, however, is the use of scaling
-factors[^shen] [^stamp] in HMM operations such that the system can
-deal with larger models, longer observation sequences, and
-larger vocabulary sizes.
+With the implementation essentially remaining as originally written,
+this revision mainly involves style adjustments and modernization
+(e.g., better alignment with C99), parallelization,
+use of scaling factors[^shen] [^stamp] in HMM operations
+(such that the system can deal with larger models, longer observation
+sequences, and larger vocabulary sizes),
+and facilitating the creation wrappers
+([Python](https://github.com/ecoz2/ecoz2py),
+[Rust](https://github.com/ecoz2/ecoz2rs)).
+
 
 ### Status
 
