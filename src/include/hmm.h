@@ -120,6 +120,11 @@ prob_t hmm_log_prob(Hmm *hmm, Symbol *O, int T);
  */
 prob_t hmm_genQopt(Hmm *, Symbol *O, int T, int *Qopt);
 
+/// as the above but with work memory provided by caller
+prob_t hmm_genQopt_with_mem(Hmm *hmm, Symbol *O, int T, int *Qopt,
+                            prob_t **phi, int **psi);
+
+
 void hmm_show_model(Hmm *, char *fmt);
 
 /**

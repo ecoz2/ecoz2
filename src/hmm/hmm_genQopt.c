@@ -9,12 +9,24 @@
 
 prob_t hmm_genQopt(Hmm *hmm, Symbol *O, int T, int *Qopt) {
     const int N = hmm->N;
-    prob_t *pi = hmm->pi;
-    prob_t **A = hmm->A;
-    prob_t **B = hmm->B;
 
     prob_t **phi = (prob_t **) new_matrix(T, N, sizeof(prob_t));
     int **psi = (int **) new_matrix(T, N, sizeof(int));
+
+    prob_t log_prob = hmm_genQopt_with_mem(hmm, O, T, Qopt, phi, psi);
+
+    del_matrix(psi);
+    del_matrix(phi);
+
+    return log_prob;
+}
+
+prob_t hmm_genQopt_with_mem(Hmm *hmm, Symbol *O, int T, int *Qopt,
+                            prob_t **phi, int **psi) {
+    const int N = hmm->N;
+    prob_t *pi = hmm->pi;
+    prob_t **A = hmm->A;
+    prob_t **B = hmm->B;
 
     for (int i = 0; i < N; i++) {
         phi[0][i] = logl(pi[i]) + logl(B[i][O[0]]);
@@ -52,9 +64,6 @@ prob_t hmm_genQopt(Hmm *hmm, Symbol *O, int T, int *Qopt) {
     for (int t = T - 2; t >= 0; t--) {
         Qopt[t] = psi[t + 1][Qopt[t + 1]];
     }
-
-    del_matrix(phi);
-    del_matrix(psi);
 
     return log_prob;
 }

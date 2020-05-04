@@ -33,9 +33,11 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
 
     int *Qopt = (int *) new_vector(max_T, sizeof(int));
 
+    prob_t **phi = (prob_t **) new_matrix(max_T, N, sizeof(prob_t));
+    int **psi = (int **) new_matrix(max_T, N, sizeof(int));
     for (int r = 0; r < num_cads; r++) {
         // get optimal sequence:
-        hmm_genQopt(hmm, seqs[r], T[r], Qopt);
+        hmm_genQopt_with_mem(hmm, seqs[r], T[r], Qopt, phi, psi);
 
         // update counters:
         for (int t = 0; t < T[r]; t++) {
@@ -44,6 +46,9 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
             den[state]++;
         }
     }
+    del_matrix(psi);
+    del_matrix(phi);
+
     del_vector(Qopt);
 
     // do required normalizations:
@@ -63,8 +68,8 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
         }
     }
 
-    del_matrix(num);
     del_vector(den);
+    del_matrix(num);
 
     printf("initial B took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
 
