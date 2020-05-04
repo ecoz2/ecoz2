@@ -286,7 +286,7 @@ static inline void refine_B(void) {
 }
 
 static int hmm_refinement_step(void) {
-    const double measure_start_sec = measure_time_now_sec();
+    //const double measure_start_sec = measure_time_now_sec();
     init_counters();
 
     // process each sequence:
@@ -301,8 +301,7 @@ static int hmm_refinement_step(void) {
     refine_A();
     refine_B();
 
-    const double elapsed_secs = measure_time_now_sec() - measure_start_sec;
-    printf("hmm_refinement_step took %s\n", measure_time_show_elapsed(elapsed_secs));
+    //printf("hmm_refinement_step took %s\n", measure_time_now_sec() - measure_start_sec);
 
     return 0;
 }

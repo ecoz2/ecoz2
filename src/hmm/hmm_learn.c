@@ -69,7 +69,7 @@ static void report_results(void) {
 }
 
 static inline prob_t get_sum_log_prob(Hmm *hmm, int num_seqs, Symbol **sequences, int *T, int use_par) {
-    const double measure_start_sec = measure_time_now_sec();
+    //const double measure_start_sec = measure_time_now_sec();
     prob_t sum_log_prob = 0.;
 
     if (use_par) {
@@ -86,7 +86,7 @@ static inline prob_t get_sum_log_prob(Hmm *hmm, int num_seqs, Symbol **sequences
         }
     }
 
-    printf("get_sum_log_prob took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
+    //printf("get_sum_log_prob took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
     return sum_log_prob;
 }
 
