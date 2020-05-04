@@ -27,9 +27,12 @@ build: $(EXECUTABLE_FILES)
 
 INCLUDE=-I ../include
 
+# uncomment if profiling:
+#profiling=-lprofiler
+
 $(EXECUTABLE_FILES): $(BIN)/% : %.c $(libecoz)
 	@mkdir -p $(BIN)
-	$(cc) $(cdebug) $(cflags) -fopenmp $(INCLUDE) -o $@ $^ -lm
+	$(cc) $(cdebug) $(cflags) -fopenmp $(INCLUDE) -o $@ $^ -lm $(profiling)
 
 tidy:
 	rm -f *.o *~

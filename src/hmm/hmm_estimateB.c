@@ -9,7 +9,7 @@
 static const prob_t one = (prob_t) 1.;
 
 void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
-    printf("estimating initial B...\n");
+    printf("estimating initial B matrix ...\n");
     const double measure_start_sec = measure_time_now_sec();
 
     const int N = hmm->N;
@@ -71,7 +71,7 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
     del_vector(den);
     del_matrix(num);
 
-    printf("initial B took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
+    printf("initial B matrix took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
 
     // now apply epsilon-restriction:
     hmm_adjustB(hmm, "hmm_estimateB");

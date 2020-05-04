@@ -1,8 +1,24 @@
 2020-05
 
+- some profiling using gperftools
+
+    - on Mac: `brew install gperftools; PATH=/usr/local/Cellar/gperftools/2.7/bin:$PATH`
+    - Add -lprofiler in x/Makefile and re-make the programs
+    - Run a program, eg:
+
+            $ CPUPROFILE=hmm.learn.prof hmm.learn -s 0 -N 128 -a 0.3 .../*.seq
+            $ pprof --text `which hmm.learn` hmm.learn.prof
+            Using local file .../_out/bin/hmm.learn.
+            Using local file hmm.learn.prof.
+            Total: 606 samples
+            374  61.7%  61.7%      378  62.4% _hmm_learn
+            197  32.5%  94.2%      197  32.5% _hmm_genQopt_with_mem
+             23   3.8%  98.0%       30   5.0% _hmm_log_prob
+              7   1.2%  99.2%        7   1.2% 0x00007fff51e5a15a
+            ...
+
 - set prob_t to just double (not long double)
-- revert to use hmm_log_p revert to use hmm_log_prob in seq_show_filesrob in seq_show_files
-  (instead of HmmProb, which maybe still need adjustments)
+- revert to use hmm_log_prob in seq_show_files (for simplicity)
 
 - some `hmm_learn` revision
 - new option `-S` for `hmm.learn` to use the serialized impl.
