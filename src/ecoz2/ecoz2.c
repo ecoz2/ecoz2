@@ -153,6 +153,7 @@ int ecoz2_hmm_learn(
             hmm_epsilon,
             val_auto,
             max_iterations,
+            1,  // use_par
             callback
     );
 }

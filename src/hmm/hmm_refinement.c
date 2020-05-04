@@ -149,7 +149,7 @@ static void init_counters(void) {
     }
 }
 
-static void gen_alpha_beta(Symbol *O, int T) {
+static inline void gen_alpha_beta(Symbol *O, int T) {
     const int N = hmm->N;
     prob_t *pi = hmm->pi;
     prob_t **A = hmm->A;
@@ -216,7 +216,7 @@ static void gen_alpha_beta(Symbol *O, int T) {
     }
 }
 
-static void gen_numA_denA(Symbol *O, int T) {
+static inline void gen_numA_denA(Symbol *O, int T) {
     const int N = hmm->N;
     prob_t **A = hmm->A;
     prob_t **B = hmm->B;
@@ -238,7 +238,7 @@ static void gen_numA_denA(Symbol *O, int T) {
     }
 }
 
-static void gen_numB_denB(Symbol *O, int T) {
+static inline void gen_numB_denB(Symbol *O, int T) {
     const int N = hmm->N;
     const int M = hmm->M;
 
@@ -261,7 +261,7 @@ static void gen_numB_denB(Symbol *O, int T) {
     }
 }
 
-static void refine_A(void) {
+static inline void refine_A(void) {
     const int N = hmm->N;
     prob_t **A = hmm->A;
 
@@ -272,7 +272,7 @@ static void refine_A(void) {
     }
 }
 
-static void refine_B(void) {
+static inline void refine_B(void) {
     const int N = hmm->N;
     const int M = hmm->M;
     prob_t **B = hmm->B;
@@ -286,7 +286,7 @@ static void refine_B(void) {
 }
 
 static int hmm_refinement_step(void) {
-    //const double measure_start_sec = measure_time_now_sec();
+    const double measure_start_sec = measure_time_now_sec();
     init_counters();
 
     // process each sequence:
@@ -301,6 +301,8 @@ static int hmm_refinement_step(void) {
     refine_A();
     refine_B();
 
-    //printf("hmm_refinement_step took %.2fs\n", measure_time_now_sec() - measure_start_sec);
+    const double elapsed_secs = measure_time_now_sec() - measure_start_sec;
+    printf("hmm_refinement_step took %s\n", measure_time_show_elapsed(elapsed_secs));
+
     return 0;
 }

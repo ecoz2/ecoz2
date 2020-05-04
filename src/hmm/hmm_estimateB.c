@@ -8,10 +8,20 @@
 
 static const prob_t one = (prob_t) 1.;
 
-void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads) {
+void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
+    printf("estimating initial B...\n");
+    const double measure_start_sec = measure_time_now_sec();
+
     const int N = hmm->N;
     const int M = hmm->M;
     prob_t **B = hmm->B;
+
+    if (max_T <= 0) {
+        max_T = 0;
+        for (int r = 0; r < num_cads; ++r) {
+            if (max_T < T[r]) max_T = T[r];
+        }
+    }
 
     // counters:
 
@@ -21,10 +31,6 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads) {
     // def[j] number of times any symbol emitted from state j:
     int *den = (int *) new_vector(N, sizeof(int));
 
-    int max_T = 0;
-    for (int r = 0; r < num_cads; r++) {
-        if (max_T < T[r]) max_T = T[r];
-    }
     int *Qopt = (int *) new_vector(max_T, sizeof(int));
 
     for (int r = 0; r < num_cads; r++) {
@@ -33,8 +39,9 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads) {
 
         // update counters:
         for (int t = 0; t < T[r]; t++) {
-            num[Qopt[t]][seqs[r][t]]++;
-            den[Qopt[t]]++;
+            const int state = Qopt[t];
+            num[state][seqs[r][t]]++;
+            den[state]++;
         }
     }
     del_vector(Qopt);
@@ -58,6 +65,8 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads) {
 
     del_matrix(num);
     del_vector(den);
+
+    printf("initial B took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
 
     // now apply epsilon-restriction:
     hmm_adjustB(hmm, "hmm_estimateB");

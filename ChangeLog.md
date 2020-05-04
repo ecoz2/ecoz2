@@ -1,5 +1,8 @@
 2020-05
 
+- some `hmm_learn` revision
+- new option `-S` for `hmm.learn` to use the serialized impl.
+
 - ecoz2_set_random_seed: use srand(rand()) instead of sranddev()
   to facilitate build on macos and linux
 

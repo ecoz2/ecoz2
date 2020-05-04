@@ -49,6 +49,7 @@ int hmm_learn(
         double hmm_epsilon,
         double val_auto,
         int max_iterations,
+        int user_par,
         hmm_learn_callback_t callback
         );
 
@@ -84,10 +85,9 @@ void hmm_adjustB(Hmm *, const char* logMsg);
 
 void hmm_destroy(Hmm *);
 
-/**
- * Initial B estimation based on symbol frequencies.
- */
-void hmm_estimateB(Hmm *hmm, Symbol **O, int *T, int num_cads);
+/// Initial B estimation based on symbol frequencies.
+/// max_T > 0 can be given if already known.
+void hmm_estimateB(Hmm *hmm, Symbol **O, int *T, int num_cads, int max_T);
 
 /**
  * Model initialization according to given mode.

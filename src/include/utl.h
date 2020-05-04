@@ -18,6 +18,8 @@ int ends_with(char* filename, char* str);
 
 double measure_time_now_sec(void);
 
+const char* measure_time_show_elapsed(double elapsed_secs);
+
 int write_file_ident(FILE *file, const char *ident);
 
 int read_file_ident(FILE *file, const char *ident);

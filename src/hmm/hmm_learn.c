@@ -13,8 +13,12 @@
 
 #include "hmm_refinement.c"
 
+#include <omp.h>
+
 // for auto convergence
 static prob_t val_auto = 0.3;
+static prob_t log_val_auto;
+static prob_t abs_log_val_auto;
 
 // number of states and symbols
 static int N = 5, M;
@@ -43,7 +47,7 @@ static void _report_results(FILE *file) {
     else fprintf(file, "%Lg", hmm_epsilon);
     fprintf(file, "\n");
     fprintf(file, "\t        #sequences: %d\n", num_seqs);
-    fprintf(file, "\t        auto value: %Lg\n", val_auto);
+    fprintf(file, "\t        auto value: %Lg  (|log|=%Lg)\n", val_auto, abs_log_val_auto);
     fprintf(file, "\t      #refinements: %d\n", num_refinements);
     fprintf(file, "\t          Σ log(P): %Le\n", sum_log_prob);
 }
@@ -64,6 +68,29 @@ static void report_results(void) {
     }
 }
 
+static inline prob_t get_sum_log_prob(Hmm *hmm, int num_seqs, Symbol **sequences, int *T, int use_par) {
+    const double measure_start_sec = measure_time_now_sec();
+    prob_t sum_log_prob = 0.;
+
+    if (use_par) {
+        #pragma omp parallel for reduction (+:sum_log_prob)
+        for (int r = 0; r < num_seqs; ++r) {
+            prob_t prob = hmm_log_prob(hmm, sequences[r], T[r]);
+            sum_log_prob += prob;
+        }
+    }
+    else {
+        for (int r = 0; r < num_seqs; ++r) {
+            prob_t prob = hmm_log_prob(hmm, sequences[r], T[r]);
+            sum_log_prob += prob;
+        }
+    }
+
+    printf("get_sum_log_prob took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
+    return sum_log_prob;
+}
+
+
 int hmm_learn(
         int N_,
         int model_type_,
@@ -72,6 +99,7 @@ int hmm_learn(
         double hmm_epsilon_,
         double val_auto_,
         int max_iterations,
+        int use_par,
         hmm_learn_callback_t callback
         ) {
 
@@ -79,10 +107,6 @@ int hmm_learn(
     assert(num_sequences <= MAX_SEQS);
 
     fprintf(stderr, "hmm_learn: num_sequences = %d\n", num_sequences);
-
-    // for (int r = 0; r < num_sequences; ++r) {
-    //     fprintf(stderr, "%3d: %s\n", r, sequence_filenames[r]);
-    // }
 
     N = N_;
     model_type = model_type_;
@@ -96,9 +120,6 @@ int hmm_learn(
     // corresponding sequence lengths:
     int T[MAX_SEQS];
 
-    // log of probability
-    prob_t prob;
-
     char sequence_className[MAX_CLASS_NAME_LEN];
 
     // model to generate:
@@ -106,7 +127,7 @@ int hmm_learn(
 
     // load first training sequence:
 
-    fprintf(stderr, "%3d: %s\n", 0, sequence_filenames[0]);
+    fprintf(stderr, "  %3d: %s\n", 0, sequence_filenames[0]);
     sequences[0] = seq_load(sequence_filenames[0], T, &M, sequence_className);
 
     if (!sequences[0]) {
@@ -142,7 +163,20 @@ int hmm_learn(
         // to check all sequences come from same codebook size:
         int Mcmp;
 
-        fprintf(stderr, "%3d: %s\n", r, sequence_filenames[r]);
+        int show_filename = 0;
+        if (num_sequences > 8) {
+            if (r == 3) {
+                fprintf(stderr, "  ...\n");
+            }
+            else if (r < 3 || r > num_sequences - 3 - 1) {
+                show_filename = 1;
+            }
+        }
+        else show_filename = 1;
+        if (show_filename) {
+            fprintf(stderr, "  %3d: %s\n", r, sequence_filenames[r]);
+        }
+
         sequences[num_seqs] = seq_load(sequence_filenames[r], T + num_seqs, &Mcmp, sequence_className);
 
         if (!sequences[num_seqs]) {
@@ -160,16 +194,13 @@ int hmm_learn(
         }
     }
 
-    prob_t log_val_auto = 0;
-    prob_t abs_log_val_auto = 0;
     if (val_auto > 0) {
         log_val_auto = logl(val_auto);
         abs_log_val_auto = fabsl(log_val_auto);
     }
 
     fprintf(stderr, "\nN=%d M=%d type=%d  #sequences = %d  max_T=%d\n", N, M, model_type, num_seqs, max_T);
-    fprintf(stderr, "val_auto = %Lg   log=%Lg\n", val_auto, log_val_auto);
-    fprintf(stderr, "max_iterations= %d\n", max_iterations);
+    fprintf(stderr, "val_auto = %Lg   log=%Lg   max_iterations=%d\n", val_auto, log_val_auto, max_iterations);
 
     const double measure_start_sec = measure_time_now_sec();
 
@@ -182,28 +213,9 @@ int hmm_learn(
     hmm_init(hmm, model_type);
 
     // initial B estimates per the given sequences:
-    hmm_estimateB(hmm, sequences, T, num_seqs);
+    hmm_estimateB(hmm, sequences, T, num_seqs, max_T);
 
-    const int show_probs = 0;
-
-    if (show_probs) fprintf(stderr, "\n[Ini]: ");
-    sum_log_prob = 0.;
-
-    for (int r = 0; r < num_seqs; ++r) {
-        prob = hmm_log_prob(hmm, sequences[r], T[r]);
-        sum_log_prob += prob;
-        if (show_probs) fprintf(stderr, "%2.1Le ", prob);
-    }
-
-//    HmmProb *hmmprob_object = hmmprob_create(hmm);
-//    for (int r = 0; r < num_seqs; ++r) {
-//        prob = hmmprob_log_prob(hmmprob_object, sequences[r], T[r]);
-//        sum_log_prob += prob;
-//        if (show_probs) fprintf(stderr, "%2.1Le ", prob);
-//    }
-//    hmmprob_destroy(hmmprob_object);
-
-    if (show_probs) fprintf(stderr, "=> %Lg\n", sum_log_prob);
+    sum_log_prob = get_sum_log_prob(hmm, num_seqs, sequences, T, use_par);
 
     // do training:
 
@@ -211,6 +223,7 @@ int hmm_learn(
         fprintf(stderr, "No memory for HMM refinement.\n");
         return 2;
     }
+    printf("refinement info prepared\n");
 
     num_refinements = 0;
     prob_t sum_log_prob_prev = sum_log_prob;
@@ -227,29 +240,12 @@ int hmm_learn(
         fflush(stderr);
 
         // probabilities post-refinement:
-        if (show_probs) fprintf(stderr, "\n[%03d]: ", num_refinements);
-        sum_log_prob = 0.;
-
-        for (int r = 0; r < num_seqs; ++r) {
-            prob = hmm_log_prob(hmm, sequences[r], T[r]);
-            sum_log_prob += prob;
-            if (show_probs) fprintf(stderr, "%2.1Le ", prob);
-        }
-
-//        hmmprob_object = hmmprob_create(hmm);
-//        for (int r = 0; r < num_seqs; ++r) {
-//            prob = hmmprob_log_prob(hmmprob_object, sequences[r], T[r]);
-//            sum_log_prob += prob;
-//            if (show_probs) fprintf(stderr, "%2.1Le ", prob);
-//        }
-//        hmmprob_destroy(hmmprob_object);
-
-        if (show_probs) fprintf(stderr, "=> %Lg  ", sum_log_prob);
+        sum_log_prob = get_sum_log_prob(hmm, num_seqs, sequences, T, use_par);
 
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
 
-        fprintf(stderr, " %d: Δ = %+Lg  sum_log_prob = %+Lg sum_log_prob_prev = %+Lg  '%s'  (%.3fs)\n",
+        fprintf(stderr, " %3d: Δ = %+10.6Lg  sum_log_prob = %+10.6Lg  prev = %+10.6Lg  '%s'  (%.3fs)\n",
                 num_refinements, change, sum_log_prob, sum_log_prob_prev, model_className,
                 measure_time_now_sec() - measure_ref_start_sec
                 );
@@ -285,6 +281,6 @@ int hmm_learn(
 
     hmm_destroy(hmm);
 
-    printf("training took %.2fs\n", measure_elapsed_sec);
+    printf("training took %s\n", measure_time_show_elapsed(measure_elapsed_sec));
     return 0;
 }
