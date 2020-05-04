@@ -106,7 +106,7 @@ int hmm_learn(
     assert(num_sequences > 0);
     assert(num_sequences <= MAX_SEQS);
 
-    fprintf(stderr, "hmm_learn: num_sequences = %d\n", num_sequences);
+    printf("hmm_learn: num_sequences = %d\n", num_sequences);
 
     N = N_;
     model_type = model_type_;
@@ -127,7 +127,7 @@ int hmm_learn(
 
     // load first training sequence:
 
-    fprintf(stderr, "  %3d: %s\n", 0, sequence_filenames[0]);
+    printf("  %3d: %s\n", 0, sequence_filenames[0]);
     sequences[0] = seq_load(sequence_filenames[0], T, &M, sequence_className);
 
     if (!sequences[0]) {
@@ -166,7 +166,7 @@ int hmm_learn(
         int show_filename = 0;
         if (num_sequences > 8) {
             if (r == 3) {
-                fprintf(stderr, "  ...\n");
+                printf("  ...\n");
             }
             else if (r < 3 || r > num_sequences - 3 - 1) {
                 show_filename = 1;
@@ -174,7 +174,7 @@ int hmm_learn(
         }
         else show_filename = 1;
         if (show_filename) {
-            fprintf(stderr, "  %3d: %s\n", r, sequence_filenames[r]);
+            printf("  %3d: %s\n", r, sequence_filenames[r]);
         }
 
         sequences[num_seqs] = seq_load(sequence_filenames[r], T + num_seqs, &Mcmp, sequence_className);
@@ -199,8 +199,8 @@ int hmm_learn(
         abs_log_val_auto = fabsl(log_val_auto);
     }
 
-    fprintf(stderr, "\nN=%d M=%d type=%d  #sequences = %d  max_T=%d\n", N, M, model_type, num_seqs, max_T);
-    fprintf(stderr, "val_auto = %g   log=%g   max_iterations=%d\n", val_auto, log_val_auto, max_iterations);
+    printf("\nN=%d M=%d type=%d  #sequences = %d  max_T=%d\n", N, M, model_type, num_seqs, max_T);
+    printf("val_auto = %g   log=%g   max_iterations=%d\n", val_auto, log_val_auto, max_iterations);
 
     const double measure_start_sec = measure_time_now_sec();
 
@@ -236,7 +236,7 @@ int hmm_learn(
             return 2;
         }
         num_refinements++;
-        fprintf(stderr, ".");
+        printf(".");
         fflush(stderr);
 
         // probabilities post-refinement:
@@ -245,7 +245,7 @@ int hmm_learn(
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
 
-        fprintf(stderr, " %3d: Δ = %+10.6g  sum_log_prob = %+10.6g  prev = %+10.6g  '%s'  (%.3fs)\n",
+        printf(" %3d: Δ = %+10.6g  sum_log_prob = %+10.6g  prev = %+10.6g  '%s'  (%.3fs)\n",
                 num_refinements, change, sum_log_prob, sum_log_prob_prev, model_className,
                 measure_time_now_sec() - measure_ref_start_sec
                 );
@@ -266,7 +266,7 @@ int hmm_learn(
 
         sum_log_prob_prev = sum_log_prob;
     }
-    fprintf(stderr, "\n");
+    printf("\n");
 
     const double measure_elapsed_sec = measure_time_now_sec() - measure_start_sec;
 

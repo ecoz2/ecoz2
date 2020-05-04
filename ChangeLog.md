@@ -1,5 +1,11 @@
 2020-05
 
+- note: Although there's surely ample room for (internal) performance
+  improvements in hmm_learn, this is not a priority especially given
+  that, in general, multiple models will typically be trained concurrently,
+  and this can be done efficiently via a "external" tool like
+  [parallel](https://www.gnu.org/software/parallel/).
+
 - some profiling using gperftools
 
     - on Mac: `brew install gperftools; PATH=/usr/local/Cellar/gperftools/2.7/bin:$PATH`
