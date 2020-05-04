@@ -37,7 +37,7 @@ enum hmm_modes_init {
 extern prob_t hmm_epsilon;
 
 // maximum number of training sequences
-#define MAX_SEQS 4096
+#define MAX_SEQS 6000
 
 #define MAX_MODELS 256
 
@@ -45,7 +45,7 @@ int hmm_learn(
         int N,
         int model_type,
         const char* sequence_filenames[],
-        int num_sequences,
+        unsigned num_sequences,
         double hmm_epsilon,
         double val_auto,
         int max_iterations,

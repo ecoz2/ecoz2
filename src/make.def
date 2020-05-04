@@ -1,5 +1,5 @@
 cc=gcc
-#cdebug=-g -DDEBUG
+cdebug=-g -DDEBUG
 cflags=-O3 -Wall -ffast-math -fopenmp -march=native
 
 # Just came across -funsafe-loop-optimizations (and -Wunsafe-loop-optimizations)

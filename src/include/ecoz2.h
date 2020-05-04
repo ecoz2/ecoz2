@@ -84,7 +84,7 @@ int ecoz2_hmm_learn(
         int N,
         int model_type,
         const char* sequence_filenames[],
-        int num_sequences,
+        unsigned num_sequences,
         double hmm_epsilon,
         double val_auto,
         int max_iterations,

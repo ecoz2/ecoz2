@@ -109,10 +109,10 @@ HMM training\n\
         return 1;
     }
 
-    const int num_sequences = argc - optind;
+    const unsigned num_sequences = argc - optind;
 
     if (num_sequences > MAX_SEQS) {
-        fprintf(stderr, "too many training sequence (max %d).\n", MAX_SEQS);
+        fprintf(stderr, "too many training sequences (max %d).\n", MAX_SEQS);
         return 1;
     }
 

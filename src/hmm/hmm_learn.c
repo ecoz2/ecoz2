@@ -95,7 +95,7 @@ int hmm_learn(
         int N_,
         int model_type_,
         const char* sequence_filenames[],
-        int num_sequences,
+        unsigned num_sequences,
         double hmm_epsilon_,
         double val_auto_,
         int max_iterations,
@@ -103,8 +103,11 @@ int hmm_learn(
         hmm_learn_callback_t callback
         ) {
 
-    assert(num_sequences > 0);
-    assert(num_sequences <= MAX_SEQS);
+
+    if (num_sequences > MAX_SEQS) {
+        fprintf(stderr, "%d: too many sequences (max %d)\n", num_sequences, MAX_SEQS);
+        return 1;
+    }
 
     printf("hmm_learn: num_sequences = %d\n", num_sequences);
 
