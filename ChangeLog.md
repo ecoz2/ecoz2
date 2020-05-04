@@ -1,5 +1,8 @@
 2020-05
 
+- revert to use hmm_log_prob in seq_show_files
+  (instead of HmmProb, which maybe still need adjustments)
+
 - some `hmm_learn` revision
 - new option `-S` for `hmm.learn` to use the serialized impl.
 
@@ -69,7 +72,6 @@
   gcc (Homebrew GCC 9.3.0_1) FSF
 
 - use HmmProb is seq_show_files
-- TODO use HmmProb also in hmm_learn?
 
 - add `-s <seed>` option to `hmm.learn`
 
