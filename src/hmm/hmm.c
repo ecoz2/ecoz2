@@ -79,7 +79,7 @@ void hmm_show_model(Hmm *hmm, char *fto) {
     printf(fto, sum);
     printf("\n");
     if (fabsl(sum - 1) > 1e-10) {
-        printf(RED("***ERROR** Σ pi = %Le != 1\n\n"), sum);
+        printf(RED("***ERROR** Σ pi = %e != 1\n\n"), sum);
     }
 
     printf("\nA =  ");
@@ -94,7 +94,7 @@ void hmm_show_model(Hmm *hmm, char *fto) {
         printf(fto, sum);
         printf("\n");
         if (fabsl(sum - 1) > 1e-10) {
-            printf(RED("***ERROR** Σ A[%d] = %Le != 1\n\n"), i, sum);
+            printf(RED("***ERROR** Σ A[%d] = %e != 1\n\n"), i, sum);
         }
     }
 
@@ -110,7 +110,7 @@ void hmm_show_model(Hmm *hmm, char *fto) {
         printf(fto, sum);
         printf("\n");
         if (fabsl(sum - 1) > 1e-10) {
-            printf(RED("***ERROR** Σ B[%d] = %Le != 1\n\n"), i, sum);
+            printf(RED("***ERROR** Σ B[%d] = %e != 1\n\n"), i, sum);
         }
     }
 }

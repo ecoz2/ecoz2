@@ -44,12 +44,12 @@ static void _report_results(FILE *file) {
            model_type == 2 ? "cascade-2" : "cascade-3");
     fprintf(file, "\trestriction: ");
     if ((prob_t) 0. == hmm_epsilon) fprintf(file, "No");
-    else fprintf(file, "%Lg", hmm_epsilon);
+    else fprintf(file, "%g", hmm_epsilon);
     fprintf(file, "\n");
     fprintf(file, "\t        #sequences: %d\n", num_seqs);
-    fprintf(file, "\t        auto value: %Lg  (|log|=%Lg)\n", val_auto, abs_log_val_auto);
+    fprintf(file, "\t        auto value: %g  (|log|=%g)\n", val_auto, abs_log_val_auto);
     fprintf(file, "\t      #refinements: %d\n", num_refinements);
-    fprintf(file, "\t          Σ log(P): %Le\n", sum_log_prob);
+    fprintf(file, "\t          Σ log(P): %e\n", sum_log_prob);
 }
 
 static void report_results(void) {
@@ -147,11 +147,11 @@ int hmm_learn(
 
     char hmmDir[2048];
     if (max_iterations >= 0) {
-        sprintf(hmmDir, "data/hmms/N%d__M%d_t%d__a%Lg_I%d", N, M, model_type,
+        sprintf(hmmDir, "data/hmms/N%d__M%d_t%d__a%g_I%d", N, M, model_type,
                 val_auto, max_iterations);
     }
     else {
-        sprintf(hmmDir, "data/hmms/N%d__M%d_t%d__a%Lg", N, M, model_type,
+        sprintf(hmmDir, "data/hmms/N%d__M%d_t%d__a%g", N, M, model_type,
                 val_auto);
     }
     mk_dirs(hmmDir);
@@ -200,7 +200,7 @@ int hmm_learn(
     }
 
     fprintf(stderr, "\nN=%d M=%d type=%d  #sequences = %d  max_T=%d\n", N, M, model_type, num_seqs, max_T);
-    fprintf(stderr, "val_auto = %Lg   log=%Lg   max_iterations=%d\n", val_auto, log_val_auto, max_iterations);
+    fprintf(stderr, "val_auto = %g   log=%g   max_iterations=%d\n", val_auto, log_val_auto, max_iterations);
 
     const double measure_start_sec = measure_time_now_sec();
 
@@ -245,7 +245,7 @@ int hmm_learn(
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
 
-        fprintf(stderr, " %3d: Δ = %+10.6Lg  sum_log_prob = %+10.6Lg  prev = %+10.6Lg  '%s'  (%.3fs)\n",
+        fprintf(stderr, " %3d: Δ = %+10.6g  sum_log_prob = %+10.6g  prev = %+10.6g  '%s'  (%.3fs)\n",
                 num_refinements, change, sum_log_prob, sum_log_prob_prev, model_className,
                 measure_time_now_sec() - measure_ref_start_sec
                 );

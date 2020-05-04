@@ -36,9 +36,9 @@ HMM training\n\
 \n\
     -N #          sets the number of states (%d, by default).\n\
     -I #          sets the maximum number of iterations\n\
-    -a <val>      sets val_auto. (%Lg, by default)\n\
+    -a <val>      sets val_auto. (%g, by default)\n\
     -e <val>      sets value for epsilon restriction on B.\n\
-                  0 means do not apply this restriction (%Lg, by default).    \n\
+                  0 means do not apply this restriction (%g, by default).    \n\
     -t <type>     sets the type of model to generate (%d, by default)\n\
                     0: random values for pi, A, and B\n\
                     1: uniform distributions\n\
@@ -77,13 +77,13 @@ HMM training\n\
                 }
                 break;
             case 'e':
-                if (sscanf(optarg, "%Lf", &hmm_epsilon) == 0) {
+                if (sscanf(optarg, "%lf", &hmm_epsilon) == 0) {
                     fprintf(stderr, "invalid epsilon value.\n");
                     return 1;
                 }
                 break;
             case 'a':
-                if (sscanf(optarg, "%Lf", &val_auto) == 0) {
+                if (sscanf(optarg, "%lf", &val_auto) == 0) {
                     fprintf(stderr, "invalid valor auto.\n");
                     return 1;
                 }

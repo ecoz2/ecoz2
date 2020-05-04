@@ -1,6 +1,7 @@
 2020-05
 
-- revert to use hmm_log_prob in seq_show_files
+- set prob_t to just double (not long double)
+- revert to use hmm_log_p revert to use hmm_log_prob in seq_show_filesrob in seq_show_files
   (instead of HmmProb, which maybe still need adjustments)
 
 - some `hmm_learn` revision

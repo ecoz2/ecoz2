@@ -331,7 +331,7 @@ int hmm_classify(
             int index = 0;
             for (int r = num_models - 1; r >= 0; r--, index++) {
                 const char *mark = classId == ordp[r] ? "*" : "";
-                printf("  [%2d] %1s %-60s : %Le  : '%s'\n",
+                printf("  [%2d] %1s %-60s : %e  : '%s'\n",
                         index,
                         mark,
                         model_names[ordp[r]],

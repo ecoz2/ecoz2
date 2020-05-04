@@ -28,14 +28,14 @@ void hmm_adjustB(Hmm *hmm, const char* logMsg) {
             prob_t sum = 0;
             for (int k = 0; k < hmm->M; k++) {
                 if (B[j][k] < 0) {
-                    printf(RED("hmm_adjustB: PRE ERROR: Σ B[%d][%d] = %Le < 0 %s\n\n"),
+                    printf(RED("hmm_adjustB: PRE ERROR: Σ B[%d][%d] = %e < 0 %s\n\n"),
                             j, k, B[j][k], logMsg);
                     exit(1);
                 }
                 sum += B[j][k];
             }
             if (fabsl(sum - 1) > 1e-10) {
-                printf(RED("hmm_adjustB: PRE ERROR: Σ B[%d] = %Le != 1 %s\n\n"),
+                printf(RED("hmm_adjustB: PRE ERROR: Σ B[%d] = %e != 1 %s\n\n"),
                         j, sum, logMsg);
                 //exit(1);
             }
@@ -66,14 +66,14 @@ void hmm_adjustB(Hmm *hmm, const char* logMsg) {
                 prob_t sum = 0;
                 for (int k = 0; k < hmm->M; k++) {
                     if (B[j][k] < hmm_epsilon) {
-                        printf(RED("hmm_adjustB: POST ERROR: Σ B[%d][%d] = %Le < ε = %Le %s\n\n"),
+                        printf(RED("hmm_adjustB: POST ERROR: Σ B[%d][%d] = %e < ε = %e %s\n\n"),
                                 j, k, B[j][k], hmm_epsilon, logMsg);
                         exit(1);
                     }
                     sum += B[j][k];
                 }
                 if (fabsl(sum - 1) > 1e-10) {
-                    printf(RED("hmm_adjustB: POST ERROR: Σ B[%d] = %Le != 1 %s\n\n"),
+                    printf(RED("hmm_adjustB: POST ERROR: Σ B[%d] = %e != 1 %s\n\n"),
                             j, sum, logMsg);
                     exit(1);
                 }

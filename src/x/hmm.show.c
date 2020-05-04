@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <getopt.h>
 
-static char *default_format = "%Lg ";
+static char *default_format = "%g ";
 
 
 static void usage() {
@@ -21,7 +21,7 @@ Default format: \"%s\"\n\
 \n\
 Example:\n\
 \n\
-    hmm.show -f \"%%Lf \" model.hmm\n\
+    hmm.show -f \"%%f \" model.hmm\n\
 \n",
            default_format
     );
