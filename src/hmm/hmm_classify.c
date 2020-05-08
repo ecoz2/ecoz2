@@ -206,9 +206,9 @@ static void _sort_probs(prob_t *probs, int *ordp, int num_models) {
 
 int hmm_classify(
         char **model_names,
-        int num_model_names,
+        unsigned num_model_names,
         char **seq_filenames,
-        int num_seq_filenames,
+        unsigned num_seq_filenames,
         int show_ranked_
         ) {
 
@@ -231,7 +231,7 @@ int hmm_classify(
     prob_t probs[MAX_MODELS];
 
     // probabilities in increasing order
-    int ordp[MAX_MODELS];
+    int ordp[MAX_MODELS] = {0};
 
     // sequence to be classified
     Symbol *sequence = 0;
@@ -258,7 +258,7 @@ int hmm_classify(
 
     // load the other models:
 
-    for (int i = 1; i < num_model_names; ++i) {
+    for (unsigned i = 1; i < num_model_names; ++i) {
         printf("%2d: %s\n", i, model_names[i]);
         models[i] = hmm_load(model_names[i]);
         if (!models[i]) {
@@ -283,7 +283,7 @@ int hmm_classify(
 
     const double measure_start_sec = measure_time_now_sec();
 
-    for (int i = 0; i < num_seq_filenames; ++i) {
+    for (unsigned i = 0; i < num_seq_filenames; ++i) {
         const char *seq_filename = seq_filenames[i];
         sequence = seq_load(seq_filename, &T, &M, seq_className);
         if (!sequence) {
@@ -330,17 +330,23 @@ int hmm_classify(
 
             int index = 0;
             for (int r = num_models - 1; r >= 0; r--, index++) {
-                const char *mark = classId == ordp[r] ? "*" : "";
-                printf("  [%2d] %1s %-60s : %e  : '%s'\n",
-                        index,
-                        mark,
-                        model_names[ordp[r]],
-                        probs[ordp[r]],
-                        models[ordp[r]]->className
+                const int model_id = ordp[r];
+                const char *mark = classId == model_id ? "*" : "";
+                printf("  [%2d] %1s <%2d>",
+                       index,
+                       mark,
+                       model_id
+                );
+                fflush(stdout);
+
+                printf("  %-60s : %e  : '%s'\n",
+                        model_names[model_id],
+                        probs[model_id],
+                        models[model_id]->className
                 );
 
                 // only show until corresponding model:
-                if (classId == ordp[r]) {
+                if (classId == model_id) {
                     break;
                 }
             }

@@ -162,7 +162,7 @@ int hmm_learn(
     sprintf(model_filename, "%s/%s.hmm", hmmDir, model_className);
 
     num_seqs = 1;
-    for (int r = 1; r < num_sequences; ++r) {
+    for (unsigned r = 1; r < num_sequences; ++r) {
         // to check all sequences come from same codebook size:
         int Mcmp;
 
