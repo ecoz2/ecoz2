@@ -1,5 +1,7 @@
 2020-05
 
+- interesting: https://gcc.gnu.org/onlinedocs/gcc/Loop-Specific-Pragmas.html#Loop-Specific-Pragmas
+
 - note: Although there's surely ample room for (internal) performance
   improvements in hmm_learn, this is not a priority especially given
   that, in general, multiple models will typically be trained concurrently,
