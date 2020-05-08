@@ -55,9 +55,9 @@ int hmm_learn(
 
 int hmm_classify(
         char **model_names,
-        int num_model_names,
+        unsigned num_model_names,
         char **seq_filenames,
-        int num_seq_filenames,
+        unsigned num_seq_filenames,
         int show_ranked_
         );
 
