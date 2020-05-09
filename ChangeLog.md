@@ -1,5 +1,9 @@
 2020-05
 
+- hmm_refinement: adjustments to more closely reflect description in papers
+  (Stamp, 2018; Rabiner, 1989).
+  TODO: review hmm_log_prob.c as well
+
 - some various adjustments and extra logging while running hmm_learn
   in various training exercises. In particular, one with N=160, M=512
   and 370 sequences ('I' whale song unit), generated some nan probabilities

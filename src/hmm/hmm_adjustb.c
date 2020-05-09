@@ -8,11 +8,11 @@
 #include <assert.h>
 
 // to verify stochastic requirement
-#define VERIFY 1
+#define VERIFY 0
 
 /*
  * if ε > 0, then each B[j][k] is adjusted
- * such that it must be >= ε.
+ * such that it is >= ε.
  */
 prob_t hmm_epsilon = 1.e-5;
 

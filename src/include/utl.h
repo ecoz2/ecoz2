@@ -4,6 +4,8 @@
 #ifndef __ECOZ_UTL_H
 #define __ECOZ_UTL_H
 
+#include "prob_t.h"
+
 #include <stdio.h>
 
 #define GREEN(s) "\x1b[32m" s "\x1b[0m"
@@ -66,5 +68,8 @@ void **new_matrix(int numRows, int numcols, int tamval);
 void _del_matrix(void **m);
 
 #define del_matrix(m) _del_matrix((void**) (m))
+
+prob_t ***new_matrix3(int d0, int d1, int d2);
+void del_matrix3(prob_t ***m, int d0, int d1);
 
 #endif
