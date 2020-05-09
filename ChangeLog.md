@@ -1,5 +1,12 @@
 2020-05
 
+- some various adjustments and extra logging while running hmm_learn
+  in various training exercises. In particular, one with N=160, M=512
+  and 370 sequences ('I' whale song unit), generated some nan probabilities
+  during the training eventually making it get stuck.
+  For now, I put some "correction" in refine_A and refine_B to handle
+  zero denominators calculated from previous steps.  TODO continue revision
+
 - interesting: https://gcc.gnu.org/onlinedocs/gcc/Loop-Specific-Pragmas.html#Loop-Specific-Pragmas
 
 - note: Although there's surely ample room for (internal) performance
