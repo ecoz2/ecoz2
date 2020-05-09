@@ -47,7 +47,7 @@ static void _report_results(FILE *file) {
     else fprintf(file, "%g", hmm_epsilon);
     fprintf(file, "\n");
     fprintf(file, "\t        #sequences: %d\n", num_seqs);
-    fprintf(file, "\t        auto value: %g  (|log|=%g)\n", val_auto, abs_log_val_auto);
+    fprintf(file, "\t        auto value: %g\n", val_auto);
     fprintf(file, "\t      #refinements: %d\n", num_refinements);
     fprintf(file, "\t          Σ log(P): %e\n", sum_log_prob);
 }
@@ -109,7 +109,8 @@ int hmm_learn(
         return 1;
     }
 
-    printf("hmm_learn: num_sequences = %d\n", num_sequences);
+    printf("\n--- hmm_learn ---\n");
+    printf("num_sequences = %d\n", num_sequences);
 
     N = N_;
     model_type = model_type_;
