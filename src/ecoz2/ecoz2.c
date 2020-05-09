@@ -142,6 +142,7 @@ int ecoz2_hmm_learn(
         double hmm_epsilon,
         double val_auto,
         int max_iterations,
+        int use_par,
         hmm_learn_callback_t callback
         ) {
 
@@ -153,7 +154,7 @@ int ecoz2_hmm_learn(
             hmm_epsilon,
             val_auto,
             max_iterations,
-            1,  // use_par
+            use_par,
             callback
     );
 }

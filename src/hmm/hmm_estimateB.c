@@ -9,7 +9,7 @@
 static const prob_t one = (prob_t) 1.;
 
 void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
-    printf("estimating initial B matrix ...\n");
+    printf("estimating initial B matrix ...  (given max_T=%d)\n", max_T);
     const double measure_start_sec = measure_time_now_sec();
 
     const int N = hmm->N;
@@ -21,6 +21,7 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
         for (int r = 0; r < num_cads; ++r) {
             if (max_T < T[r]) max_T = T[r];
         }
+        printf("(computed max_T=%d)\n", max_T);
     }
 
     // counters:
