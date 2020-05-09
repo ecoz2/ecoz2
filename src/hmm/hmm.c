@@ -65,6 +65,23 @@ void hmm_init(Hmm *hmm, int mode) {
     }
 }
 
+void hmm_init_A_row(prob_t *row, int N, int mode, int colForCascade) {
+    switch (mode) {
+        case HMM_RANDOM:
+            dis_inicAle(row, N);
+            break;
+
+        case HMM_UNIFORM:
+            dis_inicUni(row, N);
+            break;
+
+        case HMM_CASCADE2:
+        case HMM_CASCADE3:
+            dis_inicDelta(row, N, colForCascade, mode);
+            break;
+    }
+}
+
 void hmm_show_model(Hmm *hmm, char *fto) {
     printf("className: '%s'  N=%d  M=%d\n", hmm->className, hmm->N, hmm->M);
 

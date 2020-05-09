@@ -95,6 +95,11 @@ void hmm_estimateB(Hmm *hmm, Symbol **O, int *T, int num_cads, int max_T);
 void hmm_init(Hmm *, int mode);
 
 /**
+ * Initialization of A matrix row according to given mode.
+ */
+void hmm_init_A_row(prob_t *row, int N, int mode, int colForCascade);
+
+/**
  * Helper for multiple hmm_log_prob calculations wrt same model.
  */
 typedef struct {

@@ -10,10 +10,12 @@
 #include <float.h>
 #include <math.h>
 #include <assert.h>
+#include <omp.h>
+
+static int model_type = HMM_CASCADE3;
 
 #include "hmm_refinement.c"
 
-#include <omp.h>
 
 // for auto convergence
 static prob_t val_auto = 0.3;
@@ -22,8 +24,6 @@ static prob_t abs_log_val_auto;
 
 // number of states and symbols
 static int N = 5, M;
-
-static int model_type = HMM_CASCADE3;
 
 static int num_seqs;
 

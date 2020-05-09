@@ -12,6 +12,7 @@
 
 #include "hmm.h"
 #include "utl.h"
+#include "distr.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -279,7 +280,8 @@ static inline void refine_A(void) {
             }
         }
         else {
-            dis_inicDelta(A[i], N, i, HMM_CASCADE3);
+            printf(RED("!")); fflush(stdout);
+            hmm_init_A_row(A[i], N, model_type, i);
         }
         //printf("\n");
     }
@@ -298,6 +300,7 @@ static inline void refine_B(void) {
             }
         }
         else {
+            printf(RED("¡")); fflush(stdout);
             dis_inicAle(B[j], M);
         }
         //printf("\n");
