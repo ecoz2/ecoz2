@@ -8,7 +8,7 @@
 #include <assert.h>
 
 // to verify stochastic requirement
-#define VERIFY 0
+#define VERIFY 1
 
 /*
  * if ε > 0, then each B[j][k] is adjusted

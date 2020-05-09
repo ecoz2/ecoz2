@@ -7,6 +7,9 @@
  * http://courses.media.mit.edu/2010fall/mas622j/ProblemSets/ps4/tutorial.pdf
  */
 
+// TODO review denA and denB re getting zero for A and B refinement.
+
+
 #include "hmm.h"
 #include "utl.h"
 
@@ -36,11 +39,12 @@ static prob_t *denA;
 static prob_t **numB;
 static prob_t *denB;
 
+static const prob_t zero = (prob_t) 0.;
 static const prob_t one = (prob_t) 1.;
 
 //#define obs(t) (assert(O[(t)] < M), O[t])
-#define obs(t) O[t]
-//#define obs(t) (O[(t)] < M ? O[(t)] : (printf("OOPS! O[%d]=%d >= M=%d T=%d\n", (t), O[(t)], M, T), seq_show(O, T), assert((t) < M), O[t]))
+//#define obs(t) O[t]
+#define obs(t) (O[(t)] < M ? O[(t)] : (printf("OOPS! O[%d]=%d >= M=%d T=%d\n", (t), O[(t)], M, T), seq_show(O, T), assert((t) < M), O[t]))
 
 static void hmm_refinement_destroy(void);
 
@@ -136,26 +140,27 @@ static void init_counters(void) {
 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            numA[i][j] = 0.;
+            numA[i][j] = zero;
         }
-        denA[i] = 0.;
+        denA[i] = zero;
     }
 
     for (int j = 0; j < N; j++) {
         for (int k = 0; k < M; k++) {
-            numB[j][k] = 0.;
+            numB[j][k] = zero;
         }
-        denB[j] = 0.;
+        denB[j] = zero;
     }
 }
 
 static inline void gen_alpha_beta(Symbol *O, int T) {
     const int N = hmm->N;
+    const int M = hmm->M;  // for obs macro
     prob_t *pi = hmm->pi;
     prob_t **A = hmm->A;
     prob_t **B = hmm->B;
 
-    prob_t sumAlpha2 = 0.;
+    prob_t sumAlpha2 = zero;
     for (int i = 0; i < N; i++) {
         prob_t val = pi[i] * B[i][obs(0)];
         alpha[0][i] = val;
@@ -169,10 +174,10 @@ static inline void gen_alpha_beta(Symbol *O, int T) {
     }
 
     for (int t = 1; t < T; t++) {
-        prob_t sumAlpha2_t = 0.;
+        prob_t sumAlpha2_t = zero;
 
         for (int i = 0; i < N; i++) {
-            prob_t sumAlpha2_ti = 0.;
+            prob_t sumAlpha2_ti = zero;
             for (int j = 0; j < N; j++) {
                 sumAlpha2_ti += alphaH[t - 1][j] * A[j][i];
             }
@@ -206,7 +211,7 @@ static inline void gen_alpha_beta(Symbol *O, int T) {
 
     for (int t = T - 2; t >= 0; t--) {
         for (int i = 0; i < N; i++) {
-            prob_t sumBeta2_ti = 0.;
+            prob_t sumBeta2_ti = zero;
             for (int j = 0; j < N; j++) {
                 sumBeta2_ti += A[i][j] * B[j][obs(t + 1)] * betaH[t + 1][j];
             }
@@ -218,19 +223,20 @@ static inline void gen_alpha_beta(Symbol *O, int T) {
 
 static inline void gen_numA_denA(Symbol *O, int T) {
     const int N = hmm->N;
+    const int M = hmm->M;  // for obs macro
     prob_t **A = hmm->A;
     prob_t **B = hmm->B;
 
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            prob_t num_sum_t = 0.;
+            prob_t num_sum_t = zero;
             for (int t = 0; t < T - 1; t++) {
                 num_sum_t += alphaH[t][i] * A[i][j] * B[j][obs(t + 1)] * betaH[t + 1][j];
             }
             numA[i][j] += num_sum_t;
         }
 
-        prob_t den_sum_t = 0.;
+        prob_t den_sum_t = zero;
         for (int t = 0; t < T - 1; t++) {
             den_sum_t += alphaH[t][i] * betaH[t][i] / c[t];
         }
@@ -244,7 +250,7 @@ static inline void gen_numB_denB(Symbol *O, int T) {
 
     for (int j = 0; j < N; j++) {
         for (int k = 0; k < M; k++) {
-            prob_t num_sum_t = 0.;
+            prob_t num_sum_t = zero;
             for (int t = 0; t < T; t++) {
                 if (obs(t) == k) {
                     num_sum_t += alphaH[t][j] * betaH[t][j] / c[t];
@@ -253,7 +259,7 @@ static inline void gen_numB_denB(Symbol *O, int T) {
             numB[j][k] += num_sum_t;
         }
 
-        prob_t den_sum_t = 0.;
+        prob_t den_sum_t = zero;
         for (int t = 0; t < T; t++) {
             den_sum_t += alphaH[t][j] * betaH[t][j] / c[t];
         }
@@ -266,9 +272,16 @@ static inline void refine_A(void) {
     prob_t **A = hmm->A;
 
     for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            A[i][j] = numA[i][j] / denA[i];
+        //printf("&&& denA[%d]=%Le ", i, denA[i]);
+        if (denA[i] != zero) {
+            for (int j = 0; j < N; j++) {
+                A[i][j] = numA[i][j] / denA[i];
+            }
         }
+        else {
+            dis_inicDelta(A[i], N, i, HMM_CASCADE3);
+        }
+        //printf("\n");
     }
 }
 
@@ -278,9 +291,16 @@ static inline void refine_B(void) {
     prob_t **B = hmm->B;
 
     for (int j = 0; j < N; j++) {
-        for (int k = 0; k < M; k++) {
-            B[j][k] = numB[j][k] / denB[j];
+        //printf("&&& denB[%d]=%Le ", j, denB[j]);
+        if (denB[j] != zero) {
+            for (int k = 0; k < M; k++) {
+                B[j][k] = numB[j][k] / denB[j];
+            }
         }
+        else {
+            dis_inicAle(B[j], M);
+        }
+        //printf("\n");
     }
     hmm_adjustB(hmm, "refine_B");
 }

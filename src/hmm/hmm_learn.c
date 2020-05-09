@@ -82,8 +82,10 @@ static inline prob_t get_sum_log_prob(Hmm *hmm, int num_seqs, Symbol **sequences
     else {
         for (int r = 0; r < num_seqs; ++r) {
             prob_t prob = hmm_log_prob(hmm, sequences[r], T[r]);
+//            printf("{%d: prob=%Le} ", r, prob); fflush(stdout);
             sum_log_prob += prob;
         }
+//        printf("\n");
     }
 
     //printf("get_sum_log_prob took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
@@ -109,13 +111,14 @@ int hmm_learn(
         return 1;
     }
 
-    printf("\n--- hmm_learn ---\n");
-    printf("num_sequences = %d\n", num_sequences);
-
     N = N_;
     model_type = model_type_;
-    hmm_epsilon = hmm_epsilon_;
+    hmm_epsilon = (prob_t) hmm_epsilon_;
     val_auto = val_auto_;
+
+    printf("\n--- hmm_learn ---  (use_par=%d)\n", use_par);
+    printf("num_sequences = %d\n", num_sequences);
+    printf("epsilon = %Le\n", hmm_epsilon);
 
 
     // training sequences:
@@ -220,6 +223,7 @@ int hmm_learn(
     hmm_estimateB(hmm, sequences, T, num_seqs, max_T);
 
     sum_log_prob = get_sum_log_prob(hmm, num_seqs, sequences, T, use_par);
+    //printf("::::: sum_log_prob=%Le\n", sum_log_prob);
 
     // do training:
 
@@ -245,6 +249,7 @@ int hmm_learn(
 
         // probabilities post-refinement:
         sum_log_prob = get_sum_log_prob(hmm, num_seqs, sequences, T, use_par);
+        //printf("::::: sum_log_prob=%Le\n", sum_log_prob);
 
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
