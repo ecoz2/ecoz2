@@ -193,7 +193,7 @@ static inline void gen_alpha_beta(Symbol *O, int T) {
                 sum += alphaH[t][i];
             }
             if (fabsl(sum - 1) > 1e-10) {
-                printf(RED("gen_alpha_beta: ERROR: Σ alphaH[%d] = %e != 1\n\n"),
+                printf(RED("gen_alpha_beta: ERROR: Σ alphaH[%d] = %Le != 1\n\n"),
                        t, sum);
             }
         }

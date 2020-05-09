@@ -339,7 +339,7 @@ int hmm_classify(
                 );
                 fflush(stdout);
 
-                printf("  %-60s : %e  : '%s'\n",
+                printf("  %-60s : %Le  : '%s'\n",
                         model_names[model_id],
                         probs[model_id],
                         models[model_id]->className

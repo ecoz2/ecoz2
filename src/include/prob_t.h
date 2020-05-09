@@ -4,6 +4,6 @@
 #ifndef __ECOZ_PROB_T_H
 #define __ECOZ_PROB_T_H
 
-typedef double prob_t;
+typedef long double prob_t;
 
 #endif

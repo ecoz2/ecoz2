@@ -25,7 +25,6 @@
               7   1.2%  99.2%        7   1.2% 0x00007fff51e5a15a
             ...
 
-- set prob_t to just double (not long double)
 - revert to use hmm_log_prob in seq_show_files (for simplicity)
 
 - some `hmm_learn` revision

@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <getopt.h>
 
-static char *default_format = "%g ";
+static char *default_format = "%Lg ";
 
 
 static void usage() {

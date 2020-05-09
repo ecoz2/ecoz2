@@ -58,7 +58,7 @@ int seq_show_files(
 
         if (with_prob) {
             prob_t prob = hmm_log_prob(hmm, seq, T);
-            printf(" log(P) = %e", prob);
+            printf(" log(P) = %Le", prob);
         }
 
         if (gen_Qopt) {
@@ -74,7 +74,7 @@ int seq_show_files(
             printf("»\n");
 
             if (with_prob) {
-                printf(" log(P*) = %e", probQopt);
+                printf(" log(P*) = %Le", probQopt);
             }
         }
         free(seq);
