@@ -285,6 +285,7 @@ int hmm_learn(
 
     hmm_destroy(hmm);
 
-    printf("training took %s\n", measure_time_show_elapsed(measure_elapsed_sec));
+    printf("=> training took %s     class=%s\n",
+            measure_time_show_elapsed(measure_elapsed_sec), model_className);
     return 0;
 }
