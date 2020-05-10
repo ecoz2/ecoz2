@@ -120,13 +120,24 @@ prob_t hmmprob_log_prob(HmmProb *hmmprob, Symbol *O, int T);
 
 prob_t hmm_log_prob(Hmm *hmm, Symbol *O, int T);
 
-/**
- * Generates maximum likelihood state sequence
- */
+
+/// precompute log(A[i][j])
+void hmm_precompute_logA(Hmm *hmm, prob_t **logA);
+
+/// precompute log(B[j][O[t]])
+void hmm_precompute_logB(Hmm *hmm, Symbol *O, int T, prob_t **logB);
+
+/// Generates maximum likelihood state sequence.
+/// Returns associated probability.
+/// @param Qopt  Where the optimal state sequence is stored.
+///              Could be null when only the probability is of interest
+///
 prob_t hmm_genQopt(Hmm *, Symbol *O, int T, int *Qopt);
 
-/// as the above but with work memory provided by caller
+/// As with hmm_genQopt but with precomputed logs and work memory
+/// provided by caller
 prob_t hmm_genQopt_with_mem(Hmm *hmm, Symbol *O, int T, int *Qopt,
+                            prob_t **logA, prob_t **logB,
                             prob_t **phi, int **psi);
 
 

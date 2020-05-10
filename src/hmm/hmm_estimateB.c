@@ -34,11 +34,21 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
 
     int *Qopt = (int *) new_vector(max_T, sizeof(int));
 
+    prob_t **logA = (prob_t **) new_matrix(N, N, sizeof(prob_t));
+    hmm_precompute_logA(hmm, logA);
+
+    prob_t **logB = (prob_t **) new_matrix(N, M, sizeof(prob_t));
+
     prob_t **phi = (prob_t **) new_matrix(max_T, N, sizeof(prob_t));
     int **psi = (int **) new_matrix(max_T, N, sizeof(int));
+
     for (int r = 0; r < num_cads; r++) {
+        hmm_precompute_logB(hmm, seqs[r], T[r], logB);
+
         // get optimal sequence:
-        hmm_genQopt_with_mem(hmm, seqs[r], T[r], Qopt, phi, psi);
+        hmm_genQopt_with_mem(hmm, seqs[r], T[r], Qopt,
+                logA, logB,
+                phi, psi);
 
         // update counters:
         for (int t = 0; t < T[r]; t++) {
@@ -49,6 +59,8 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *T, int num_cads, int max_T) {
     }
     del_matrix(psi);
     del_matrix(phi);
+    del_matrix(logB);
+    del_matrix(logA);
 
     del_vector(Qopt);
 

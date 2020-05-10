@@ -1,5 +1,10 @@
 2020-05
 
+- hmm_refinement: more revision
+
+    - reestimate_A/B (renamed from refine_A/B).
+    - precompute `log(A[i][j])` and `log(B[j][O[t]])` as suggested in Rabiner (1989)
+
 - hmm_refinement: adjustments to more closely reflect description in papers
   (Stamp, 2018; Rabiner, 1989).
   TODO: review hmm_log_prob.c as well

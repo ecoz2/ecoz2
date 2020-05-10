@@ -3,11 +3,8 @@
  * HMM model parameter re-estimation based on multiple input sequences.
  *
  * Modified from my original implementation to incorporate scaling factors
- * as explained in "Some Mathematics for HMM," Dawei Shen (2008)
- * http://courses.media.mit.edu/2010fall/mas622j/ProblemSets/ps4/tutorial.pdf
+ * as explained in [^rab89], [^stamp], [^shen].
  */
-
-// TODO review denA and denB re getting zero for A and B refinement.
 
 
 #include "hmm.h"
@@ -46,7 +43,7 @@ static const prob_t one = (prob_t) 1.;
 //#define obs(t) O[t]
 #define obs(t) (O[(t)] < M ? O[(t)] : (printf("OOPS! O[%d]=%d >= M=%d T=%d\n", (t), O[(t)], M, T), seq_show(O, T), assert((t) < M), O[t]))
 
-static void hmm_refinement_destroy(void);
+static void hmm_refinement_destroy(int max_T);
 
 static int hmm_refinement_prepare(Hmm *_lmd, Symbol **_cads, int *_T, int _num_cads) {
     hmm = _lmd;
@@ -83,20 +80,20 @@ static int hmm_refinement_prepare(Hmm *_lmd, Symbol **_cads, int *_T, int _num_c
         || 0 == gamma1
         || 0 == gamma2
             ) {
-        hmm_refinement_destroy();
+        hmm_refinement_destroy(max_T);
         return 1;
     }
 
     return 0;
 }
 
-static void hmm_refinement_destroy(void) {
+static void hmm_refinement_destroy(int max_T) {
     if (0 != gamma1) {
         del_matrix(gamma1);
         gamma1 = 0;
     }
     if (0 != gamma2) {
-        del_matrix3(gamma2, hmm->N, hmm->N);
+        del_matrix3(gamma2, max_T, hmm->N);
         gamma2 = 0;
     }
     if (0 != beta) {
@@ -288,6 +285,7 @@ static inline void reestimate_A(void) {
     const int N = hmm->N;
     prob_t **A = hmm->A;
 
+    int num_zero_dens = 0;
     for (int i = 0; i < N; i++) {
         if (denA[i] != zero) {
             for (int j = 0; j < N; j++) {
@@ -295,9 +293,14 @@ static inline void reestimate_A(void) {
             }
         }
         else {
-            printf(RED("!")); fflush(stdout);
+            ++num_zero_dens;
             hmm_init_A_row(A[i], N, model_type, i);
+            // TODO or perhaps just leave A[i] as it is?
         }
+    }
+    if (num_zero_dens) {
+        printf("%s(%d)", RED("!"), num_zero_dens);
+        fflush(stdout);
     }
 }
 
@@ -306,6 +309,7 @@ static inline void reestimate_B(void) {
     const int M = hmm->M;
     prob_t **B = hmm->B;
 
+    int num_zero_dens = 0;
     for (int i = 0; i < N; ++i) {
         if (denB[i] != zero) {
             for (int j = 0; j < M; ++j) {
@@ -313,9 +317,14 @@ static inline void reestimate_B(void) {
             }
         }
         else {
-            printf(RED("¡")); fflush(stdout);
+            ++num_zero_dens;
             dis_inicAle(B[i], M);
+            // TODO or perhaps just leave B[i] as it is?
         }
+    }
+    if (num_zero_dens) {
+        printf("%s(%d)", RED("¡"), num_zero_dens);
+        fflush(stdout);
     }
     hmm_adjustB(hmm, "reestimate_B");
 }

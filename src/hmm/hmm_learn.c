@@ -118,7 +118,7 @@ int hmm_learn(
 
     printf("\n--- hmm_learn ---  (use_par=%d)\n", use_par);
     printf("num_sequences = %d\n", num_sequences);
-    printf("epsilon = %Le\n", hmm_epsilon);
+    printf("epsilon = %Lg\n", hmm_epsilon);
 
 
     // training sequences:
@@ -279,7 +279,7 @@ int hmm_learn(
 
     const double measure_elapsed_sec = measure_time_now_sec() - measure_start_sec;
 
-    hmm_refinement_destroy();
+    hmm_refinement_destroy(max_T);
 
     report_results();
 
