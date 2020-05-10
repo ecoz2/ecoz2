@@ -37,7 +37,7 @@ enum hmm_modes_init {
 extern prob_t hmm_epsilon;
 
 // maximum number of training sequences
-#define MAX_SEQS 6000
+#define MAX_SEQS 4096
 
 #define MAX_MODELS 256
 
