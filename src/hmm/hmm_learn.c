@@ -49,7 +49,7 @@ static void _report_results(FILE *file) {
     fprintf(file, "\t        #sequences: %d\n", num_seqs);
     fprintf(file, "\t        auto value: %Lg\n", val_auto);
     fprintf(file, "\t      #refinements: %d\n", num_refinements);
-    fprintf(file, "\t          Σ log(P): %Le\n", sum_log_prob);
+    fprintf(file, "\t          Σ log(P): %Lg\n", sum_log_prob);
 }
 
 static void report_results(void) {
@@ -290,7 +290,7 @@ int hmm_learn(
 
     hmm_destroy(hmm);
 
-    printf("=> training took %s     class=%s\n",
+    printf("=> training took %s     class=%s\n\n",
             measure_time_show_elapsed(measure_elapsed_sec), model_className);
     return 0;
 }

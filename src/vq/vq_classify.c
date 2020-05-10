@@ -116,11 +116,26 @@ static void report_results() {
     printf("%*s ", margin, "");
     printf("class     accuracy    tests      candidate order\n");
 
+    int num_classes = 0;
+    float avg_accuracy = 0;
+    float error_rate = 0;
+
     for (int classId = 0; classId <= TOTAL; classId++) {
         if (result[classId][0] == 0)
             continue;
 
+        const int num_tests = result[classId][0];
+        const int correct_tests = result[classId][1];
+        const int incorrect_tests = num_tests - correct_tests;
+
+        const float acc = (float) correct_tests / num_tests;
+        const float err = (float) incorrect_tests / num_tests;
+
         if (classId < TOTAL) {
+            ++num_classes;
+            avg_accuracy += acc;
+            error_rate += err;
+
             printf("%*s ", margin, models[classId]->className);
             printf("  %3d    ", classId);
         }
@@ -131,8 +146,8 @@ static void report_results() {
         }
 
         printf("  %6.2f%%   %3d        ",
-               (float) (100.0 * result[classId][1] / result[classId][0]),
-               result[classId][0]
+               (float) (100.0 * acc),
+               num_tests
         );
 
         for (int i = 1; i <= num_models; i++) {
@@ -140,6 +155,9 @@ static void report_results() {
         }
         printf("\n");
     }
+    printf("  avg_accuracy  %6.2f%%\n", (float) (100.0 * avg_accuracy) / num_classes);
+    printf("    error_rate  %6.2f%%\n", (float) (100.0 * error_rate) / num_classes);
+    printf("\n");
 }
 
 // sorts distortions in decreasing order

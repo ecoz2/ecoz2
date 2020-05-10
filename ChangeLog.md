@@ -1,5 +1,7 @@
 2020-05
 
+- _classify: show average accuracy and error rate
+
 - hmm.learn: make it run serialized by default as we assume the general
   setting of multiple models being ("externally") trained in parallel.
 
