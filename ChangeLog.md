@@ -1,5 +1,47 @@
 2020-05
 
+0.3.2
+
+- reduce calculations involving A depending on model type (eg CASCADE3).
+  (note, CASCADE3 hard-coded for now as it's been the only model type used in general).
+
+  Initial adjustment in hmm_log_prob().
+
+  With this, using same hmm.learn exercise:
+
+            Model: data/hmms/N128__M1024_t3__a0.3/M.hmm   className: 'M'
+            N=128 M=1024 type: cascade-3
+            restriction: 1e-05
+                    #sequences: 49
+                    auto value: 0.3
+  
+    per refinement result and profiling, went from:
+
+                  #refinements: 48
+                      Σ log(P): -9.371734e+03
+                   
+
+                4657  85.6%  85.6%     4659  85.7% _hmm_learn
+                 401   7.4%  93.0%      401   7.4% _hmm_genQopt_with_mem
+                 189   3.5%  96.5%      189   3.5% 0x00007fff51e5a15a
+                 182   3.3%  99.8%      375   6.9% _hmm_log_prob
+
+    to:
+    
+                  #refinements: 65
+                      Σ log(P): -2.619622e+04    
+                   
+                6311  93.3%  93.3%     6311  93.3% _hmm_learn
+                 410   6.1%  99.3%      410   6.1% _hmm_genQopt_with_mem
+                  35   0.5%  99.9%       35   0.5% 0x00007fff51e5a15a
+                   5   0.1%  99.9%       39   0.6% _hmm_log_prob
+                   3   0.0% 100.0%        3   0.0% _hmm_adjustB    
+
+    that is, with _hmm_log_prob taking 0.1% instead of 7.5%.
+    but the training taking more iterations to converge, maybe to a 
+    better model. (Will need evaluation based on classifications.)
+
+
 - hmm.learn: make it run serialized by default as we assume the general
   setting of multiple models being ("externally") trained in parallel.
 

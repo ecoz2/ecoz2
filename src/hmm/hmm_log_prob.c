@@ -20,6 +20,10 @@ static const prob_t one = (prob_t) 1.;
 // repeated calls to hmm_log_prob
 
 prob_t hmm_log_prob(Hmm *hmm, Symbol *O, int T) {
+    // TODO get actual model type
+    const int model_type = HMM_CASCADE3;
+    // for now hard-coded as it's the one generally used.
+
     const int N = hmm->N;
     prob_t *pi = hmm->pi;
     prob_t **A = hmm->A;
@@ -54,9 +58,22 @@ prob_t hmm_log_prob(Hmm *hmm, Symbol *O, int T) {
 
         for (int i = 0; i < N; i++) {
             prob_t sumAlpha2_ti = 0.;
-            for (int j = 0; j < N; j++) {
+
+            int j_from = 0;
+            int j_limit = N;
+            if (model_type == HMM_CASCADE3) {
+                // just visit A[j][i] if j <= i and i < j + 2, ie, i - 1 <= j
+                j_from = i - 1;
+                if (j_from < 0) j_from = 0;
+                j_limit = i + 1;
+                if (j_limit > N) j_limit = N;
+            }
+            // TODO other model_type cases.
+
+            for (int j = j_from; j < j_limit; ++j) {
                 sumAlpha2_ti += alphaH[t - 1][j] * A[j][i];
             }
+
             sumAlpha2_ti *= B[i][O[t]];
 
             alpha2[t][i] = sumAlpha2_ti;

@@ -49,7 +49,7 @@ static void _report_results(FILE *file) {
     fprintf(file, "\t        #sequences: %d\n", num_seqs);
     fprintf(file, "\t        auto value: %Lg\n", val_auto);
     fprintf(file, "\t      #refinements: %d\n", num_refinements);
-    fprintf(file, "\t          Σ log(P): %Le\n", sum_log_prob);
+    fprintf(file, "\t          Σ log(P): %Lg\n", sum_log_prob);
 }
 
 static void report_results(void) {
@@ -71,6 +71,8 @@ static void report_results(void) {
 static inline prob_t get_sum_log_prob(Hmm *hmm, int num_seqs, Symbol **sequences, int *T, int use_par) {
     //const double measure_start_sec = measure_time_now_sec();
     prob_t sum_log_prob = 0.;
+
+    // TODO use hmm_genQopt instead of hmm_log_prob?
 
     if (use_par) {
         #pragma omp parallel for reduction (+:sum_log_prob)
@@ -290,7 +292,7 @@ int hmm_learn(
 
     hmm_destroy(hmm);
 
-    printf("=> training took %s     class=%s\n",
+    printf("=> training took %s     class=%s\n\n",
             measure_time_show_elapsed(measure_elapsed_sec), model_className);
     return 0;
 }
