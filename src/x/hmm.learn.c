@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     int max_iterations = -1;
 
     int seed = -1;
-    int use_par = 1;
+    int use_par = 0;
 
     if (argc < 2) {
         printf("\
@@ -45,7 +45,7 @@ HMM training\n\
                     2: cascade-2; random B\n\
                     3: cascade-3; random B\n\
     -s <val>      Seed for random numbers. Negative means random seed (%d, by default).\n\
-    -S            Use serialized impl (parallel impl, by default).\n\
+    -P            Use parallel impl (serialized impl, by default).\n\
     <sequence>... training sequences (max: %d)\n\
 \n\n",
                N, val_auto, hmm_epsilon, model_type, seed, MAX_SEQS
@@ -55,7 +55,7 @@ HMM training\n\
 
     int opc;
 
-    while (EOF != (opc = getopt(argc, argv, "N:t:e:a:I:s:S"))) {
+    while (EOF != (opc = getopt(argc, argv, "N:t:e:a:I:s:P"))) {
         switch (opc) {
             case 'I':
                 if (sscanf(optarg, "%u", &max_iterations) == 0) {
@@ -94,8 +94,8 @@ HMM training\n\
                     return 1;
                 }
                 break;
-            case 'S':
-                use_par = 0;
+            case 'P':
+                use_par = 1;
                 break;
             case '?':
                 return 0;

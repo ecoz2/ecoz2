@@ -1,5 +1,8 @@
 2020-05
 
+- hmm.learn: make it run serialized by default as we assume the general
+  setting of multiple models being ("externally") trained in parallel.
+
 - hmm_refinement: more revision
 
     - reestimate_A/B (renamed from refine_A/B).
@@ -32,6 +35,29 @@
 
             $ CPUPROFILE=hmm.learn.prof hmm.learn -s 0 -N 128 -a 0.3 .../*.seq
             $ pprof --text `which hmm.learn` hmm.learn.prof
+
+                4780  81.4%  81.4%     4783  81.4% _hmm_learn
+                 441   7.5%  88.9%      656  11.2% _hmm_log_prob
+                 396   6.7%  95.6%      396   6.7% _hmm_genQopt_with_mem
+                 187   3.2%  98.8%      187   3.2% 0x00007fff51e5a15a
+                  30   0.5%  99.3%       30   0.5% 0x00007fff51e4fdc2
+                  10   0.2%  99.5%       10   0.2% 0x00007fff51e58e66
+                   9   0.2%  99.6%        9   0.2% 0x00007fff51e58e7e
+                   5   0.1%  99.7%        5   0.1% 0x00007fff51e595aa
+                   4   0.1%  99.8%        4   0.1% 0x00007fff51f8dc69
+                   3   0.1%  99.8%        3   0.1% _hmm_precompute_logB
+                   2   0.0%  99.9%        2   0.0% _hmm_adjustB
+                   1   0.0%  99.9%        1   0.0% 0x0000000111c4fa49
+                   1   0.0%  99.9%        1   0.0% 0x00007fff51e5970a
+                   1   0.0%  99.9%        1   0.0% 0x00007fff51eb32eb
+                   1   0.0%  99.9%        1   0.0% 0x00007fff51ebf1d7
+                   1   0.0% 100.0%        1   0.0% 0x00007fff51ebf3be
+                   1   0.0% 100.0%        1   0.0% 0x00007fff51f8dc94
+                   1   0.0% 100.0%        1   0.0% _hmm_genQopt
+                   ...
+
+      some previous run:
+
             Using local file .../_out/bin/hmm.learn.
             Using local file hmm.learn.prof.
             Total: 606 samples
