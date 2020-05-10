@@ -11,13 +11,13 @@ const char *ecoz2_version() {
 }
 
 void ecoz2_set_random_seed(int seed) {
-    printf("ecoz2_set_random_seed: seed=%d\n", seed);
+    printf("ecoz2_set_random_seed: seed=%d", seed);
     if (seed < 0) {
-        srand(rand());
+        int seed = rand();
+        printf("; actual seed=%d", seed);
     }
-    else {
-        srand((unsigned) seed);
-    }
+    printf("\n");
+    srand((unsigned) seed);
 }
 
 int ecoz2_lpc_signals(
