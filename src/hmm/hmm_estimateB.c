@@ -91,4 +91,6 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *Ts, int num_seqs, int max_T) {
 
     printf("num_not_emitting_states=%d\n", num_not_emitting_states);
     printf("initial B matrix took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
+
+    hmm_adjust_B_epsilon(hmm, "hmm_estimateB");
 }
