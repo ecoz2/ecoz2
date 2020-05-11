@@ -68,8 +68,6 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *Ts, int num_seqs, int max_T) {
 
     del_vector(Qopt);
 
-    // TODO apply epsilon restriction only in relevant rows below
-
     int num_not_emitting_states = 0;
 
     // do required normalizations:
@@ -93,7 +91,4 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *Ts, int num_seqs, int max_T) {
 
     printf("num_not_emitting_states=%d\n", num_not_emitting_states);
     printf("initial B matrix took %s\n", measure_time_show_elapsed(measure_time_now_sec() - measure_start_sec));
-
-    // now apply epsilon-restriction:  TODO see above
-    hmm_adjustB(hmm, "hmm_estimateB");
 }

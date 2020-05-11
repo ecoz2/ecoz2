@@ -326,7 +326,8 @@ static inline void reestimate_B(void) {
         printf("%s(%d)", RED("¡"), num_zero_dens);
         fflush(stdout);
     }
-    hmm_adjustB(hmm, "reestimate_B");
+
+    hmm_adjust_B_epsilon(hmm, "reestimate_B");
 }
 
 static int hmm_refinement_step(void) {

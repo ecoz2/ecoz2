@@ -78,10 +78,10 @@ Hmm *hmm_load(char *filename);
 
 int hmm_save(Hmm *, char *filename);
 
-/**
- * Adjust B according to epsilon restriction
- */
-void hmm_adjustB(Hmm *, const char* logMsg);
+/// Adjust B according to epsilon restriction:
+///  if hmm_epsilon > 0, then each B[j][k] is adjusted
+///  such that it is >= hmm_epsilon.  B[j] is of course re-normalized.
+void hmm_adjust_B_epsilon(Hmm *hmm, const char* logMsg);
 
 void hmm_destroy(Hmm *);
 
