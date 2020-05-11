@@ -233,6 +233,8 @@ int hmm_learn(
     }
     printf("refinement info prepared\n");
 
+    char change_str[2014];
+
     num_refinements = 0;
     prob_t sum_log_prob_prev = sum_log_prob;
     while (max_iterations < 0 || num_refinements < max_iterations) {
@@ -254,8 +256,16 @@ int hmm_learn(
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
 
-        printf(" %3d: Δ = %+10.6Lg  sum_log_prob = %+10.6Lg  prev = %+10.6Lg  '%s'  (%.3fs)\n",
-                num_refinements, change, sum_log_prob, sum_log_prob_prev, model_className,
+        if (change < zero) {
+            sprintf(change_str, RED("%+10.6Lg"), change);
+        }
+        else {
+            sprintf(change_str, "%+10.6Lg", change);
+        }
+        printf(" %3d: Δ = %s  sum_log_prob = %+10.6Lg  prev = %+10.6Lg  '%s'  (%.3fs)\n",
+                num_refinements,
+                change_str,
+                sum_log_prob, sum_log_prob_prev, model_className,
                 measure_time_now_sec() - measure_ref_start_sec
                 );
 
