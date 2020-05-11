@@ -87,7 +87,7 @@ void hmm_destroy(Hmm *);
 
 /// Initial B estimation based on symbol frequencies.
 /// max_T > 0 can be given if already known.
-void hmm_estimateB(Hmm *hmm, Symbol **O, int *T, int num_cads, int max_T);
+void hmm_estimateB(Hmm *hmm, Symbol **O, int *Ts, int num_seqs, int max_T);
 
 /**
  * Model initialization according to given mode.

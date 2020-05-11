@@ -1,5 +1,7 @@
 2020-05
 
+- minor adjs in hmm_estimateB
+
 - _classify: show average accuracy and error rate
 
 - hmm.learn: make it run serialized by default as we assume the general
