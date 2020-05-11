@@ -1,5 +1,9 @@
 2020-05
 
+- interesting: https://doi.org/10.1155/2017/7318940
+  "Efficient and Effective Learning of HMMs Based on Identification of Hidden States"
+  Liu and Lemeire (2017).
+
 - minor adjs in hmm_estimateB
 
 - _classify: show average accuracy and error rate
