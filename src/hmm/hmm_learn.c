@@ -172,10 +172,11 @@ int hmm_learn(
 
         int show_filename = 0;
         if (num_sequences > 8) {
-            if (r == 3) {
+            const int part_size = 2;
+            if (r == part_size) {
                 printf("  ...\n");
             }
-            else if (r < 3 || r > num_sequences - 3 - 1) {
+            else if (r < part_size || r > num_sequences - part_size - 1) {
                 show_filename = 1;
             }
         }

@@ -101,6 +101,37 @@ static void init_results() {
     }
 }
 
+typedef struct {
+    float accuracy;
+    float avg_accuracy;
+} Summary;
+
+
+static void _report_summary(FILE *file, Summary *summary) {
+    fprintf(file, "{\n"
+                  "  \"accuracy\":     %.2f,\n"
+                  "  \"avg_accuracy\": %.2f\n"
+                  "}\n",
+            summary->accuracy,
+            summary->avg_accuracy
+    );
+}
+
+static void report_summary(Summary *summary) {
+    //_report_summary(stdout, summary);
+
+    char filename[2048];
+    sprintf(filename, "classification.json");
+    FILE *file = fopen(filename, "w");
+    if (file) {
+        _report_summary(file, summary);
+        fclose(file);
+    }
+    else {
+        fprintf(stderr, "ERROR creating %s\n", filename);
+    }
+}
+
 static void report_results() {
     if (result[TOTAL][0] == 0)
         return;
@@ -156,8 +187,8 @@ static void report_results() {
     printf("class     accuracy    tests      candidate order\n");
 
     int num_classes = 0;
-    float avg_accuracy = 0;
-    float error_rate = 0;
+
+    Summary summary = { 0, 0 };
 
     for (int classId = 0; classId <= TOTAL; classId++) {
         if (result[classId][0] == 0)
@@ -165,15 +196,12 @@ static void report_results() {
 
         const int num_tests = result[classId][0];
         const int correct_tests = result[classId][1];
-        const int incorrect_tests = num_tests - correct_tests;
 
         const float acc = (float) correct_tests / num_tests;
-        const float err = (float) incorrect_tests / num_tests;
 
         if (classId < TOTAL) {
             ++num_classes;
-            avg_accuracy += acc;
-            error_rate += err;
+            summary.avg_accuracy += acc;
 
             printf("%*s ", margin, models[classId]->className);
             printf("  %3d    ", classId);
@@ -182,6 +210,7 @@ static void report_results() {
             printf("\n");
             printf("%*s ", margin, "");
             printf("  TOTAL  ");
+            summary.accuracy = acc;
         }
 
         printf("  %6.2f%%   %3d        ",
@@ -194,9 +223,15 @@ static void report_results() {
         }
         printf("\n");
     }
-    printf("  avg_accuracy  %6.2f%%\n", (float) (100.0 * avg_accuracy) / num_classes);
-    printf("    error_rate  %6.2f%%\n", (float) (100.0 * error_rate) / num_classes);
+
+    summary.accuracy *= 100.;
+    summary.avg_accuracy = summary.avg_accuracy * 100. / num_classes;
+
+    printf("  avg_accuracy  %6.2f%%\n", summary.avg_accuracy);
+    //printf("    error_rate  %6.2f%%\n", (float) (100. - avg_accuracy));
     printf("\n");
+
+    report_summary(&summary);
 }
 
 // sorts probabilities in increasing order

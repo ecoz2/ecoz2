@@ -17,6 +17,8 @@ void hmm_adjust_B_epsilon(Hmm *hmm, const char* logMsg) {
         return;  // no restriction
     }
 
+    (void) logMsg; // avoid compile warning when VERIFY undefined.
+
     const int N = hmm->N;
     const int M = hmm->M;
     prob_t **B = hmm->B;
