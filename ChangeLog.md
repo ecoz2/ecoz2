@@ -1,5 +1,7 @@
 2020-05
 
+- 0.3.3 add ecoz2_vq_learn_using_base_codebook
+
 - vq.learn: add ability to start from a given codebook
 
         vq.learn [options] <predictor> ...

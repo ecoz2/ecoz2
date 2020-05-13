@@ -7,7 +7,7 @@
 #include <stdlib.h>  // rand, srand
 
 const char *ecoz2_version() {
-    return "0.3.2";
+    return "0.3.3";
 }
 
 void ecoz2_set_random_seed(int seed) {
@@ -85,6 +85,24 @@ int ecoz2_vq_learn(
             epsilon,
             codebook_class_name,
             predictor_filenames,
+            num_predictors,
+            1,  // use_par
+            callback
+    );
+}
+
+int ecoz2_vq_learn_using_base_codebook(
+        char *base_codebook,
+        double epsilon,
+        const char *predictor_filenames[],
+        int num_predictors,
+        vq_learn_callback_t callback
+        ) {
+
+    return vq_learn_using_base_codebook(
+            base_codebook,
+            epsilon,
+            (const char **) predictor_filenames,
             num_predictors,
             1,  // use_par
             callback
