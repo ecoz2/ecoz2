@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #include <time.h>  // clock_gettime
 #include <math.h>  // floor
+#include <sys/resource.h>  // rlim_t, etc
+
 
 int ends_with(char* filename, char* str) {
     const int len_i = strlen(filename);
@@ -51,4 +53,26 @@ const char* measure_time_show_elapsed(double elapsed_secs) {
         sprintf(str, "%.3fs", elapsed_secs);
     }
     return str;
+}
+
+void increment_stack_size(void) {
+    const rlim_t min_desired_mb = 16;
+    const rlim_t min_desired = min_desired_mb * 1024 * 1024;
+    struct rlimit rl;
+    int result = getrlimit(RLIMIT_STACK, &rl);
+    if (!result) {
+        //printf("getrlimit: rlim_cur = %Lu\n", rl.rlim_cur);
+        if (rl.rlim_cur < min_desired) {
+            rl.rlim_cur = min_desired;
+            result = setrlimit(RLIMIT_STACK, &rl);
+            if (result) {
+                fprintf(stderr,
+                        RED("WARN: call to increment stack size to %LuMb returned %d\n"),
+                        min_desired_mb, result);
+            }
+        }
+    }
+    else {
+        fprintf(stderr, RED("WARN: getrlimit returned %d\n"), result);
+    }
 }

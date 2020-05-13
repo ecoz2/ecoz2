@@ -72,4 +72,6 @@ void _del_matrix(void **m);
 prob_t ***new_matrix3(int d0, int d1, int d2);
 void del_matrix3(prob_t ***m, int d0, int d1);
 
+void increment_stack_size(void);
+
 #endif

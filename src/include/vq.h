@@ -8,7 +8,7 @@
 #include "lpc.h"
 #include "symbol.h"
 
-#define MAX_CODEBOOK_SIZE 2048
+#define MAX_CODEBOOK_SIZE 4096
 
 #define MAX_PREDICTION_ORDER 40
 

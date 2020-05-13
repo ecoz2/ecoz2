@@ -27,6 +27,8 @@ Codebook training\n\
 }
 
 int main(int argc, char *argv[]) {
+    increment_stack_size();
+
     char base_codebook[2048] = "";
     int P = 0;
     sample_t epsilon = .05;

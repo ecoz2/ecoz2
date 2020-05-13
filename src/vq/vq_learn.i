@@ -42,6 +42,11 @@ static inline int initial_codebook(int P) {
 
 /// Grows the codebook by perturbing each reflector with the pert1 and pert0 factors.
 static int grow_codebook(int num_raas, int P) {
+    if (num_raas == MAX_CODEBOOK_SIZE) {
+        fprintf(stderr, "ERROR: maximum codebook size reached: %d", MAX_CODEBOOK_SIZE);
+        exit(1);
+    }
+
     // factors to grow codebook:
     const sample_t pert0 = 0.99f;
     const sample_t pert1 = 1.01f;

@@ -80,6 +80,8 @@ int ecoz2_vq_learn(
         vq_learn_callback_t callback
         ) {
 
+    increment_stack_size();
+
     return vq_learn(
             prediction_order,
             epsilon,
@@ -98,6 +100,8 @@ int ecoz2_vq_learn_using_base_codebook(
         int num_predictors,
         vq_learn_callback_t callback
         ) {
+
+    increment_stack_size();
 
     return vq_learn_using_base_codebook(
             base_codebook,
