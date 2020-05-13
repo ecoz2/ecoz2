@@ -1,5 +1,18 @@
 2020-05
 
+- vq.learn: add ability to start from a given codebook
+
+        vq.learn [options] <predictor> ...
+    
+        -B <codebook>   Start training from this base codebook.
+        -P <val>        Prediction order (required if -B not given).
+        -w <id>         Class ID to associate to generated codebooks.
+        -e <val>        Epsilon parameter for convergence (0.05, by default).
+        -s <val>        Seed for random numbers. Negative means random seed (-1, by default).
+        -S              Use serialized impl (parallel impl, by default).
+        <predictor>...  training predictor files
+
+
 - interesting: https://doi.org/10.1155/2017/7318940
   "Efficient and Effective Learning of HMMs Based on Identification of Hidden States"
   Liu and Lemeire (2017).

@@ -78,6 +78,7 @@ sample_t quantize(sample_t *raas,
                  );
 
 
+/// Clustering starting from codebook size 2
 int vq_learn(int prediction_order,
              sample_t epsilon,
              const char *codebook_class_name,
@@ -86,6 +87,16 @@ int vq_learn(int prediction_order,
              int use_par,
              vq_learn_callback_t callback
             );
+
+/// Clustering starting from next size according to given codebook
+int vq_learn_using_base_codebook(
+        char *base_codebook,
+        sample_t epsilon,
+        const char *predictor_filenames[],
+        int num_predictors,
+        int use_par,
+        vq_learn_callback_t callback
+        );
 
 int vq_quantize(const char *nom_raas,
                 const char *predictor_filenames[], int num_predictors
