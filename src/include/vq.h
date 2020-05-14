@@ -85,6 +85,7 @@ int vq_learn(int prediction_order,
              const char *predictor_filenames[],
              int num_predictors,
              int use_par,
+             void* callback_target,
              vq_learn_callback_t callback
             );
 
@@ -95,6 +96,7 @@ int vq_learn_using_base_codebook(
         const char *predictor_filenames[],
         int num_predictors,
         int use_par,
+        void* callback_target,
         vq_learn_callback_t callback
         );
 

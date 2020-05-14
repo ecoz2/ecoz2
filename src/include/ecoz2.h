@@ -46,7 +46,10 @@ int ecoz2_prd_show_file(
         int to
         );
 
-typedef void (*vq_learn_callback_t)(int M, double avgDistortion, double sigma, double inertia);
+typedef void (*vq_learn_callback_t)(
+        void* callback_target,
+        int M, double avgDistortion, double sigma, double inertia
+        );
 
 /// Clustering starting from codebook size 2
 int ecoz2_vq_learn(
@@ -55,6 +58,7 @@ int ecoz2_vq_learn(
         const char *codebook_class_name,
         const char *predictor_filenames[],
         int num_predictors,
+        void* callback_target,
         vq_learn_callback_t callback
         );
 
@@ -64,6 +68,7 @@ int ecoz2_vq_learn_using_base_codebook(
         double epsilon,
         const char *predictor_filenames[],
         int num_predictors,
+        void* callback_target,
         vq_learn_callback_t callback
         );
 

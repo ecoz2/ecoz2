@@ -1,5 +1,7 @@
 2020-05
 
+- include callback_target in vq learn functions
+
 - increase max codebook size to 4096.
   For now, just increasing stack size for associated arrays.
   TODO use heap.

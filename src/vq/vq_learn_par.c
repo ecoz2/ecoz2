@@ -7,6 +7,7 @@ static void learn_par(const char *codebook_class_name,
                   long tot_vecs,
                   sample_t **allVectors,
                   sample_t eps,
+                  void* callback_target,
                   vq_learn_callback_t callback
                   ) {
 
@@ -135,7 +136,7 @@ static void learn_par(const char *codebook_class_name,
             sample_t inertia = calculateInertia(allVectors,  tot_vecs, codebook, num_raas, P);
 
             if (callback != 0) {
-                callback(num_raas, avgDistortion, sigma, inertia);
+                callback(callback_target, num_raas, avgDistortion, sigma, inertia);
             }
 
             report_cbook(cb_filename, pass + 1, avgDistortion, sigma, inertia, num_raas, cardd, discel,

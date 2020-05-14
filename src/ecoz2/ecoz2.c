@@ -77,6 +77,7 @@ int ecoz2_vq_learn(
         const char *codebook_class_name,
         const char *predictor_filenames[],
         int num_predictors,
+        void* callback_target,
         vq_learn_callback_t callback
         ) {
 
@@ -87,6 +88,7 @@ int ecoz2_vq_learn(
             predictor_filenames,
             num_predictors,
             1,  // use_par
+            callback_target,
             callback
     );
 }
@@ -96,6 +98,7 @@ int ecoz2_vq_learn_using_base_codebook(
         double epsilon,
         const char *predictor_filenames[],
         int num_predictors,
+        void* callback_target,
         vq_learn_callback_t callback
         ) {
 
@@ -105,6 +108,7 @@ int ecoz2_vq_learn_using_base_codebook(
             (const char **) predictor_filenames,
             num_predictors,
             1,  // use_par
+            callback_target,
             callback
     );
 }

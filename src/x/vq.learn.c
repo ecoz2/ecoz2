@@ -111,6 +111,7 @@ int main(int argc, char *argv[]) {
                 (const char **) predictor_filenames,
                 numPredictors,
                 use_par,
+                0, // callback_target
                 0  // callback
         );
     }
@@ -121,6 +122,7 @@ int main(int argc, char *argv[]) {
                 (const char **) predictor_filenames,
                 numPredictors,
                 use_par,
+                0, // callback_target
                 0  // callback
         );
     }

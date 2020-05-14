@@ -164,6 +164,7 @@ int vq_learn_(
         const char *predictor_filenames[],
         int num_predictors,
         int use_par,
+        void* callback_target,
         vq_learn_callback_t callback
         ) {
 
@@ -219,14 +220,14 @@ int vq_learn_(
     if (use_par) {
         learn_par(codebook_class_name,
                   P, prefix,
-                  num_raas, tot_vecs, allVectors, eps, callback);
+                  num_raas, tot_vecs, allVectors, eps, callback_target, callback);
 
     }
     else {
         printf("(using serialized impl)\n");
         learn_ser(codebook_class_name,
                   P, prefix,
-                  num_raas, tot_vecs, allVectors, eps, callback);
+                  num_raas, tot_vecs, allVectors, eps, callback_target, callback);
     }
 
 
