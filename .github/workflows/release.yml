@@ -18,20 +18,21 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build linux
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         CC=gcc make
         cd _out/bin/
         zip "${{github.workspace}}/ecoz2-linux.zip" *
-      if: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Build macos
+      if: ${{ matrix.os == 'macos-latest' }}
       run: |
         CC=gcc-9 make
         cd _out/bin/
         zip "${{github.workspace}}/ecoz2-macos.zip" *
-      if: ${{ matrix.os == 'macos-latest' }}
 
-    - name: Do release
+    - name: Release linux
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       uses: sondreb/action-release@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -40,4 +41,16 @@ jobs:
         body: 'This is a pre-release'
         name: "Draft Release"
         tag: ${{ github.ref }}
-        files: "${{github.workspace}}/ecoz2-linux.zip;${{github.workspace}}/ecoz2-macos.zip"
+        files: "ecoz2-linux.zip"
+
+    - name: Release macos
+      if: ${{ matrix.os == 'macos-latest' }}
+      uses: sondreb/action-release@master
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        draft: true
+        prerelease: true
+        body: 'This is a pre-release'
+        name: "Draft Release"
+        tag: ${{ github.ref }}
+        files: "ecoz2-macos.zip"
