@@ -1,6 +1,6 @@
 2020-05
 
-- 0.3.35 - release using github actions (linux and macos binaries)
+- 0.3.5 - release using github actions (linux and macos binaries)
 
 - include callback_target in vq learn functions
 
