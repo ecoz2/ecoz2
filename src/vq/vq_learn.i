@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <malloc.h>
+//#include <malloc.h> -> No such file or directory, on macos-latest (github actions)
 #include <string.h>
 
 #include "lpc.h"
