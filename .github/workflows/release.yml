@@ -35,7 +35,6 @@ jobs:
       uses: sondreb/action-release@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        folder: "${{github.workspace}}/package/"
         draft: true
         prerelease: true
         body: 'This is a pre-release'
