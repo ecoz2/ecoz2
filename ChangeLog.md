@@ -1,5 +1,7 @@
 2020-05
 
+- 0.3.35 - release using github actions (linux and macos binaries)
+
 - include callback_target in vq learn functions
 
 - increase max codebook size to 4096.
