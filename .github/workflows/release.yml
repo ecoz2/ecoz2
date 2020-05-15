@@ -19,7 +19,7 @@ jobs:
 
     - name: Build linux
       run: |
-        make
+        CC=gcc make
         cd _out/bin/
         zip ../../ecoz2-linux.zip *
       if: ${{ matrix.os == 'ubuntu-latest' }}
@@ -52,6 +52,7 @@ jobs:
         asset_path: ./ecoz2-linux.zip
         asset_name: ecoz2-linux.zip
         asset_content_type: application/zip
+      if: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Upload macos asset release
       uses: actions/upload-release-asset@v1
@@ -62,3 +63,4 @@ jobs:
         asset_path: ./ecoz2-macos.zip
         asset_name: ecoz2-macos.zip
         asset_content_type: application/zip
+      if: ${{ matrix.os == 'macos-latest' }}

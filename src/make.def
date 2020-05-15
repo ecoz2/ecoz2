@@ -1,4 +1,4 @@
-cc=gcc
+cc=$(CC)
 #cdebug=-g -DDEBUG
 cflags=-O3 -Wall -ffast-math -fopenmp -march=native
 
