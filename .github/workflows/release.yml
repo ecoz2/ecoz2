@@ -40,4 +40,4 @@ jobs:
         body: 'This is a pre-release'
         name: "Draft Release"
         tag: ${{ github.ref }}
-        files: "ecoz2-linux.zip;ecoz2-macos.zip"
+        files: "${{github.workspace}}/ecoz2-linux.zip;${{github.workspace}}/ecoz2-macos.zip"
