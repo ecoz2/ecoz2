@@ -17,20 +17,17 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Build
-      run: make
-
-    - name: Package linux
+    - name: Build linux
       if: ${{ matrix.os }} == 'ubuntu-latest'
       run: |
-        echo "Packaging liknux..."
+        make
         cd _out/bin/
         zip ../../ecoz2-linux.zip *
 
-    - name: Package macos
+    - name: Build macos
       if: ${{ matrix.os }} == 'macos-latest'
       run: |
-        echo "Packaging..."
+        CC=gcc-9 make
         cd _out/bin/
         zip ../../ecoz2-macos.zip *
 
