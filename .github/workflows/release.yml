@@ -21,21 +21,21 @@ jobs:
       run: |
         CC=gcc make
         cd _out/bin/
-        zip "${{github.workspace}}/package/ecoz2-linux.zip" *
+        zip "${{github.workspace}}/ecoz2-linux.zip" *
       if: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Build macos
       run: |
         CC=gcc-9 make
         cd _out/bin/
-        zip "${{github.workspace}}/package/ecoz2-macos.zip" *
+        zip "${{github.workspace}}/ecoz2-macos.zip" *
       if: ${{ matrix.os == 'macos-latest' }}
 
     - name: Do release
       uses: sondreb/action-release@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        folder: "${{github.workspace}}/package/"
+        folder: "${{github.workspace}}/"
         draft: true
         prerelease: true
         body: 'This is a pre-release'
