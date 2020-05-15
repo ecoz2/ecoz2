@@ -18,14 +18,14 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Build linux
-      if: ${{ matrix.os }} == 'ubuntu-latest'
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         make
         cd _out/bin/
         zip ../../ecoz2-linux.zip *
 
     - name: Build macos
-      if: ${{ matrix.os }} == 'macos-latest'
+      if: ${{ matrix.os == 'macos-latest' }}
       run: |
         CC=gcc-9 make
         cd _out/bin/
