@@ -7,7 +7,7 @@
 #include <stdlib.h>  // rand, srand
 
 const char *ecoz2_version() {
-    return "0.3.32c";
+    return "0.3.32e";
 }
 
 void ecoz2_set_random_seed(int seed) {
