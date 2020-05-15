@@ -1,9 +1,10 @@
 name: ECOZ2 C Release
 
-on:
-  push:
-    tags:
-      - 'v*'
+on: [push]
+#on:
+#  push:
+#    tags:
+#      - 'v*'
 
 jobs:
   build:
@@ -42,6 +43,7 @@ jobs:
         body: One more pre-release
         draft: false
         prerelease: true
+      if: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Upload linux asset release
       uses: actions/upload-release-asset@v1
