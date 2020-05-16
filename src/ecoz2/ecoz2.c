@@ -5,6 +5,7 @@
 
 #include <string.h>
 #include <stdlib.h>  // rand, srand
+#include <time.h>    // time
 
 const char *ecoz2_version() {
     return "0.3.6";
@@ -13,7 +14,7 @@ const char *ecoz2_version() {
 void ecoz2_set_random_seed(int seed) {
     printf("ecoz2_set_random_seed: seed=%d", seed);
     if (seed < 0) {
-        int seed = rand();
+        int seed = time(NULL);
         printf("; actual seed=%d", seed);
     }
     printf("\n");
