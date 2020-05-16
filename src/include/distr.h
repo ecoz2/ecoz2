@@ -6,12 +6,16 @@
 
 #include "prob_t.h"
 
-void dis_inicAle(prob_t *dis, int lon);
+/// Sets a random distribution, with no null-values
+void dis_set_random(prob_t *dis, int len);
 
-void dis_inicDelta(prob_t *dis, int lon, int desde, int delta);
+/// Sets a random left-right distribution from a given position
+void dis_set_random_delta(prob_t *dis, int len, int from, int delta);
 
-void dis_inicUni(prob_t *dis, int lon);
+/// Sets a uniform distribution
+void dis_set_uniform(prob_t *dis, int len);
 
-int dis_event(prob_t *dis, int lon);
+/// Returns an event as outcome of an experiment over the distribution
+int dis_event(prob_t *dis, int len);
 
 #endif

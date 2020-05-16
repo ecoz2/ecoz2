@@ -36,18 +36,18 @@ void hmm_destroy(Hmm *hmm) {
 void hmm_init(Hmm *hmm, int mode) {
     switch (mode) {
         case HMM_RANDOM:
-            dis_inicAle(hmm->pi, hmm->N);
+            dis_set_random(hmm->pi, hmm->N);
             for (int i = 0; i < hmm->N; i++) {
-                dis_inicAle(hmm->A[i], hmm->N);
-                dis_inicAle(hmm->B[i], hmm->M);
+                dis_set_random(hmm->A[i], hmm->N);
+                dis_set_random(hmm->B[i], hmm->M);
             }
             break;
 
         case HMM_UNIFORM:
-            dis_inicUni(hmm->pi, hmm->N);
+            dis_set_uniform(hmm->pi, hmm->N);
             for (int i = 0; i < hmm->N; i++) {
-                dis_inicUni(hmm->A[i], hmm->N);
-                dis_inicUni(hmm->B[i], hmm->M);
+                dis_set_uniform(hmm->A[i], hmm->N);
+                dis_set_uniform(hmm->B[i], hmm->M);
             }
             break;
 
@@ -55,11 +55,11 @@ void hmm_init(Hmm *hmm, int mode) {
         case HMM_CASCADE3:
             /* pi: 1; A: delta=mode; B: random */
 
-            dis_inicDelta(hmm->pi, hmm->N, 0, 1);
+            dis_set_random_delta(hmm->pi, hmm->N, 0, 1);
 
             for (int i = 0; i < hmm->N; i++) {
-                dis_inicDelta(hmm->A[i], hmm->N, i, mode);
-                dis_inicAle(hmm->B[i], hmm->M);
+                dis_set_random_delta(hmm->A[i], hmm->N, i, mode);
+                dis_set_random(hmm->B[i], hmm->M);
             }
             break;
     }
@@ -68,16 +68,16 @@ void hmm_init(Hmm *hmm, int mode) {
 void hmm_init_A_row(prob_t *row, int N, int mode, int colForCascade) {
     switch (mode) {
         case HMM_RANDOM:
-            dis_inicAle(row, N);
+            dis_set_random(row, N);
             break;
 
         case HMM_UNIFORM:
-            dis_inicUni(row, N);
+            dis_set_uniform(row, N);
             break;
 
         case HMM_CASCADE2:
         case HMM_CASCADE3:
-            dis_inicDelta(row, N, colForCascade, mode);
+            dis_set_random_delta(row, N, colForCascade, mode);
             break;
     }
 }

@@ -3,7 +3,7 @@
 
 #include "hmm.h"
 #include "utl.h"
-#include "distr.h" // dis_inicUni
+#include "distr.h" // dis_set_uniform
 
 #include <stdlib.h>
 
@@ -30,10 +30,11 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *Ts, int num_seqs, int max_T) {
     // num[j][k] number of times symbol k emitted from state j:
     int **num = (int **) new_matrix(N, M, sizeof(int));
 
-    // def[j] number of times any symbol emitted from state j:
+    // den[j] number of times any symbol emitted from state j:
     int *den = (int *) new_vector(N, sizeof(int));
 
-    int *Qopt = (int *) new_vector(max_T, sizeof(int));
+    // optimal state sequence
+    int *q_opt = (int *) new_vector(max_T, sizeof(int));
 
     prob_t **logA = (prob_t **) new_matrix(N, N, sizeof(prob_t));
     hmm_precompute_logA(hmm, logA);
@@ -50,13 +51,13 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *Ts, int num_seqs, int max_T) {
         hmm_precompute_logB(hmm, O, T, logB);
 
         // get optimal sequence:
-        hmm_genQopt_with_mem(hmm, O, T, Qopt,
+        hmm_genQopt_with_mem(hmm, O, T, q_opt,
                 logA, logB,
                 phi, psi);
 
         // update counters:
         for (int t = 0; t < T; t++) {
-            const int state = Qopt[t];
+            const int state = q_opt[t];
             num[state][O[t]]++;
             den[state]++;
         }
@@ -66,7 +67,7 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *Ts, int num_seqs, int max_T) {
     del_matrix(logB);
     del_matrix(logA);
 
-    del_vector(Qopt);
+    del_vector(q_opt);
 
     int num_not_emitting_states = 0;
 
@@ -74,8 +75,8 @@ void hmm_estimateB(Hmm *hmm, Symbol **seqs, int *Ts, int num_seqs, int max_T) {
     for (int j = 0; j < N; j++) {
         // no emitted symbol from this state?
         if (den[j] == 0) {
-            // set uniform distribution:
-            dis_inicUni(B[j], M);
+            // TODO appropriate distribution
+            dis_set_uniform(B[j], M);
             ++num_not_emitting_states;
         }
         else {

@@ -318,7 +318,7 @@ static inline void reestimate_B(void) {
         }
         else {
             ++num_zero_dens;
-            dis_inicAle(B[i], M);
+            dis_set_random(B[i], M);
             // TODO or perhaps just leave B[i] as it is?
         }
     }
