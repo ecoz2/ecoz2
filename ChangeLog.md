@@ -1,6 +1,6 @@
 2020-05
 
-- use arc4random
+- use a get_seed depending on os
 - minor distribution related adjustments
 
 - 0.3.5 - release using github actions (linux and macos binaries)

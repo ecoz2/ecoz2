@@ -4,18 +4,39 @@
 #include "hmm.h"
 
 #include <string.h>
-#include <stdlib.h>  // rand, srand
-#include <stdlib.h>  // arc4random
+#include <stdlib.h>  // rand, srand, arc4random (on macos)
+
+#if defined(__APPLE__)
+    static inline unsigned get_seed(void) {
+        return (unsigned) arc4random();
+    }
+#else
+    #include <sys/time.h>
+    #include <errno.h>
+    static inline unsigned get_seed(void) {
+        struct timeval tv;
+        int res = gettimeofday(&tv, 0);
+        if (res) {
+            fprintf(stderr, RED("error in gettimeofday call: errno=%d\n"), errno);
+            return (unsigned) time(0);
+        }
+        else {
+            // only µs should be fine for us as not many quickly started programs expected
+            return (unsigned) tv.tv_usec;
+            // one ref: https://stackoverflow.com/a/322995/830737
+        }
+    }
+#endif
 
 const char *ecoz2_version() {
-    return "0.3.61";
+    return "0.3.62";
 }
 
 void ecoz2_set_random_seed(int seed) {
     printf("ecoz2_set_random_seed: seed=%d", seed);
     unsigned u;
     if (seed < 0) {
-        u = (unsigned) arc4random();
+        u = get_seed();
         printf("; actual seed=%u", u);
     }
     else u = (unsigned) seed;
