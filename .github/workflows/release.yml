@@ -39,7 +39,7 @@ jobs:
         draft: true
         prerelease: true
         body: 'This is a pre-release'
-        name: "Draft Release"
+        name: "Draft Release ${{ github.ref }}"
         tag: ${{ github.ref }}
         files: "ecoz2-linux.zip"
 
@@ -51,6 +51,6 @@ jobs:
         draft: true
         prerelease: true
         body: 'This is a pre-release'
-        name: "Draft Release"
+        name: "Draft Release ${{ github.ref }}"
         tag: ${{ github.ref }}
         files: "ecoz2-macos.zip"
