@@ -8,7 +8,7 @@
 #include <stdlib.h>  // arc4random
 
 const char *ecoz2_version() {
-    return "0.3.6";
+    return "0.3.61";
 }
 
 void ecoz2_set_random_seed(int seed) {
