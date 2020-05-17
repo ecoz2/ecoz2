@@ -5,7 +5,7 @@
 
 #include <string.h>
 #include <stdlib.h>  // rand, srand
-#include <time.h>    // time
+#include <stdlib.h>  // arc4random
 
 const char *ecoz2_version() {
     return "0.3.6";
@@ -13,12 +13,15 @@ const char *ecoz2_version() {
 
 void ecoz2_set_random_seed(int seed) {
     printf("ecoz2_set_random_seed: seed=%d", seed);
+    unsigned u;
     if (seed < 0) {
-        int seed = time(NULL);
-        printf("; actual seed=%d", seed);
+        u = (unsigned) arc4random();
+        printf("; actual seed=%u", u);
     }
+    else u = (unsigned) seed;
+
     printf("\n");
-    srand((unsigned) seed);
+    srand(u);
 }
 
 int ecoz2_lpc_signals(

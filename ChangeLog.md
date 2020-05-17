@@ -1,5 +1,6 @@
 2020-05
 
+- use arc4random
 - minor distribution related adjustments
 
 - 0.3.5 - release using github actions (linux and macos binaries)
