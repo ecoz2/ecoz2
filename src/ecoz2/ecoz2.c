@@ -29,7 +29,7 @@
 #endif
 
 const char *ecoz2_version() {
-    return "0.4.0";
+    return "0.4.1";
 }
 
 void ecoz2_set_random_seed(int seed) {

@@ -94,7 +94,10 @@ int vq_quantize(const char *nom_raas,
             printf("\nWARN%s NO className", seq_filename);
         }
 
-        seq_show(seq, T);
+        if (show_filenames) {
+            seq_show(seq, T);
+        }
+
         free(seq);
         prd_destroy(prd);
     }
