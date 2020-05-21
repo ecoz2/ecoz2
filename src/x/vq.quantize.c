@@ -36,5 +36,7 @@ int main(int argc, char *argv[]) {
     const int num_predictors = argc - 2;
     char **predictor_filenames = argv + 2;
 
-    return vq_quantize(nom_raas, (const char **) predictor_filenames, num_predictors);
+    const int show_filenames = 1;
+
+    return vq_quantize(nom_raas, (const char **) predictor_filenames, num_predictors, show_filenames);
 }

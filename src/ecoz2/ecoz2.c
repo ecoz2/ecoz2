@@ -29,7 +29,7 @@
 #endif
 
 const char *ecoz2_version() {
-    return "0.3.63";
+    return "0.4.0";
 }
 
 void ecoz2_set_random_seed(int seed) {
@@ -141,13 +141,15 @@ int ecoz2_vq_learn_using_base_codebook(
 int ecoz2_vq_quantize(
         const char *nom_raas,
         const char *predictor_filenames[],
-        int num_predictors
+        int num_predictors,
+        int show_filenames
         ) {
 
     return vq_quantize(
             nom_raas,
             predictor_filenames,
-            num_predictors
+            num_predictors,
+            show_filenames
     );
 }
 

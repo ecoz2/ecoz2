@@ -11,12 +11,14 @@
 
 
 int vq_quantize(const char *nom_raas,
-                const char *predictor_filenames[], int num_predictors
+                const char *predictor_filenames[],
+                int num_predictors,
+                int show_filenames
         ) {
 
     Symbol *seq;
 
-    int num_cads;
+    int num_seqs;
     sample_t ddprm_total;
 
     int P;
@@ -42,7 +44,7 @@ int vq_quantize(const char *nom_raas,
 
     char seq_filename[2048];
 
-    num_cads = 0;
+    num_seqs = 0;
     ddprm_total = 0.f;
 
     for (int i = 0; i < num_predictors; i++) {
@@ -64,7 +66,7 @@ int vq_quantize(const char *nom_raas,
         }
 
         ddprm_total += ddprm = quantize(raas, num_raas, prd, seq);
-        num_cads++;
+        num_seqs++;
 
         char className[MAX_CLASS_NAME_LEN];
         get_class_name(prd_filename, className, sizeof(className));
@@ -84,7 +86,9 @@ int vq_quantize(const char *nom_raas,
             printf("error saving sequence\n");
         }
 
-        printf("\n%s className='%s' (%1.4g) = ", seq_filename, className, ddprm);
+        if (show_filenames) {
+            printf("\n%s className='%s' (%1.4g) = ", seq_filename, className, ddprm);
+        }
 
         if (*className == 0) {
             printf("\nWARN%s NO className", seq_filename);
@@ -95,9 +99,9 @@ int vq_quantize(const char *nom_raas,
         prd_destroy(prd);
     }
 
-    if (num_cads > 0) {
-        printf("\ntotal: %d sequences; dprm total = %f\n",
-               num_cads, ddprm_total / num_cads);
+    if (num_seqs > 0) {
+        printf("\ntotal: %d sequences; total  average distortion = %f\n",
+               num_seqs, ddprm_total / num_seqs);
     }
 
     return 0;

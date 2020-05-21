@@ -75,7 +75,8 @@ int ecoz2_vq_learn_using_base_codebook(
 int ecoz2_vq_quantize(
         const char *nom_raas,
         const char *predictor_filenames[],
-        int num_predictors
+        int num_predictors,
+        int show_filenames
         );
 
 int ecoz2_vq_show(

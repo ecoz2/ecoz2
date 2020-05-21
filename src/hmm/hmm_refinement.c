@@ -20,7 +20,7 @@
 static Hmm *hmm;
 static Symbol **seqs;
 static int *T;
-static int num_cads;
+static int num_seqs;
 
 static prob_t **alpha;
 
@@ -45,11 +45,11 @@ static const prob_t one = (prob_t) 1.;
 
 static void hmm_refinement_destroy(int max_T);
 
-static int hmm_refinement_prepare(Hmm *_lmd, Symbol **_cads, int *_T, int _num_cads) {
+static int hmm_refinement_prepare(Hmm *_lmd, Symbol **_cads, int *_T, int _num_seqs) {
     hmm = _lmd;
     seqs = _cads;
     T = _T;
-    num_cads = _num_cads;
+    num_seqs = _num_seqs;
 
     numA = (prob_t **) new_matrix(hmm->N, hmm->N, sizeof(prob_t));
     numB = (prob_t **) new_matrix(hmm->N, hmm->M, sizeof(prob_t));
@@ -58,7 +58,7 @@ static int hmm_refinement_prepare(Hmm *_lmd, Symbol **_cads, int *_T, int _num_c
 
     // use max T for the following memory allocations
     int max_T = 0;
-    for (int r = 0; r < num_cads; r++) {
+    for (int r = 0; r < num_seqs; r++) {
         if (max_T < T[r]) max_T = T[r];
     }
 
@@ -335,7 +335,7 @@ static int hmm_refinement_step(void) {
     init_counters();
 
     // process each sequence:
-    for (int r = 0; r < num_cads; r++) {
+    for (int r = 0; r < num_seqs; r++) {
         generate_gammas(seqs[r], T[r]);
 
         accumulate_numA_denA(T[r]);
