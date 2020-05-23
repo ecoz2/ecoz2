@@ -13,7 +13,7 @@ const char *ecoz2_version(void);
 /// Calls `srand(rand())` if seed < 0;
 /// otherwise, calls `srand((unsigned) seed)`.
 /// Returns the seed actually used.
-unsigned ecoz2_set_random_seed(int seed);
+unsigned long ecoz2_set_random_seed(long seed);
 
 /// Returns the seed actually used in the last call to ecoz2_set_random_seed.
 /// Returns -1 if no such call has been made. Otherwise the return value

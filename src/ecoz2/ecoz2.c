@@ -34,8 +34,8 @@ const char *ecoz2_version() {
 
 static long last_seed_used = -1;
 
-unsigned ecoz2_set_random_seed(int seed) {
-    printf("ecoz2_set_random_seed: seed=%d", seed);
+unsigned long ecoz2_set_random_seed(long seed) {
+    printf("ecoz2_set_random_seed: seed=%ld", seed);
     unsigned u;
     if (seed < 0) {
         u = get_seed();

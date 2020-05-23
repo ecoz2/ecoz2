@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
 
     int max_iterations = -1;
 
-    int seed = -1;
+    long seed = -1;
     int use_par = 0;
 
     if (argc < 2) {
@@ -44,7 +44,7 @@ HMM training\n\
                     1: uniform distributions\n\
                     2: cascade-2; random B\n\
                     3: cascade-3; random B\n\
-    -s <val>      Seed for random numbers. Negative means random seed (%d, by default).\n\
+    -s <val>      Seed for random numbers. Negative means random seed (%ld, by default).\n\
     -P            Use parallel impl (serialized impl, by default).\n\
     <sequence>... training sequences (max: %d)\n\
 \n\n",
@@ -89,7 +89,7 @@ HMM training\n\
                 }
                 break;
             case 's':
-                if (sscanf(optarg, "%d", &seed) == 0) {
+                if (sscanf(optarg, "%ld", &seed) == 0) {
                     fprintf(stderr, "invalid seed.\n");
                     return 1;
                 }
