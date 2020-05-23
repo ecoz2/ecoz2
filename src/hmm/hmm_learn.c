@@ -92,6 +92,32 @@ static inline prob_t get_sum_log_prob(Hmm *hmm, int num_seqs, Symbol **sequences
     return sum_log_prob;
 }
 
+static FILE *file_csv = 0;
+
+void csv_prepare(char *csv_filename, int max_T) {
+    if (0 == (file_csv = fopen(csv_filename, "w"))) {
+        printf("error creating %s\n", csv_filename);
+        return;
+    }
+
+    fprintf(file_csv, "# N=%d M=%d type=%d  #sequences = %d  max_T=%d\n", N, M, model_type, num_seqs, max_T);
+    fprintf(file_csv, "%s,%s\n", "I", "Σ log(P)");
+}
+
+void csv_add_line(int i, prob_t sum_log_prob) {
+    if (0 == file_csv) {
+        return;
+    }
+
+    fprintf(file_csv, "%d,%Lg\n", i, sum_log_prob);
+}
+
+void csv_close(void) {
+    if (file_csv) {
+        fclose(file_csv);
+        file_csv = 0;
+    }
+}
 
 int hmm_learn(
         int N_,
@@ -210,6 +236,11 @@ int hmm_learn(
     printf("\nN=%d M=%d type=%d  #sequences = %d  max_T=%d\n", N, M, model_type, num_seqs, max_T);
     printf("val_auto = %Lg   log=%Lg   max_iterations=%d\n", val_auto, log_val_auto, max_iterations);
 
+    char csv_filename[2048];
+    #pragma GCC diagnostic ignored "-Wformat-overflow"
+    sprintf(csv_filename, "%s/%s.csv", hmmDir, model_className);
+    csv_prepare(csv_filename, max_T);
+
     const double measure_start_sec = measure_time_now_sec();
 
     // create and initialize HMM:
@@ -225,11 +256,13 @@ int hmm_learn(
 
     sum_log_prob = get_sum_log_prob(hmm, num_seqs, sequences, T, use_par);
     //printf("::::: sum_log_prob=%Le\n", sum_log_prob);
+    csv_add_line(0, sum_log_prob);
 
     // do training:
 
     if (hmm_refinement_prepare(hmm, sequences, T, num_seqs)) {
         fprintf(stderr, "No memory for HMM refinement.\n");
+        csv_close();
         return 2;
     }
     printf("refinement info prepared\n");
@@ -244,6 +277,7 @@ int hmm_learn(
 
         if (hmm_refinement_step()) {
             fprintf(stderr, "refinement error\n");
+            csv_close();
             return 2;
         }
         num_refinements++;
@@ -253,6 +287,7 @@ int hmm_learn(
         // probabilities post-refinement:
         sum_log_prob = get_sum_log_prob(hmm, num_seqs, sequences, T, use_par);
         //printf("::::: sum_log_prob=%Le\n", sum_log_prob);
+        csv_add_line(num_refinements + 1, sum_log_prob);
 
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
@@ -287,6 +322,8 @@ int hmm_learn(
         sum_log_prob_prev = sum_log_prob;
     }
     printf("\n");
+
+    csv_close();
 
     const double measure_elapsed_sec = measure_time_now_sec() - measure_start_sec;
 

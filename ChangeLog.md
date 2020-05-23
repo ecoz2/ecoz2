@@ -1,5 +1,6 @@
 2020-05
 
+- 0.4.2, report csv with (iteration, Σ log(P)) in hmm_learn
 - 0.4.0, with minor adjs
 - use a get_seed depending on os
 - minor distribution related adjustments
