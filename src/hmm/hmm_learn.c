@@ -58,7 +58,7 @@ static void _report_results(FILE *file, const char *prefix) {
 
 static void report_results(void) {
     printf("\n");
-    _report_results(stdout, "\t");
+    _report_results(stdout, "    ");
 
     char rpt_filename[2048];
     strcpy(rpt_filename, model_filename);
