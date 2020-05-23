@@ -29,10 +29,12 @@
 #endif
 
 const char *ecoz2_version() {
-    return "0.4.2";
+    return "0.4.3";
 }
 
-void ecoz2_set_random_seed(int seed) {
+static long last_seed_used = -1;
+
+unsigned ecoz2_set_random_seed(int seed) {
     printf("ecoz2_set_random_seed: seed=%d", seed);
     unsigned u;
     if (seed < 0) {
@@ -43,6 +45,12 @@ void ecoz2_set_random_seed(int seed) {
 
     printf("\n");
     srand(u);
+    last_seed_used = u;
+    return u;
+}
+
+long ecoz2_get_random_seed_used(void) {
+    return last_seed_used;
 }
 
 int ecoz2_lpc_signals(

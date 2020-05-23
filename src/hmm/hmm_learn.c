@@ -36,31 +36,36 @@ static char model_filename[2048];
 static int num_refinements;
 
 
-static void _report_results(FILE *file) {
-    fprintf(file, "\n\tModel: %s   className: '%s'\n", model_filename, model_className);
-    fprintf(file, "\tN=%d M=%d type: %s\n", N, M,
+static void _report_results(FILE *file, const char *prefix) {
+    fprintf(file, "%s Model: %s   (seed=%ld)'\n", prefix,
+            model_filename, ecoz2_get_random_seed_used());
+    fprintf(file, "%s className: '%s'\n", prefix,
+            model_className);
+    fprintf(file, "%s N=%d M=%d type: %s\n", prefix,
+            N, M,
            model_type == 0 ? "no restriction" :
            model_type == 1 ? "uniform distributions" :
            model_type == 2 ? "cascade-2" : "cascade-3");
-    fprintf(file, "\trestriction: ");
+    fprintf(file, "%s restriction: ", prefix);
     if ((prob_t) 0. == hmm_epsilon) fprintf(file, "No");
     else fprintf(file, "%Lg", hmm_epsilon);
     fprintf(file, "\n");
-    fprintf(file, "\t        #sequences: %d\n", num_seqs);
-    fprintf(file, "\t        auto value: %Lg\n", val_auto);
-    fprintf(file, "\t      #refinements: %d\n", num_refinements);
-    fprintf(file, "\t          Σ log(P): %Lg\n", sum_log_prob);
+    fprintf(file, "%s     #sequences: %d\n",  prefix, num_seqs);
+    fprintf(file, "%s     auto value: %Lg\n", prefix, val_auto);
+    fprintf(file, "%s   #refinements: %d\n",  prefix, num_refinements);
+    fprintf(file, "%s       Σ log(P): %Lg\n", prefix, sum_log_prob);
 }
 
 static void report_results(void) {
-    _report_results(stdout);
+    printf("\n");
+    _report_results(stdout, "\t");
 
     char rpt_filename[2048];
     strcpy(rpt_filename, model_filename);
     camext(rpt_filename, ".rpt");
     FILE *rpt_file = fopen(rpt_filename, "w");
     if (rpt_file) {
-        _report_results(rpt_file);
+        _report_results(rpt_file, "");
         fclose(rpt_file);
     }
     else {
@@ -100,7 +105,8 @@ void csv_prepare(char *csv_filename, int max_T) {
         return;
     }
 
-    fprintf(file_csv, "# N=%d M=%d type=%d  #sequences = %d  max_T=%d\n", N, M, model_type, num_seqs, max_T);
+    fprintf(file_csv, "# N=%d M=%d type=%d  #sequences = %d  max_T=%d  (seed=%ld)\n",
+            N, M, model_type, num_seqs, max_T, ecoz2_get_random_seed_used());
     fprintf(file_csv, "%s,%s\n", "I", "Σ log(P)");
 }
 
