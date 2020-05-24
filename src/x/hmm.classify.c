@@ -18,12 +18,13 @@ static void usage() {
 \n\
 ECOZ System -- HMM based classification\n\
 \n\
-    hmm.classify [-r] <hmm> ... <sequence> ...\n\
+    hmm.classify [options] <hmm> ... <sequence> ...\n\
 \n\
     hmm.classify classifies the given sequences according to given models. \n\
     Reports resulting confusion matrix and candidate order table.  \n\
 \n\
-    -r    show ranked models for incorrect classifications\n\
+    -r              show ranked models for incorrect classifications\n\
+    -c <filename>   generate classification file with this name\n\
 \n\
     <hmm> ...       the HMM models.\n\
 \n\
@@ -38,13 +39,17 @@ int main(int argc, char *argv[]) {
         return 0;
     }
     int show_ranked = 0;
+    char *classification_filename = 0;
 
     int opc;
     int arg;
-    while (EOF != (opc = getopt(argc, argv, "r"))) {
+    while (EOF != (opc = getopt(argc, argv, "rc:"))) {
         switch (opc) {
             case 'r':
                 show_ranked = 1;
+                break;
+            case 'c':
+                classification_filename = optarg;
                 break;
             case '?':
                 return 0;
@@ -99,6 +104,7 @@ int main(int argc, char *argv[]) {
             num_models,
             seq_filenames,
             num_seq_filenames,
-            show_ranked
+            show_ranked,
+            classification_filename
             );
 }

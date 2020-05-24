@@ -119,7 +119,8 @@ int ecoz2_hmm_classify(
         unsigned num_model_names,
         char **seq_filenames,
         unsigned num_seq_filenames,
-        int show_ranked
+        int show_ranked,
+        const char *classification_filename
         );
 
 int ecoz2_hmm_show(

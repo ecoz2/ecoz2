@@ -29,7 +29,7 @@
 #endif
 
 const char *ecoz2_version() {
-    return "0.4.3";
+    return "0.4.4";
 }
 
 static long last_seed_used = -1;
@@ -221,7 +221,8 @@ int ecoz2_hmm_classify(
         unsigned num_model_names,
         char **seq_filenames,
         unsigned num_seq_filenames,
-        int show_ranked
+        int show_ranked,
+        const char *classification_filename
         ) {
 
     return hmm_classify(
@@ -229,7 +230,8 @@ int ecoz2_hmm_classify(
             num_model_names,
             seq_filenames,
             num_seq_filenames,
-            show_ranked
+            show_ranked,
+            classification_filename
     );
 }
 

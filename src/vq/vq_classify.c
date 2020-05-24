@@ -273,7 +273,7 @@ int vq_classify(
             fprintf(stderr, GREEN("*"));
         }
         else {
-            fprintf(stderr, RED("_"));
+            fprintf(stderr, RED("!"));
         }
         fflush(stderr);
 

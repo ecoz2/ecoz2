@@ -256,13 +256,56 @@ static void _sort_probs(prob_t *probs, int *ordp, int num_models) {
     }
 }
 
+static FILE *c12n_file = 0;
+
+void c12n_prepare(const char *classification_filename, int codebook_size, int num_seqs) {
+    if (!classification_filename) {
+        return;
+    }
+
+    if (0 == (c12n_file = fopen(classification_filename, "w"))) {
+        printf(RED("error creating %s\n"), classification_filename);
+        return;
+    }
+
+    fprintf(c12n_file, "# num_models=%d  M=%d  num_seqs=%d\n",
+            num_models, codebook_size, num_seqs
+            );
+
+    fprintf(c12n_file, "%s,%s,%s,%s\n",
+            "seq_filename", "seq_class_name",
+            "correct", "rank"
+    );
+}
+
+void c12n_add_case(const char *seq_filename, const char *seq_class_name, int correct, int rank) {
+    if (!c12n_file) {
+        return;
+    }
+
+    fprintf(c12n_file, "%s,%s,%s,%d\n",
+            seq_filename, seq_class_name,
+            correct ? "*" : "!",
+            rank
+            );
+}
+
+void c12n_close(void) {
+    if (c12n_file) {
+        fclose(c12n_file);
+        c12n_file = 0;
+    }
+}
+
+
 
 int hmm_classify(
         char **model_names,
         unsigned num_model_names,
         char **seq_filenames,
         unsigned num_seq_filenames,
-        int show_ranked_
+        int show_ranked_,
+        const char *classification_filename
         ) {
 
     assert(0 < num_model_names && num_model_names < MAX_MODELS);
@@ -290,7 +333,7 @@ int hmm_classify(
     Symbol *sequence = 0;
 
     // className of the sequence
-    char seq_className[MAX_CLASS_NAME_LEN];
+    char seq_class_name[MAX_CLASS_NAME_LEN];
 
     static HmmProb *hmmprob_objects[MAX_MODELS];
 
@@ -332,13 +375,16 @@ int hmm_classify(
     create_not_loaded_models_list();
 
     init_results();
+
+    c12n_prepare(classification_filename, Mcmp, num_seq_filenames);
+
     printf("\n");
 
     const double measure_start_sec = measure_time_now_sec();
 
     for (unsigned i = 0; i < num_seq_filenames; ++i) {
         const char *seq_filename = seq_filenames[i];
-        sequence = seq_load(seq_filename, &T, &M, seq_className);
+        sequence = seq_load(seq_filename, &T, &M, seq_class_name);
         if (!sequence) {
             fprintf(stderr, "%s: error loading sequence.\n", seq_filename);
             continue;
@@ -349,7 +395,7 @@ int hmm_classify(
             continue;
         }
 
-        const int classId = get_classId(seq_className);
+        const int classId = get_classId(seq_class_name);
 
         if (classId < 0) {
             free(sequence);
@@ -365,6 +411,7 @@ int hmm_classify(
         for (int r = 0; r < num_models; r++) {
             probs[r] = hmmprob_log_prob(hmmprob_objects[r], sequence, T);
         }
+
         _sort_probs(probs, ordp, num_models);
 
         const int correct = classId == ordp[num_models - 1];
@@ -374,35 +421,42 @@ int hmm_classify(
             fprintf(stderr, GREEN("*"));
         }
         else {
-            fprintf(stderr, RED("_"));
+            fprintf(stderr, RED("!"));
         }
         fflush(stderr);
 
-        if (show_ranked && !correct) {
-            printf("\n%s: '%s'\n", seq_filename, seq_className);
+        const int do_show_ranked = show_ranked && !correct;
 
-            int index = 0;
-            for (int r = num_models - 1; r >= 0; r--, index++) {
-                const int model_id = ordp[r];
+        if (do_show_ranked) {
+            printf("\n%s: '%s'\n", seq_filename, seq_class_name);
+        }
+
+        int rank = 1;
+        for (int r = num_models - 1; r >= 0; r--, rank++) {
+            const int model_id = ordp[r];
+
+            if (do_show_ranked) {
                 const char *mark = classId == model_id ? "*" : "";
                 printf("  [%2d] %1s <%2d>",
-                       index,
+                       rank,
                        mark,
                        model_id
                 );
                 fflush(stdout);
 
                 printf("  %-60s : %Le  : '%s'\n",
-                        model_names[model_id],
-                        probs[model_id],
-                        models[model_id]->className
+                       model_names[model_id],
+                       probs[model_id],
+                       models[model_id]->className
                 );
-
-                // only show until corresponding model:
-                if (classId == model_id) {
-                    break;
-                }
             }
+
+            // only show until corresponding model:
+            if (classId == model_id) {
+                break;
+            }
+        }
+        if (do_show_ranked) {
             printf("\n");
         }
 
@@ -411,7 +465,7 @@ int hmm_classify(
         confusion[classId][ordp[num_models - 1]]++;
 
         // did best candidate correctly classify the instance?
-        if (ordp[num_models - 1] == classId) {
+        if (correct) {
             result[TOTAL][1]++;
             result[classId][1]++;
         }
@@ -426,9 +480,13 @@ int hmm_classify(
             }
         }
 
+        c12n_add_case(seq_filename, seq_class_name, correct, rank);
+
         free(sequence);
     }
     const double measure_elapsed_sec = measure_time_now_sec() - measure_start_sec;
+
+    c12n_close();
 
     release_not_loaded_models_list();
 

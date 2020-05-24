@@ -58,7 +58,8 @@ int hmm_classify(
         unsigned num_model_names,
         char **seq_filenames,
         unsigned num_seq_filenames,
-        int show_ranked_
+        int show_ranked_,
+        const char*classification_filename
         );
 
 int hmm_show(char *filename, char *format);

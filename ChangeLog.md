@@ -1,5 +1,16 @@
 2020-05
 
+- 0.4.4, hmm_classify: option to generate classification results file.
+  Example:
+
+        # num_models=18  M=1024  num_seqs=2004
+        seq_filename,                      seq_class_name, correct, rank
+        data/sequences/M1024/A/00003.seq,  A,              *,       1
+        data/sequences/M1024/Bd/00119.seq, Bd,             !,       2
+        data/sequences/M1024/E1/00823.seq, E1,             !,       11
+
+    Note: rank now shown starting from 1 (not 0).
+
 - 0.4.3, report actually used random seed to facilitate reproducibility
 - 0.4.2, report csv with (iteration, Σ log(P)) in hmm_learn
 - 0.4.0, with minor adjs
