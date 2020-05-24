@@ -272,22 +272,40 @@ void c12n_prepare(const char *classification_filename, int codebook_size, int nu
             num_models, codebook_size, num_seqs
             );
 
-    fprintf(c12n_file, "%s,%s,%s,%s\n",
+    fprintf(c12n_file, "%s,%s,%s,%s",
             "seq_filename", "seq_class_name",
             "correct", "rank"
     );
+
+    for (int r = 1; r <= num_models; ++r) {
+        fprintf(c12n_file, ",r%d", r);
+    }
+    fprintf(c12n_file, "\n");
 }
 
-void c12n_add_case(const char *seq_filename, const char *seq_class_name, int correct, int rank) {
+void c12n_add_case(const char *seq_filename, const char *seq_class_name,
+        int correct,
+        int rank,
+        int ranked_model_ids[]
+        ) {
     if (!c12n_file) {
         return;
     }
 
-    fprintf(c12n_file, "%s,%s,%s,%d\n",
+    fprintf(c12n_file, "%s,%s,%s,%d",
             seq_filename, seq_class_name,
             correct ? "*" : "!",
             rank
             );
+
+    for (int r = 1; r <= num_models; ++r) {
+        int model_id = ranked_model_ids[r];
+        char *model_class = models[model_id]->className;
+        fprintf(c12n_file, ",%s", model_class);
+    }
+
+    fprintf(c12n_file, "\n");
+
 }
 
 void c12n_close(void) {
@@ -431,11 +449,14 @@ int hmm_classify(
             printf("\n%s: '%s'\n", seq_filename, seq_class_name);
         }
 
+        int best_rank = 1;
+        int ranked_model_ids[num_models + 1];  // +1 for consistency with first rank @ [1]
+        int correct_model_shown = 0;
         int rank = 1;
         for (int r = num_models - 1; r >= 0; r--, rank++) {
             const int model_id = ordp[r];
 
-            if (do_show_ranked) {
+            if (do_show_ranked && !correct_model_shown) {
                 const char *mark = classId == model_id ? "*" : "";
                 printf("  [%2d] %1s <%2d>",
                        rank,
@@ -451,9 +472,12 @@ int hmm_classify(
                 );
             }
 
-            // only show until corresponding model:
+            ranked_model_ids[rank] = model_id;
+
+            // only the display above until corresponding model:
             if (classId == model_id) {
-                break;
+                best_rank = rank;
+                correct_model_shown = 1;
             }
         }
         if (do_show_ranked) {
@@ -480,7 +504,7 @@ int hmm_classify(
             }
         }
 
-        c12n_add_case(seq_filename, seq_class_name, correct, rank);
+        c12n_add_case(seq_filename, seq_class_name, correct, best_rank, ranked_model_ids);
 
         free(sequence);
     }

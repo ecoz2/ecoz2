@@ -4,10 +4,13 @@
   Example:
 
         # num_models=18  M=1024  num_seqs=2004
-        seq_filename,                      seq_class_name, correct, rank
-        data/sequences/M1024/A/00003.seq,  A,              *,       1
-        data/sequences/M1024/Bd/00119.seq, Bd,             !,       2
-        data/sequences/M1024/E1/00823.seq, E1,             !,       11
+        seq_filename,                      seq_class_name, correct, rank, r1, r2,...
+        data/sequences/M1024/A/00003.seq,  A,              *,       1,    A,  ...
+        data/sequences/M1024/Bd/00119.seq, Bd,             !,       2,    C,  Bd, ...
+
+
+       - `rank` is the rank of the correct model (so `*,1` should always appear together).
+       - `r1, ..., r<num-models>` show all models (class name) in decreasing probability order
 
     Note: rank now shown starting from 1 (not 0).
 
