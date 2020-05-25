@@ -3,7 +3,6 @@
 from math import ceil, floor
 
 import matplotlib.pyplot as plt
-from matplotlib import cm
 from matplotlib import gridspec
 import librosa
 from librosa import display
@@ -47,7 +46,10 @@ def show_signal(signal):
     ))
 
 
-def plot_spectrogram(signal, interval):
+def plot_spectrogram(signal, interval, ax, accum_times, args):
+    # ax.xaxis.tick_top()
+    # ax.xaxis.set_label_position('top')
+
     def compute_stft(window_size, offset):
         stft = np.abs(librosa.stft(y=interval, n_fft=window_size, hop_length=offset))
         stft = librosa.amplitude_to_db(stft, ref=np.max)
@@ -55,10 +57,13 @@ def plot_spectrogram(signal, interval):
 
     def spectrogram(stft):
         display.specshow(stft, y_axis='mel', x_axis='time', sr=signal.sample_rate,
-                         cmap='Blues', fmin=0, fmax=16000)
+                         cmap='Blues', fmin=0, fmax=16000, ax=ax)
 
     stft = compute_stft(1024, 512)
     spectrogram(stft)
+
+    if accum_times and len(accum_times) <= args.msfd:
+        plot_vertical_lines(accum_times)
 
 
 def load_csv(filename, sep=',') -> pd.DataFrame:
@@ -68,12 +73,25 @@ def load_csv(filename, sep=',') -> pd.DataFrame:
     return csv
 
 
+def get_accum_times(selections_and_c12n):
+    elapsed_times = np.array([s.end_time_s - s.begin_time_s
+                              for s, _ in selections_and_c12n])
+    accum_times = []
+    for i in range(len(elapsed_times)):
+        accum_times.append(elapsed_times[0:i].sum())
+
+    return accum_times
+
+
 def plot_vertical_lines(accum_times):
     for x in accum_times:
-        plt.axvline(x=x, c='gray')
+        plt.axvline(x=x, c='gray', linewidth=1)
 
 
-def plot_classification(selections_and_c12n):
+def plot_classification(selections_and_c12n, accum_times, ax, args):
+    # ax.xaxis.tick_top()
+    # ax.xaxis.set_label_position('top')
+
     ranks = np.array([c.get('rank') for _, c in selections_and_c12n])
 
     elapsed_times = np.array([s.end_time_s - s.begin_time_s
@@ -84,54 +102,84 @@ def plot_classification(selections_and_c12n):
 
     def get_colors():
         print('ranks({}) = {}'.format(len(ranks), ranks))
-        color_map = ['lightgreen', 'lightblue', 'yellow', 'orange', 'red']
+        color_map = ['lightgreen', 'lightblue', 'blue', 'yellow', 'orange', 'red']
         return [color_map[r - 1] if r <= len(color_map) else 'brown' for r in ranks]
 
     colors = get_colors()
     # print('colors = {}'.format(colors))
     plt.xlim(xmin=0, xmax=total_time)
 
-    accum_times = []
-    for i in range(len(elapsed_times)):
-        accum_times.append(elapsed_times[0:i].sum())
+    max_rank = np.full((len(ranks)), ranks.max())
+    bar_heights = max_rank - ranks + 1
+    plt.bar(x=accum_times, height=bar_heights, width=elapsed_times, color=colors, align='edge')
 
-    plt.bar(x=accum_times, height=1, width=elapsed_times, color=colors, align='edge')
+    def add_x_labels_and_vertical_lines():
+        selection_numbers = [s.selection for s, _ in selections_and_c12n]
+        r1s = np.array([c.get('r1') for _, c in selections_and_c12n])
+        seq_class_names = np.array([c.get('seq_class_name') for _, c in selections_and_c12n])
 
-    selection_numbers = [s.selection for s, _ in selections_and_c12n]
-    xlabels = ['{}: {}'.format(s, r) for s, r in zip(selection_numbers, ranks)]
-    plt.xticks(accum_times, xlabels, rotation=80, ha='center')
+        def label(selection_number, rank, r1, seq_class_name):
+            if args.class_name:
+                if rank == 1:
+                    return '{}'.format(selection_number) if len(ranks) < 50 else ''
+                else:
+                    return '{}~ {}:{}'.format(r1, rank, selection_number)
+            else:
+                if rank == 1:
+                    return '{}#{}'.format(seq_class_name, selection_number)
+                else:
+                    return '1={}/ {}={}#{}'.format(r1, rank, seq_class_name, selection_number)
+
+        x_labels = [label(s, rank, r1, scn) for s, rank, r1, scn in zip(selection_numbers, ranks, r1s, seq_class_names)]
+        plt.xticks(accum_times, rotation=90, ha='left', fontsize=10)
+        ax.tick_params(axis='x', labelsize=10 if len(ranks) < 50 else 6)
+        ax.set_xticklabels(x_labels)
+
+        plot_vertical_lines(accum_times)
+
+    if len(ranks) <= args.msfd:
+        add_x_labels_and_vertical_lines()
+    else:
+        plt.xticks([])
 
     plt.ylabel('rank')
     plt.yticks([])
-
-    plot_vertical_lines(accum_times)
-    return accum_times
 
 
 def do_plot(signal, interval,
             title,
             out_file,
+            args,
             selections_for_classification=None
             ):
 
-    fig = plt.figure(figsize=(10, 4))
+    if args.concat:
+        fig = plt.figure(figsize=(12, 4))
+    else:
+        fig = plt.figure(figsize=(6, 4))
 
+    accum_times = None
     if selections_for_classification:
+        accum_times = get_accum_times(selections_for_classification)
         gs = gridspec.GridSpec(2, 1, height_ratios=[1, 7])
     else:
         gs = gridspec.GridSpec(1, 1)
 
-    accum_times = None
+    index = 0
+
     if selections_for_classification:
-        plt.subplot(gs[0])
-        accum_times = plot_classification(selections_for_classification)
+        ax = plt.subplot(gs[index])
+        index += 1
+        plot_classification(selections_for_classification, accum_times, ax, args)
 
-    plt.title(title)
+        plt.title(title)
 
-    plt.subplot(gs[1])
-    plot_spectrogram(signal, interval)
-    if accum_times:
-        plot_vertical_lines(accum_times)
+    ax = plt.subplot(gs[index])
+    index += 1
+    plot_spectrogram(signal, interval, ax, accum_times, args)
+
+    if selections_for_classification is None:
+        plt.title(title)
 
     plt.tight_layout()
     plt.show()
@@ -221,9 +269,8 @@ def dispatch_selection(signal: Signal,
     seq_filename = c12n_row.get('seq_filename')
     rank = c12n_row.get('rank')
 
-    title = 'Classification results. Selection: {}'.format(selection.selection)
-    title += '\n{}'.format(seq_filename)
-    title += '\nSequence "{}"  Rank: {}'.format(seq_class_name, rank)
+    title = 'Selection number: {}'.format(selection.selection)
+    title += '\n{}: "{}"  Rank: {}'.format(seq_filename, seq_class_name, rank)
     if rank > 1:
         ranked_models = ['{}:{}'.format(r, c12n_row.get('r{}'.format(r))) for r in range(1, rank + 1)]
         title += '\nRanked models: {}'.format(', '.join(ranked_models))
@@ -236,6 +283,7 @@ def dispatch_selection(signal: Signal,
     do_plot(signal, interval,
             title,
             out_file,
+            args
             )
 
 
@@ -308,15 +356,18 @@ def dispatch_concatenate_selections(signal: Signal, segments_df: pd.DataFrame, c
         if rank == 1:
             num_correct += 1
 
-    num_incorrect = num_selections - num_correct
-
-    title = 'Classification. Num selections: {}'.format(num_selections)
-    title += '\nAccuracy: {} ({:.2f}%)   Error: {} ({:.2f}%)'.format(
-        num_correct,
-        float(num_correct) * 100. / num_selections,
-        num_incorrect,
-        float(num_incorrect) * 100 / num_selections,
-    )
+    title_lines = [
+        '{} selections.  Correct: {} ({:.2f}%)'.format(
+            num_selections,
+            num_correct,
+            float(num_correct) * 100. / num_selections,
+            ),
+        '{}{}{}'.format(args.c12n,
+                        '  Class: "{}"'.format(args.class_name) if args.class_name else '',
+                        '  Rank: {}'.format(args.rank) if args.rank else '',
+                        ),
+    ]
+    title = '\n'.join(title_lines)
 
     out_file = None
     if args.out_prefix:
@@ -325,6 +376,7 @@ def dispatch_concatenate_selections(signal: Signal, segments_df: pd.DataFrame, c
     do_plot(signal, concatenated,
             title,
             out_file,
+            args,
             selections_and_c12n
             )
 
@@ -361,6 +413,9 @@ def parse_args():
 
     parser.add_argument('--class', dest='class_name',
                         help='Only dispatch given class')
+
+    parser.add_argument('--msfd', default=110, metavar='number',
+                        help='Maximum number of selections for detailed plot (default 100)')
 
     parser.add_argument('--out-prefix',
                         help='Prefix to name output plot file.')
