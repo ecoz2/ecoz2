@@ -35,24 +35,28 @@ def plot_vertical_lines(times, elapsed_times, args):
             plt.axvline(x=x, c='gray', linewidth=1)
 
 
+def get_colors(ranks):
+    color_map = ['lightgreen', 'lightblue', 'blue', 'yellow', 'orange', 'red']
+    return [color_map[r - 1] if r <= len(color_map) else 'brown' for r in ranks]
+
+
 def plot_classification(selections_and_c12n,
                         times: np.array,
                         elapsed_times: np.array,
+                        duration_s,
                         ax,
                         args):
     # ax.xaxis.tick_top()
     # ax.xaxis.set_label_position('top')
 
     ranks = np.array([c.get('rank') for _, c in selections_and_c12n])
+    print('ranks({}) = {}'.format(len(ranks), ranks))
+    colors = get_colors(ranks)
 
-    def get_colors():
-        print('ranks({}) = {}'.format(len(ranks), ranks))
-        color_map = ['lightgreen', 'lightblue', 'blue', 'yellow', 'orange', 'red']
-        return [color_map[r - 1] if r <= len(color_map) else 'brown' for r in ranks]
-
-    colors = get_colors()
-    # print('colors = {}'.format(colors))
-    plt.xlim(xmin=0, xmax=elapsed_times.sum())
+    if args.concat:
+        plt.xlim(xmin=0, xmax=elapsed_times.sum())
+    else:
+        plt.xlim(xmin=0, xmax=duration_s)
 
     max_rank = np.full((len(ranks)), ranks.max())
     bar_heights = max_rank - ranks + 1
@@ -93,9 +97,9 @@ def plot_classification(selections_and_c12n,
 
 
 def do_plot(signal: Signal,
-            interval: np.ndarray,
+            signal_interval: SignalInterval,
             title: str,
-            out_file: str,
+            out_file: str or None,
             args,
             selections_and_c12n=None
             ):
@@ -126,6 +130,7 @@ def do_plot(signal: Signal,
         plot_classification(selections_and_c12n,
                             times,
                             elapsed_times,
+                            signal_interval.duration_s,
                             ax,
                             args)
 
@@ -136,7 +141,7 @@ def do_plot(signal: Signal,
 
     ax = plt.subplot(gs[index])
     index += 1
-    plot_spectrogram(signal, interval, ax)
+    plot_spectrogram(signal_interval.interval, signal.sample_rate, ax)
 
     if len(times) <= args.msfd:
         plot_vertical_lines(times, elapsed_times, args)
@@ -171,6 +176,7 @@ def dispatch_selection(signal: Signal,
         out_file = '%sc12n_%s.png' % (
             args.out_prefix, selection.selection)
 
+    # FIXME interval is now signal_interval: SignalInterval
     do_plot(signal,
             interval,
             title,
@@ -241,23 +247,25 @@ def concatenate_selections(signal: Signal,
     intervals = [get_signal_interval_from_selection(signal, s) for s, _ in selections_and_c12n]
     concatenated = np.concatenate(intervals)
     print('concatenated signal: {} samples'.format(len(concatenated)))
-    return concatenated
+    return SignalInterval(concatenated, 0, 0)  # FIXME
 
 
 # get complete signal interval from min to max selections:
 def cover_min_max_selections(signal: Signal,
                              selections_and_c12n,
                              args
-                             ) -> np.array:
+                             ) -> SignalInterval:
     min_selection = None
     max_selection = None
     for s, _ in selections_and_c12n:
-      if min_selection is None or min_selection.selection > s.selection:
-        min_selection = s
-      if max_selection is None or max_selection.selection < s.selection:
-        max_selection = s
+        if min_selection is None or min_selection.selection > s.selection:
+            min_selection = s
+        if max_selection is None or max_selection.selection < s.selection:
+            max_selection = s
     print('min_selection = {}'.format(min_selection))
     print('max_selection = {}'.format(max_selection))
+    tot_duration_s = max_selection.end_time_s - min_selection.begin_time_s
+    print('tot_duration_s = {}'.format(tot_duration_s))
 
     return get_signal_interval_for_min_max_selections(signal,
                                                       min_selection,
@@ -279,11 +287,11 @@ def dispatch_aggregate_selections(signal: Signal,
         return
 
     if args.concat:
-        interval = concatenate_selections(signal, selections_and_c12n)
+        signal_interval = concatenate_selections(signal, selections_and_c12n)
     else:
-        interval = cover_min_max_selections(signal, selections_and_c12n, args)
+        signal_interval = cover_min_max_selections(signal, selections_and_c12n, args)
 
-    print('interval with {} samples'.format(len(interval)))
+    print('interval with {} samples'.format(len(signal_interval.interval)))
 
     title = get_title_for_c12n(selections_and_c12n, args)
 
@@ -292,7 +300,7 @@ def dispatch_aggregate_selections(signal: Signal,
         out_file = '{}c12n_concatenated.png'.format(args.out_prefix)
 
     do_plot(signal,
-            interval,
+            signal_interval,
             title,
             out_file,
             args,

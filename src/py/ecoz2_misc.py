@@ -51,23 +51,31 @@ def show_signal(signal: Signal):
     ))
 
 
-def plot_spectrogram(signal: Signal,
-                     interval: np.ndarray,
-                     ax):
+def plot_spectrogram(interval: np.ndarray,
+                     sample_rate,
+                     ax,
+                     window_size=1024,
+                     window_offset=512,
+                     fmin=0,
+                     fmax=16000
+                     ):
     # ax.xaxis.tick_top()
     # ax.xaxis.set_label_position('top')
 
-    def compute_stft(window_size, offset):
-        stft = np.abs(librosa.stft(y=interval, n_fft=window_size, hop_length=offset))
-        stft = librosa.amplitude_to_db(stft, ref=np.max)
-        return stft
+    def compute_stft():
+        stft = np.abs(librosa.stft(y=interval,
+                                   n_fft=window_size,
+                                   hop_length=window_offset))
+        return librosa.amplitude_to_db(stft, ref=np.max)
 
     def spectrogram(stft):
-        display.specshow(stft, y_axis='mel', x_axis='time', sr=signal.sample_rate,
-                         cmap='Blues', fmin=0, fmax=16000, ax=ax)
+        display.specshow(stft, y_axis='mel', x_axis='time',
+                         sr=sample_rate,
+                         cmap='Blues',
+                         fmin=fmin, fmax=fmax,
+                         ax=ax)
 
-    stft = compute_stft(1024, 512)
-    spectrogram(stft)
+    spectrogram(compute_stft())
 
 
 def extract_selection_number(c12n_row: pd.core.series.Series,
@@ -160,11 +168,18 @@ def get_signal_interval_from_selection(signal: Signal,
         return None
 
 
+SignalInterval = namedtuple('SignalInterval', [
+    'interval',       # np.ndarray
+    'begin_time_s',   # float
+    'duration_s',     # float
+])
+
+
 def get_signal_interval_for_min_max_selections(signal: Signal,
                                                min_selection: Selection,
                                                max_selection: Selection,
                                                max_seconds=None
-                                               ) -> np.ndarray or None:
+                                               ) -> SignalInterval:
     if max_seconds is None:
         max_seconds = 2 * 60
     max_ms = 1000 * int(max_seconds)
@@ -178,7 +193,11 @@ def get_signal_interval_for_min_max_selections(signal: Signal,
         duration_ms = max_ms
 
     if start_time_ms + duration_ms < signal.tot_duration_ms:
-        return get_signal_interval(signal, start_time_ms, duration_ms)
+        interval = get_signal_interval(signal, start_time_ms, duration_ms)
+        return SignalInterval(interval,
+                              min_selection.begin_time_s,
+                              duration_ms / 1000.
+                              )
     else:
         print('WARN: interval beyond signal length')
-        return None
+        exit(1)
