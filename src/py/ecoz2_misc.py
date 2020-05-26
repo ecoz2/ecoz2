@@ -51,7 +51,9 @@ def show_signal(signal: Signal):
     ))
 
 
-def plot_spectrogram(signal: Signal, interval, ax):
+def plot_spectrogram(signal: Signal,
+                     interval: np.ndarray,
+                     ax):
     # ax.xaxis.tick_top()
     # ax.xaxis.set_label_position('top')
 
@@ -68,7 +70,9 @@ def plot_spectrogram(signal: Signal, interval, ax):
     spectrogram(stft)
 
 
-def extract_selection_number(c12n_row, column_name):
+def extract_selection_number(c12n_row: pd.core.series.Series,
+                             column_name: str
+                             ):
     # eg, "data/sequences/M256/M/01971.seq"
     #                            ^^^^^
     col_value = c12n_row.get(column_name)
@@ -107,33 +111,16 @@ def get_selection(segments_df: pd.DataFrame, selection_number: int) -> Selection
         )
 
 
-def show_selection(s: Selection):
-    print('  selection     : {}'.format(s.selection))
-    print('  view          : {}'.format(s.view))
-    print('  channel       : {}'.format(s.channel))
-    print('  begin_time_s  : {}'.format(s.begin_time_s))
-    print('  end_time_s    : {}'.format(s.end_time_s))
-    print('  low_freq_hz   : {}'.format(s.low_freq_hz))
-    print('  high_freq_hz  : {}'.format(s.high_freq_hz))
-    print('  type          : {}'.format(s.type_))
-
-
-def get_selections_and_c12n(segments_df: pd.DataFrame, c12n,
+def get_selections_and_c12n(segments_df: pd.DataFrame,
+                            c12n: pd.DataFrame,
                             desired_rank=None,
                             desired_class_name=None
-                            ) -> [(Selection, any)]:  # any for c12n_row
+                            ) -> [(Selection, pd.core.series.Series)]:
     selections_and_c12n = []
-    min_selection_number = 0
-    max_selection_number = 0
     for i, c12n_row in c12n.iterrows():
         selection_number = extract_selection_number(c12n_row, 'seq_filename')
         if selection_number < 0:
             continue
-
-        if i == 0 or min_selection_number > selection_number:
-            min_selection_number = selection_number
-        if i == 0 or max_selection_number < selection_number:
-            max_selection_number = selection_number
 
         rank = c12n_row.get('rank')
         if desired_rank is not None and int(desired_rank) != rank:
@@ -146,7 +133,6 @@ def get_selections_and_c12n(segments_df: pd.DataFrame, c12n,
         selection = get_selection(segments_df, selection_number)
         selections_and_c12n.append((selection, c12n_row))
 
-    print('selection_numbers: [{} ... {}]'.format(min_selection_number, max_selection_number))
     return selections_and_c12n
 
 
@@ -166,6 +152,30 @@ def get_signal_interval_from_selection(signal: Signal,
     start_time_ms = 1000.0 * selection.begin_time_s
     end_time_ms = 1000.0 * selection.end_time_s
     duration_ms = end_time_ms - start_time_ms
+
+    if start_time_ms + duration_ms < signal.tot_duration_ms:
+        return get_signal_interval(signal, start_time_ms, duration_ms)
+    else:
+        print('WARN: interval beyond signal length')
+        return None
+
+
+def get_signal_interval_from_min_max_selections(signal: Signal,
+                                                min_selection: Selection,
+                                                max_selection: Selection,
+                                                max_seconds=None
+                                                ) -> np.ndarray or None:
+    if max_seconds is None:
+        max_seconds = 2 * 60
+    max_ms = 1000 * int(max_seconds)
+
+    start_time_ms = 1000.0 * min_selection.begin_time_s
+    end_time_ms = 1000.0 * max_selection.end_time_s
+    duration_ms = end_time_ms - start_time_ms
+
+    if duration_ms > max_ms:
+        print('applying max_seconds={}'.format(max_seconds))
+        duration_ms = max_ms
 
     if start_time_ms + duration_ms < signal.tot_duration_ms:
         return get_signal_interval(signal, start_time_ms, duration_ms)

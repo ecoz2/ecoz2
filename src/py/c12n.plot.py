@@ -80,9 +80,10 @@ def plot_classification(selections_and_c12n, accum_times, ax, args):
     plt.yticks([])
 
 
-def do_plot(signal, interval,
-            title,
-            out_file,
+def do_plot(signal: Signal,
+            interval: np.ndarray,
+            title: str,
+            out_file: str,
             args,
             selections_for_classification=None
             ):
@@ -125,8 +126,8 @@ def do_plot(signal, interval,
 
 
 def dispatch_selection(signal: Signal,
-                       interval,
-                       c12n_row,
+                       interval: np.ndarray,
+                       c12n_row: pd.core.series.Series,
                        selection: Selection,
                        args):
     seq_class_name = c12n_row.get('seq_class_name')
@@ -144,14 +145,18 @@ def dispatch_selection(signal: Signal,
         out_file = '%sc12n_%s.png' % (
             args.out_prefix, selection.selection)
 
-    do_plot(signal, interval,
+    do_plot(signal,
+            interval,
             title,
             out_file,
             args
             )
 
 
-def dispatch_individual_selections(signal: Signal, segments_df: pd.DataFrame, c12n, args):
+def dispatch_individual_selections(signal: Signal,
+                                   segments_df: pd.DataFrame,
+                                   c12n: pd.DataFrame,
+                                   args):
     for i, c12n_row in c12n.iterrows():
         selection_number = extract_selection_number(c12n_row, 'seq_filename')
         if selection_number < 0:
@@ -172,7 +177,7 @@ def dispatch_individual_selections(signal: Signal, segments_df: pd.DataFrame, c1
             correct, rank))
 
         selection = get_selection(segments_df, selection_number)
-        show_selection(selection)
+        print('selection = {}'.format(selection))
 
         if selection:
             interval = get_signal_interval_from_selection(signal, selection)
@@ -180,7 +185,10 @@ def dispatch_individual_selections(signal: Signal, segments_df: pd.DataFrame, c1
                 dispatch_selection(signal, interval, c12n_row, selection, args)
 
 
-def dispatch_concatenate_selections(signal: Signal, segments_df: pd.DataFrame, c12n, args):
+def dispatch_concatenate_selections(signal: Signal,
+                                    segments_df: pd.DataFrame,
+                                    c12n: pd.DataFrame,
+                                    args):
     selections_and_c12n = get_selections_and_c12n(segments_df, c12n,
                                                   desired_rank=args.rank,
                                                   desired_class_name=args.class_name
