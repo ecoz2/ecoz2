@@ -250,27 +250,48 @@ def concatenate_selections(signal: Signal,
     return SignalInterval(concatenated, 0, 0)  # FIXME
 
 
-# get complete signal interval from min to max selections:
+# get signal interval from min to max selections but restricted by
+# args.max_seconds  (5min by default)
 def cover_min_max_selections(signal: Signal,
                              selections_and_c12n,
                              args
-                             ) -> SignalInterval:
+                             ) -> (any, SignalInterval):
+
+    max_seconds = 5 * 60 if args.max_seconds is None else float(args.max_seconds)
+
+    # for now, just from the beginning
+    begin_time_s = selections_and_c12n[0][0].begin_time_s
+    end_time_s = begin_time_s + max_seconds
+
     min_selection = None
     max_selection = None
-    for s, _ in selections_and_c12n:
+    selected = []
+    for s, c in selections_and_c12n:
+        if s.begin_time_s < begin_time_s:
+            continue
+
+        if s.end_time_s > end_time_s:
+            continue
+
         if min_selection is None or min_selection.selection > s.selection:
             min_selection = s
         if max_selection is None or max_selection.selection < s.selection:
             max_selection = s
+
+        selected.append((s, c))
+
     print('min_selection = {}'.format(min_selection))
     print('max_selection = {}'.format(max_selection))
+    print('num_selections = {}'.format(len(selected)))
     tot_duration_s = max_selection.end_time_s - min_selection.begin_time_s
     print('tot_duration_s = {}'.format(tot_duration_s))
 
-    return get_signal_interval_for_min_max_selections(signal,
-                                                      min_selection,
-                                                      max_selection,
-                                                      max_seconds=args.max_seconds)
+    signal_interval = get_signal_interval_for_min_max_selections(signal,
+                                                                 min_selection,
+                                                                 max_selection,
+                                                                 max_seconds)
+
+    return selected, signal_interval
 
 
 def dispatch_aggregate_selections(signal: Signal,
@@ -278,6 +299,7 @@ def dispatch_aggregate_selections(signal: Signal,
                                   c12n: pd.DataFrame,
                                   args):
 
+    # get these only filtering for rank and class name (if any)
     selections_and_c12n = get_selections_and_c12n(segments_df, c12n,
                                                   desired_rank=args.rank,
                                                   desired_class_name=args.class_name
@@ -286,18 +308,24 @@ def dispatch_aggregate_selections(signal: Signal,
         print('No selections')
         return
 
+    out_file = None
+
     if args.concat:
+        # TODO apply args.max_seconds also in this case.
         signal_interval = concatenate_selections(signal, selections_and_c12n)
+
+        if args.out_prefix:
+            out_file = '{}c12n_concat.png'.format(args.out_prefix)
+
     else:
-        signal_interval = cover_min_max_selections(signal, selections_and_c12n, args)
+        selections_and_c12n, signal_interval = cover_min_max_selections(signal, selections_and_c12n, args)
+
+        if args.out_prefix:
+            out_file = '{}c12n_cover.png'.format(args.out_prefix)
 
     print('interval with {} samples'.format(len(signal_interval.interval)))
 
     title = get_title_for_c12n(selections_and_c12n, args)
-
-    out_file = None
-    if args.out_prefix:
-        out_file = '{}c12n_concatenated.png'.format(args.out_prefix)
 
     do_plot(signal,
             signal_interval,
@@ -317,41 +345,35 @@ def parse_args():
     )
 
     parser.add_argument('--signal', metavar='wav',
-                        help='Sound file to associate results to.')
+                        help='Associated sound file (spectrogram of which is shown).')
 
-    parser.add_argument('-W',  metavar='ms', default=45,
-                        help='Window length in ms (default 45).')
-
-    parser.add_argument('-O', metavar='ms', default=15,
-                        help='Window offset in ms (default 15).')
-
-    parser.add_argument('--max-seconds',
+    parser.add_argument('--max-seconds', metavar='secs',
                         help='Max seconds to visualize')
 
     parser.add_argument('--concat', default=False, action='store_const',
                         const=True,
-                        help='Concatenate all given selections')
+                        help='Concatenate given selections all together')
 
     parser.add_argument('--cover', default=False, action='store_const',
                         const=True,
-                        help='Interval covered by the selections')
+                        help='Show interval covered by the selections')
 
-    parser.add_argument('--segments', required=True,
+    parser.add_argument('--segments', required=True, metavar='file',
                         help='CSV file with segments.')
 
-    parser.add_argument('--c12n', required=True,
-                        help='CSV file classification results.')
+    parser.add_argument('--c12n', required=True, metavar='secs',
+                        help='CSV file with classification results.')
 
-    parser.add_argument('--rank',
+    parser.add_argument('--rank', metavar='rank',
                         help='Only dispatch given rank')
 
-    parser.add_argument('--class', dest='class_name',
+    parser.add_argument('--class', dest='class_name', metavar='name',
                         help='Only dispatch given class')
 
     parser.add_argument('--msfd', default=110, metavar='number',
                         help='Maximum number of selections for detailed plot (default 100)')
 
-    parser.add_argument('--out-prefix',
+    parser.add_argument('--out-prefix', metavar='prefix',
                         help='Prefix to name output plot file.')
 
     args = parser.parse_args()

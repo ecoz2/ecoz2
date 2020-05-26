@@ -2,24 +2,25 @@
 
 - add c12n.plot.py to plot classification results
 
-        usage: c12n.plot.py [-h] [--signal wav] [-W ms] [-O ms] [--concat] --segments
-                        SEGMENTS --c12n C12N [--rank RANK] [--class CLASS_NAME]
-                        [--out-prefix OUT_PREFIX]
+        $ c12n.plot.py -h
+        usage: c12n.plot.py [-h] [--signal wav] [--max-seconds secs] [--concat]
+                            [--cover] --segments file --c12n secs [--rank rank]
+                            [--class name] [--msfd number] [--out-prefix prefix]
         
         Plot classification results
         
         optional arguments:
-          -h, --help            show this help message and exit
-          --signal wav          Sound file to associate results to.
-          -W ms                 Window length in ms (default 45).
-          -O ms                 Window offset in ms (default 15).
-          --concat              Concatenate all given selections
-          --segments SEGMENTS   CSV file with segments.
-          --c12n C12N           CSV file classification results.
-          --rank RANK           Only dispatch given rank
-          --class CLASS_NAME    Only dispatch given class
-          --out-prefix OUT_PREFIX
-                                Prefix to name output plot file.
+          -h, --help           show this help message and exit
+          --signal wav         Associated sound file (spectrogram of which is shown).
+          --max-seconds secs   Max seconds to visualize
+          --concat             Concatenate given selections all together
+          --cover              Show interval covered by the selections
+          --segments file      CSV file with segments.
+          --c12n secs          CSV file with classification results.
+          --rank rank          Only dispatch given rank
+          --class name         Only dispatch given class
+          --msfd number        Maximum number of selections for detailed plot (default 100)
+          --out-prefix prefix  Prefix to name output plot file.
 
     Example in ecoz2-whale/exerc03b:
 
@@ -29,7 +30,17 @@
             --c12n c12n/TEST/N5__M256_t3__a0.3_I2.csv  --class Bm \
             --out-prefix c12n/TEST/
 
-      ![](src/py/c12n_concatenated.png)
+      ![](src/py/c12n_concat.png)
+
+
+        c12n.plot.py --cover  \
+            --signal ../../ecoz2-whale/MARS_20161221_000046_SongSession_16kHz_HPF5Hz.wav \
+            --segments ../exerc01/MARS_20161221_000046_SongSession_16kHz_HPF5HzNorm_labels.csv \
+            --c12n c12n/TEST/N5__M256_t3__a0.3_I2.csv   \
+            --out-prefix c12n/TEST/      
+
+      ![](src/py/c12n_cover.png)
+
 
 - 0.4.4, hmm_classify: option to generate classification results file.
   Example:

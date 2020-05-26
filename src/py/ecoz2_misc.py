@@ -130,13 +130,13 @@ def get_selections_and_c12n(segments_df: pd.DataFrame,
         if selection_number < 0:
             continue
 
-        rank = c12n_row.get('rank')
-        if desired_rank is not None and int(desired_rank) != rank:
-            continue
+        if desired_rank is not None:
+            if int(desired_rank) != c12n_row.get('rank'):
+                continue
 
-        seq_class_name = c12n_row.get('seq_class_name')
-        if desired_class_name is not None and desired_class_name != seq_class_name:
-            continue
+        if desired_class_name is not None:
+            if desired_class_name != c12n_row.get('seq_class_name'):
+                continue
 
         selection = get_selection(segments_df, selection_number)
         selections_and_c12n.append((selection, c12n_row))
@@ -178,11 +178,9 @@ SignalInterval = namedtuple('SignalInterval', [
 def get_signal_interval_for_min_max_selections(signal: Signal,
                                                min_selection: Selection,
                                                max_selection: Selection,
-                                               max_seconds=None
+                                               max_seconds: float
                                                ) -> SignalInterval:
-    if max_seconds is None:
-        max_seconds = 2 * 60
-    max_ms = 1000 * int(max_seconds)
+    max_ms = 1000 * max_seconds
 
     start_time_ms = 1000.0 * min_selection.begin_time_s
     end_time_ms = 1000.0 * max_selection.end_time_s
