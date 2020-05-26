@@ -7,32 +7,43 @@ from matplotlib import gridspec
 from ecoz2_misc import *
 
 
-def get_accum_times(selections_and_c12n):
+def get_times(selections_and_c12n, args) -> (np.array, np.array):
     elapsed_times = np.array([s.end_time_s - s.begin_time_s
                               for s, _ in selections_and_c12n])
-    accum_times = []
-    for i in range(len(elapsed_times)):
-        accum_times.append(elapsed_times[0:i].sum())
 
-    return accum_times
+    if args.concat:
+        times = []
+        for i in range(len(elapsed_times)):
+            times.append(elapsed_times[0:i].sum())
+
+    else:
+        begin_times = np.array([s.begin_time_s for s, _ in selections_and_c12n])
+        first_being_time = begin_times[0]
+        times = begin_times - first_being_time
+
+    return np.array(times), elapsed_times
 
 
-def plot_vertical_lines(accum_times):
-    for x in accum_times:
+def plot_vertical_lines(times, elapsed_times, args):
+    for x in times:
         plt.axvline(x=x, c='gray', linewidth=1)
 
+    if args.cover:
+        # add right line for each selection
+        right_times = np.add(times, elapsed_times)
+        for x in right_times:
+            plt.axvline(x=x, c='gray', linewidth=1)
 
-def plot_classification(selections_and_c12n, accum_times, ax, args):
+
+def plot_classification(selections_and_c12n,
+                        times: np.array,
+                        elapsed_times: np.array,
+                        ax,
+                        args):
     # ax.xaxis.tick_top()
     # ax.xaxis.set_label_position('top')
 
     ranks = np.array([c.get('rank') for _, c in selections_and_c12n])
-
-    elapsed_times = np.array([s.end_time_s - s.begin_time_s
-                              for s, _ in selections_and_c12n])
-    total_time = elapsed_times.sum()
-    print('elapsed_times = {}'.format(elapsed_times))
-    print('total_time = {}'.format(total_time))
 
     def get_colors():
         print('ranks({}) = {}'.format(len(ranks), ranks))
@@ -41,13 +52,17 @@ def plot_classification(selections_and_c12n, accum_times, ax, args):
 
     colors = get_colors()
     # print('colors = {}'.format(colors))
-    plt.xlim(xmin=0, xmax=total_time)
+    plt.xlim(xmin=0, xmax=elapsed_times.sum())
 
     max_rank = np.full((len(ranks)), ranks.max())
     bar_heights = max_rank - ranks + 1
-    plt.bar(x=accum_times, height=bar_heights, width=elapsed_times, color=colors, align='edge')
+    plt.bar(x=times, height=bar_heights, width=elapsed_times, color=colors, align='edge')
 
     def add_x_labels_and_vertical_lines():
+        plt.xticks(times, rotation=90, ha='left', fontsize=10)
+
+        # ax.set_xticklabels([])
+
         selection_numbers = [s.selection for s, _ in selections_and_c12n]
         r1s = np.array([c.get('r1') for _, c in selections_and_c12n])
         seq_class_names = np.array([c.get('seq_class_name') for _, c in selections_and_c12n])
@@ -64,12 +79,9 @@ def plot_classification(selections_and_c12n, accum_times, ax, args):
                 else:
                     return '1={}/ {}={}#{}'.format(r1, rank, seq_class_name, selection_number)
 
-        x_labels = [label(s, rank, r1, scn) for s, rank, r1, scn in zip(selection_numbers, ranks, r1s, seq_class_names)]
-        plt.xticks(accum_times, rotation=90, ha='left', fontsize=10)
         ax.tick_params(axis='x', labelsize=10 if len(ranks) < 50 else 6)
+        x_labels = [label(s, rank, r1, scn) for s, rank, r1, scn in zip(selection_numbers, ranks, r1s, seq_class_names)]
         ax.set_xticklabels(x_labels)
-
-        plot_vertical_lines(accum_times)
 
     if len(ranks) <= args.msfd:
         add_x_labels_and_vertical_lines()
@@ -85,37 +97,51 @@ def do_plot(signal: Signal,
             title: str,
             out_file: str,
             args,
-            selections_for_classification=None
+            selections_and_c12n=None
             ):
 
-    if args.concat:
+    if args.concat or args.cover:
         fig = plt.figure(figsize=(12, 4))
     else:
         fig = plt.figure(figsize=(6, 4))
 
-    accum_times = None
-    if selections_for_classification:
-        accum_times = get_accum_times(selections_for_classification)
+    times = None
+    elapsed_times = None
+
+    if selections_and_c12n:
+        times, elapsed_times = get_times(selections_and_c12n, args)
+        # print('times({}) = {}'.format(len(times), times))
+        # print('elapsed_times({}) = {}'.format(len(elapsed_times), elapsed_times))
+
         gs = gridspec.GridSpec(2, 1, height_ratios=[1, 7])
+
     else:
         gs = gridspec.GridSpec(1, 1)
 
     index = 0
 
-    if selections_for_classification:
+    if selections_and_c12n:
         ax = plt.subplot(gs[index])
         index += 1
-        plot_classification(selections_for_classification, accum_times, ax, args)
+        plot_classification(selections_and_c12n,
+                            times,
+                            elapsed_times,
+                            ax,
+                            args)
+
+        if len(times) <= args.msfd:
+            plot_vertical_lines(times, elapsed_times, args)
 
         plt.title(title)
 
     ax = plt.subplot(gs[index])
     index += 1
     plot_spectrogram(signal, interval, ax)
-    if accum_times and len(accum_times) <= args.msfd:
-        plot_vertical_lines(accum_times)
 
-    if selections_for_classification is None:
+    if len(times) <= args.msfd:
+        plot_vertical_lines(times, elapsed_times, args)
+
+    if selections_and_c12n is None:
         plt.title(title)
 
     plt.tight_layout()
@@ -185,49 +211,88 @@ def dispatch_individual_selections(signal: Signal,
                 dispatch_selection(signal, interval, c12n_row, selection, args)
 
 
-def dispatch_concatenate_selections(signal: Signal,
-                                    segments_df: pd.DataFrame,
-                                    c12n: pd.DataFrame,
-                                    args):
-    selections_and_c12n = get_selections_and_c12n(segments_df, c12n,
-                                                  desired_rank=args.rank,
-                                                  desired_class_name=args.class_name
-                                                  )
+def get_title_for_c12n(selections_and_c12n,
+                       args):
     num_selections = len(selections_and_c12n)
-    if not num_selections:
-        print('No selections')
-        return
-
-    intervals = [get_signal_interval_from_selection(signal, s)
-                 for s, _ in selections_and_c12n]
-
-    concatenated = np.concatenate(intervals)
-    print('concatenated signal: {} samples'.format(len(concatenated)))
 
     num_correct = 0
     for s, c in selections_and_c12n:
         rank = c.get('rank')
         if rank == 1:
-            num_correct += 1
+          num_correct += 1
 
     title_lines = [
         '{} selections.  Correct: {} ({:.2f}%)'.format(
-            num_selections,
-            num_correct,
-            float(num_correct) * 100. / num_selections,
-            ),
+          num_selections,
+          num_correct,
+          float(num_correct) * 100. / num_selections,
+        ),
         '{}{}{}'.format(args.c12n,
                         '  Class: "{}"'.format(args.class_name) if args.class_name else '',
                         '  Rank: {}'.format(args.rank) if args.rank else '',
                         ),
     ]
-    title = '\n'.join(title_lines)
+    return '\n'.join(title_lines)
+
+
+def concatenate_selections(signal: Signal,
+                           selections_and_c12n
+                           ) -> np.array:
+    intervals = [get_signal_interval_from_selection(signal, s) for s, _ in selections_and_c12n]
+    concatenated = np.concatenate(intervals)
+    print('concatenated signal: {} samples'.format(len(concatenated)))
+    return concatenated
+
+
+# get complete signal interval from min to max selections:
+def cover_min_max_selections(signal: Signal,
+                             selections_and_c12n,
+                             args
+                             ) -> np.array:
+    min_selection = None
+    max_selection = None
+    for s, _ in selections_and_c12n:
+      if min_selection is None or min_selection.selection > s.selection:
+        min_selection = s
+      if max_selection is None or max_selection.selection < s.selection:
+        max_selection = s
+    print('min_selection = {}'.format(min_selection))
+    print('max_selection = {}'.format(max_selection))
+
+    return get_signal_interval_for_min_max_selections(signal,
+                                                      min_selection,
+                                                      max_selection,
+                                                      max_seconds=args.max_seconds)
+
+
+def dispatch_aggregate_selections(signal: Signal,
+                                  segments_df: pd.DataFrame,
+                                  c12n: pd.DataFrame,
+                                  args):
+
+    selections_and_c12n = get_selections_and_c12n(segments_df, c12n,
+                                                  desired_rank=args.rank,
+                                                  desired_class_name=args.class_name
+                                                  )
+    if not len(selections_and_c12n):
+        print('No selections')
+        return
+
+    if args.concat:
+        interval = concatenate_selections(signal, selections_and_c12n)
+    else:
+        interval = cover_min_max_selections(signal, selections_and_c12n, args)
+
+    print('interval with {} samples'.format(len(interval)))
+
+    title = get_title_for_c12n(selections_and_c12n, args)
 
     out_file = None
     if args.out_prefix:
         out_file = '{}c12n_concatenated.png'.format(args.out_prefix)
 
-    do_plot(signal, concatenated,
+    do_plot(signal,
+            interval,
             title,
             out_file,
             args,
@@ -252,9 +317,16 @@ def parse_args():
     parser.add_argument('-O', metavar='ms', default=15,
                         help='Window offset in ms (default 15).')
 
+    parser.add_argument('--max-seconds',
+                        help='Max seconds to visualize')
+
     parser.add_argument('--concat', default=False, action='store_const',
                         const=True,
                         help='Concatenate all given selections')
+
+    parser.add_argument('--cover', default=False, action='store_const',
+                        const=True,
+                        help='Interval covered by the selections')
 
     parser.add_argument('--segments', required=True,
                         help='CSV file with segments.')
@@ -286,8 +358,8 @@ def main(args):
     segments_df = load_csv(args.segments, sep='\t')
     c12n = load_csv(args.c12n)
 
-    if args.concat:
-        dispatch_concatenate_selections(signal, segments_df, c12n, args)
+    if args.concat or args.cover:
+        dispatch_aggregate_selections(signal, segments_df, c12n, args)
 
     else:
         dispatch_individual_selections(signal, segments_df, c12n, args)

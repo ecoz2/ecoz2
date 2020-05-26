@@ -160,11 +160,11 @@ def get_signal_interval_from_selection(signal: Signal,
         return None
 
 
-def get_signal_interval_from_min_max_selections(signal: Signal,
-                                                min_selection: Selection,
-                                                max_selection: Selection,
-                                                max_seconds=None
-                                                ) -> np.ndarray or None:
+def get_signal_interval_for_min_max_selections(signal: Signal,
+                                               min_selection: Selection,
+                                               max_selection: Selection,
+                                               max_seconds=None
+                                               ) -> np.ndarray or None:
     if max_seconds is None:
         max_seconds = 2 * 60
     max_ms = 1000 * int(max_seconds)
