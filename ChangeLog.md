@@ -24,13 +24,13 @@
 
     Example in ecoz2-whale/exerc03b:
 
-        c12n.plot.py --concat \
+        c12n.plot.py --concat --class C \
             --signal ../../ecoz2-whale/MARS_20161221_000046_SongSession_16kHz_HPF5Hz.wav \
             --segments ../exerc01/MARS_20161221_000046_SongSession_16kHz_HPF5HzNorm_labels.csv \
-            --c12n c12n/TEST/N5__M256_t3__a0.3_I2.csv  --class Bm \
+            --c12n c12n/TEST/N5__M256_t3__a0.3_I2.csv   \
             --out-prefix c12n/TEST/
 
-      ![](src/py/c12n_concat.png)
+      ![](src/py/c12n_concat_C.png)
 
 
         c12n.plot.py --cover  \

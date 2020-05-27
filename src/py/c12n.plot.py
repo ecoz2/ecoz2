@@ -72,18 +72,28 @@ def plot_classification(selections_and_c12n,
         seq_class_names = np.array([c.get('seq_class_name') for _, c in selections_and_c12n])
 
         def label(selection_number, rank, r1, seq_class_name):
+            if len(ranks) > 50:
+                return ''
+
+            prefix = ''
             if args.class_name:
                 if rank == 1:
-                    return '{}'.format(selection_number) if len(ranks) < 50 else ''
+                    pass
                 else:
-                    return '{}~ {}:{}'.format(r1, rank, selection_number)
+                    # show winning class (r1):
+                    prefix = '{}>{}'.format(r1, rank)
             else:
                 if rank == 1:
-                    return '{}#{}'.format(seq_class_name, selection_number)
+                    # no specific class for the report, so show the sequence class:
+                    prefix = '{}'.format(seq_class_name)
                 else:
-                    return '1={}/ {}={}#{}'.format(r1, rank, seq_class_name, selection_number)
+                    # show winning class (r1), and rank of the correct class for the sequence:
+                    prefix = '{}>{}:{}'.format(r1, rank, seq_class_name)
 
-        ax.tick_params(axis='x', labelsize=10 if len(ranks) < 50 else 6)
+            # last piece always `#<selection_number>`:
+            return '{}#{}'.format(prefix, selection_number)
+
+        ax.tick_params(axis='x', labelsize=8 if len(ranks) < 50 else 6)
         x_labels = [label(s, rank, r1, scn) for s, rank, r1, scn in zip(selection_numbers, ranks, r1s, seq_class_names)]
         ax.set_xticklabels(x_labels)
 
@@ -251,16 +261,16 @@ def concatenate_selections(signal: Signal,
 
 
 # get signal interval from min to max selections but restricted by
-# args.max_seconds  (5min by default)
+# args.delta_begin_seconds and args.max_seconds as indicated
 def cover_min_max_selections(signal: Signal,
                              selections_and_c12n,
                              args
                              ) -> (any, SignalInterval):
 
-    max_seconds = 5 * 60 if args.max_seconds is None else float(args.max_seconds)
+    begin_time_s = selections_and_c12n[0][0].begin_time_s + float(args.delta_begin_seconds)
 
-    # for now, just from the beginning
-    begin_time_s = selections_and_c12n[0][0].begin_time_s
+    max_seconds = float(args.max_seconds)
+
     end_time_s = begin_time_s + max_seconds
 
     min_selection = None
@@ -299,7 +309,7 @@ def dispatch_aggregate_selections(signal: Signal,
                                   c12n: pd.DataFrame,
                                   args):
 
-    # get these only filtering for rank and class name (if any)
+    # get these only by filtering for rank and class name (if any)
     selections_and_c12n = get_selections_and_c12n(segments_df, c12n,
                                                   desired_rank=args.rank,
                                                   desired_class_name=args.class_name
@@ -309,19 +319,17 @@ def dispatch_aggregate_selections(signal: Signal,
         return
 
     out_file = None
-
+    class_str = '_{}'.format(args.class_name) if args.class_name else ''
     if args.concat:
         # TODO apply args.max_seconds also in this case.
         signal_interval = concatenate_selections(signal, selections_and_c12n)
-
         if args.out_prefix:
-            out_file = '{}c12n_concat.png'.format(args.out_prefix)
+            out_file = '{}c12n_concat{}.png'.format(args.out_prefix, class_str)
 
     else:
         selections_and_c12n, signal_interval = cover_min_max_selections(signal, selections_and_c12n, args)
-
         if args.out_prefix:
-            out_file = '{}c12n_cover.png'.format(args.out_prefix)
+            out_file = '{}c12n_cover{}.png'.format(args.out_prefix, class_str)
 
     print('interval with {} samples'.format(len(signal_interval.interval)))
 
@@ -347,8 +355,11 @@ def parse_args():
     parser.add_argument('--signal', metavar='wav',
                         help='Associated sound file (spectrogram of which is shown).')
 
-    parser.add_argument('--max-seconds', metavar='secs',
-                        help='Max seconds to visualize')
+    parser.add_argument('--delta-begin-seconds', metavar='secs', default=0,
+                        help='Increment from first selection time to visualize (default, 0).')
+
+    parser.add_argument('--max-seconds', metavar='secs', default=3 * 60,
+                        help='Max seconds to visualize (default, 3min).')
 
     parser.add_argument('--concat', default=False, action='store_const',
                         const=True,
