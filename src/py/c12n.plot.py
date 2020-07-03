@@ -72,7 +72,7 @@ def plot_classification(selections_and_c12n,
         seq_class_names = np.array([c.get('seq_class_name') for _, c in selections_and_c12n])
 
         def label(selection_number, rank, r1, seq_class_name):
-            if len(ranks) > 50:
+            if len(ranks) > 140:
                 return ''
 
             prefix = ''
@@ -372,7 +372,7 @@ def parse_args():
     parser.add_argument('--segments', required=True, metavar='file',
                         help='CSV file with segments.')
 
-    parser.add_argument('--c12n', required=True, metavar='secs',
+    parser.add_argument('--c12n', required=True, metavar='file',
                         help='CSV file with classification results.')
 
     parser.add_argument('--rank', metavar='rank',
@@ -381,7 +381,7 @@ def parse_args():
     parser.add_argument('--class', dest='class_name', metavar='name',
                         help='Only dispatch given class')
 
-    parser.add_argument('--msfd', default=110, metavar='number',
+    parser.add_argument('--msfd', default=100, metavar='number',
                         help='Maximum number of selections for detailed plot (default 100)')
 
     parser.add_argument('--out-prefix', metavar='prefix',
