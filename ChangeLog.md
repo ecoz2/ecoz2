@@ -1,3 +1,15 @@
+2020-07-31
+
+- Reset my local dev environment since usual build was not working upon
+  some various OS upgrades.
+
+    In short:
+
+    - Re-install XCode (11.6) and then `xcode-select --install`
+    - Upgrade gcc `brew upgrade gcc`
+    - update path: `export PATH=/usr/local/Cellar/gcc/10.1.0/bin:$PATH`
+    - back to a successful complete build: `CC=gcc-10 make`
+
 2020-05
 
 - add c12n.plot.py to plot classification results

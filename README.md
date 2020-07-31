@@ -44,12 +44,15 @@ at hand, but, alas, I don't at the moment!)
 ### Building the programs
 
 This is a pretty straightforward Makefile-based project with
-no dependencies other than standard C libraries.
+no dependencies other than GNU GCC and standard C libraries.
 Under a Unix-like environment just type:
 
 ```
 $ make
 ```
+
+> On a MacOS, you may need something like `CC=gcc-10 make` to indicate use
+> of GNU GCC, which can be installed via `brew install gcc`.
 
 The programs will be placed under `_out/bin/`.
 
