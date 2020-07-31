@@ -27,7 +27,7 @@ jobs:
     - name: Build macos
       if: ${{ matrix.os == 'macos-latest' }}
       run: |
-        CC=gcc-10 make
+        CC=gcc-9 make
         cd _out/bin/
         zip "${{github.workspace}}/ecoz2-macos.zip" *
 
