@@ -1,6 +1,16 @@
 #!/usr/bin/env python3.8
 # coding=utf-8
 
+# the following as I started having issues with the final fig.savefig on my mac
+import platform
+print('platform.system(): {}'.format(platform.system()))
+if platform.system() == 'Darwin':
+    import matplotlib
+    print('Switching from backend: {}'.format(matplotlib.get_backend()))
+    matplotlib.use('macosx', force=True)
+    print('to : {}'.format(matplotlib.get_backend()))
+    # with this, fig.savefig completes ok.
+
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 

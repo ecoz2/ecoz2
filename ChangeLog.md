@@ -1,4 +1,6 @@
-2020-08-04
+2020-08
+
+- matplotlib.use('macosx') so final fig.savefig completes ok on my mac
 
 - add `--cmap cm` option to c12n.plot.py to override default color map in spectra plots
 - add `--lpc P` option to c12n.plot.py to generate LPC spectra plot
