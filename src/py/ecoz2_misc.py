@@ -57,7 +57,8 @@ def plot_spectrogram(interval: np.ndarray,
                      window_size=1024,
                      window_offset=512,
                      fmin=0,
-                     fmax=16000
+                     fmax=16000,
+                     cmap=None,
                      ):
     # ax.xaxis.tick_top()
     # ax.xaxis.set_label_position('top')
@@ -71,7 +72,7 @@ def plot_spectrogram(interval: np.ndarray,
     def spectrogram(stft):
         display.specshow(stft, y_axis='mel', x_axis='time',
                          sr=sample_rate,
-                         cmap='Blues',
+                         cmap=cmap or 'Blues',
                          fmin=fmin, fmax=fmax,
                          ax=ax)
 
@@ -111,6 +112,7 @@ def plot_lpc_spectrogram(interval: np.ndarray,
                          ax,
                          window_size=1024,
                          window_offset=512,
+                         cmap=None
                          ):
 
     lpcs = short_term_lpc(y=interval,
@@ -121,17 +123,10 @@ def plot_lpc_spectrogram(interval: np.ndarray,
 
     from matplotlib import cm
     from matplotlib.colors import ListedColormap, LinearSegmentedColormap
-    cmap = 'Blues'
-    # cmap = 'viridis'
-    # cmap = ListedColormap(["darkorange", "gold", "lightseagreen"])
-    # top = cm.get_cmap('Oranges_r', 512)
-    # bottom = cm.get_cmap('Blues', 512)
-    # newcolors = np.vstack((top(np.linspace(0, 0.3, 256)), bottom(np.linspace(0.3, 1, 256))))
-    # cmap = ListedColormap(newcolors, name='OrangeBlue')
     ax.imshow(lpcs,
               origin='lower',
               aspect='auto',
-              cmap=cmap,
+              cmap=cmap or 'pink',
               )
 
 

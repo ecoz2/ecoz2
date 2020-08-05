@@ -153,10 +153,10 @@ def do_plot(signal: Signal,
     index += 1
 
     if args.lpc:
-        plot_lpc_spectrogram(signal_interval.interval, signal.sample_rate, args.lpc, ax)
+        plot_lpc_spectrogram(signal_interval.interval, signal.sample_rate, args.lpc, ax, cmap=args.cmap)
         # TODO plot_vertical_lines
     else:
-        plot_spectrogram(signal_interval.interval, signal.sample_rate, ax)
+        plot_spectrogram(signal_interval.interval, signal.sample_rate, ax, cmap=args.cmap)
 
         if len(times) <= args.msfd:
             plot_vertical_lines(times, elapsed_times, args)
@@ -362,6 +362,9 @@ def parse_args():
 
     parser.add_argument('--lpc', type=int, metavar='P',
                         help='Order of prediction to display LPC spectra')
+
+    parser.add_argument('--cmap', type=str, metavar='cm',
+                        help='Name of color map for spectra')
 
     parser.add_argument('--delta-begin-seconds', metavar='secs', default=0,
                         help='Increment from first selection time to visualize (default, 0).')
