@@ -2,7 +2,7 @@
 
 - add `--cmap cm` option to c12n.plot.py to override default color map in spectra plots
 - add `--lpc P` option to c12n.plot.py to generate LPC spectra plot
-  instead of regular spectrogram
+  along with the regular spectrogram
 
     Example (under `ecoz2-whale/exerc02`):
 
@@ -11,6 +11,8 @@
             --segments ../exerc01/MARS_20161221_000046_SongSession_16kHz_HPF5HzNorm_labels.csv \
             --c12n c12n/TRAIN/N17__M4096_t3__a0.3_I1.csv   \
             --out-prefix c12n/TRAIN/
+
+    ![](src/py/c12n.plot.png)
 
 
 2020-07-31

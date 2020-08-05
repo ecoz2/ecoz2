@@ -127,7 +127,10 @@ def do_plot(signal: Signal,
         # print('times({}) = {}'.format(len(times), times))
         # print('elapsed_times({}) = {}'.format(len(elapsed_times), elapsed_times))
 
-        gs = gridspec.GridSpec(2, 1, height_ratios=[1, 7])
+        if args.lpc:
+            gs = gridspec.GridSpec(3, 1, height_ratios=[1, 7, 7])
+        else:
+            gs = gridspec.GridSpec(2, 1, height_ratios=[1, 7])
 
     else:
         gs = gridspec.GridSpec(1, 1)
@@ -152,19 +155,23 @@ def do_plot(signal: Signal,
     ax = plt.subplot(gs[index])
     index += 1
 
-    if args.lpc:
-        plot_lpc_spectrogram(signal_interval.interval, signal.sample_rate, args.lpc, ax, cmap=args.cmap)
-        # TODO plot_vertical_lines
-    else:
-        plot_spectrogram(signal_interval.interval, signal.sample_rate, ax, cmap=args.cmap)
+    plot_spectrogram(signal_interval.interval, signal.sample_rate, ax, cmap=args.cmap)
+    if len(times) <= args.msfd:
+        plot_vertical_lines(times, elapsed_times, args)
+    plt.title('Spectrogram')
 
-        if len(times) <= args.msfd:
-            plot_vertical_lines(times, elapsed_times, args)
+    if args.lpc:
+        ax = plt.subplot(gs[index])
+        index += 1
+        plot_lpc_spectrogram(signal_interval.interval, signal.sample_rate, args.lpc, ax, cmap=args.cmap)
+        plt.title('LPC Spectrogram ($P = {}$)'.format(args.lpc))
+        # TODO plot_vertical_lines
 
     if selections_and_c12n is None:
         plt.title(title)
 
     plt.tight_layout()
+    plt.subplots_adjust(hspace=0.3)
     plt.show()
     if out_file:
         print('Saving {}'.format(out_file))
