@@ -1,3 +1,8 @@
+2020-08-04
+
+- add `--lpc P` option to c12n.plot.py to generate LPC spectra plot
+  instead of regular spectrogram
+
 2020-07-31
 
 - Reset my local dev environment since usual build was not working upon

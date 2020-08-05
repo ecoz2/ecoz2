@@ -78,6 +78,63 @@ def plot_spectrogram(interval: np.ndarray,
     spectrogram(compute_stft())
 
 
+def short_term_lpc(y: np.ndarray,
+                   sample_rate: float,
+                   window_size: int,
+                   window_offset: int,
+                   prediction_order: int,
+                   ):
+    """Short-term LPC"""
+
+    def windows():
+        num_windows = 1 + (len(y) - window_size) // window_offset
+        print('num_windows = {}'.format(num_windows))
+        for w in range(0, num_windows * window_offset, window_offset):
+            yield y[w: w + window_size]
+
+    def lpc(window, w):
+        return librosa.lpc(window, prediction_order)
+
+    def lpc_and_envelope(window,  w):
+        lpc_coeffs = lpc(window, w)
+        abs = np.abs(np.fft.rfft(a=lpc_coeffs, n=1024))
+        ft = librosa.amplitude_to_db(abs, ref=np.max)
+        return ft
+
+    res = np.array([lpc_and_envelope(window, w) for w, window in enumerate(windows())])
+    return np.transpose(res)
+
+
+def plot_lpc_spectrogram(interval: np.ndarray,
+                         sample_rate,
+                         prediction_order,
+                         ax,
+                         window_size=1024,
+                         window_offset=512,
+                         ):
+
+    lpcs = short_term_lpc(y=interval,
+                          sample_rate=sample_rate,
+                          window_size=window_size,
+                          window_offset=window_offset,
+                          prediction_order=prediction_order)
+
+    from matplotlib import cm
+    from matplotlib.colors import ListedColormap, LinearSegmentedColormap
+    cmap = 'Blues'
+    # cmap = 'viridis'
+    # cmap = ListedColormap(["darkorange", "gold", "lightseagreen"])
+    # top = cm.get_cmap('Oranges_r', 512)
+    # bottom = cm.get_cmap('Blues', 512)
+    # newcolors = np.vstack((top(np.linspace(0, 0.3, 256)), bottom(np.linspace(0.3, 1, 256))))
+    # cmap = ListedColormap(newcolors, name='OrangeBlue')
+    ax.imshow(lpcs,
+              origin='lower',
+              aspect='auto',
+              cmap=cmap,
+              )
+
+
 def extract_selection_number(c12n_row: pd.core.series.Series,
                              column_name: str
                              ):

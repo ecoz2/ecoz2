@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3.8
 # coding=utf-8
 
 import matplotlib.pyplot as plt
@@ -151,10 +151,15 @@ def do_plot(signal: Signal,
 
     ax = plt.subplot(gs[index])
     index += 1
-    plot_spectrogram(signal_interval.interval, signal.sample_rate, ax)
 
-    if len(times) <= args.msfd:
-        plot_vertical_lines(times, elapsed_times, args)
+    if args.lpc:
+        plot_lpc_spectrogram(signal_interval.interval, signal.sample_rate, args.lpc, ax)
+        # TODO plot_vertical_lines
+    else:
+        plot_spectrogram(signal_interval.interval, signal.sample_rate, ax)
+
+        if len(times) <= args.msfd:
+            plot_vertical_lines(times, elapsed_times, args)
 
     if selections_and_c12n is None:
         plt.title(title)
@@ -354,6 +359,9 @@ def parse_args():
 
     parser.add_argument('--signal', metavar='wav',
                         help='Associated sound file (spectrogram of which is shown).')
+
+    parser.add_argument('--lpc', type=int, metavar='P',
+                        help='Order of prediction to display LPC spectra')
 
     parser.add_argument('--delta-begin-seconds', metavar='secs', default=0,
                         help='Increment from first selection time to visualize (default, 0).')
