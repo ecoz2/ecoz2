@@ -93,16 +93,16 @@ def short_term_lpc(y: np.ndarray,
         for w in range(0, num_windows * window_offset, window_offset):
             yield y[w: w + window_size]
 
-    def lpc(window, w):
+    def lpc(window):
         return librosa.lpc(window, prediction_order)
 
-    def lpc_and_envelope(window,  w):
-        lpc_coeffs = lpc(window, w)
+    def lpc_and_envelope(window):
+        lpc_coeffs = lpc(window)
         abs = np.abs(np.fft.rfft(a=lpc_coeffs, n=1024))
         ft = librosa.amplitude_to_db(abs, ref=np.max)
         return ft
 
-    res = np.array([lpc_and_envelope(window, w) for w, window in enumerate(windows())])
+    res = np.array([lpc_and_envelope(window) for window in windows()])
     return np.transpose(res)
 
 
