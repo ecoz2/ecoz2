@@ -121,8 +121,6 @@ def plot_lpc_spectrogram(interval: np.ndarray,
                           window_offset=window_offset,
                           prediction_order=prediction_order)
 
-    from matplotlib import cm
-    from matplotlib.colors import ListedColormap, LinearSegmentedColormap
     ax.imshow(lpcs,
               origin='lower',
               aspect='auto',
