@@ -152,6 +152,8 @@ int hmm_learn(
     printf("num_sequences = %d\n", num_sequences);
     printf("epsilon = %Lg\n", (long double) hmm_epsilon);
 
+    printf("(sizeof(prob_t) = %lu)\n", sizeof(prob_t));
+
 
     // training sequences:
     Symbol *sequences[MAX_SEQS];

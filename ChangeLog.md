@@ -1,5 +1,6 @@
 2020-10
 
+- 0.5.1: display `sizeof(prob_t)` in hmm_learn
 - 0.5.0: allow to indicate `prob_t` type via `#define PROB_T`
 
 2020-08
