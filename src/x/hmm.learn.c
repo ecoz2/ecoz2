@@ -19,7 +19,9 @@ int main(int argc, char *argv[]) {
     int model_type = HMM_CASCADE3;
 
     // for auto convergence
-    prob_t val_auto = 0.3;
+    long double val_auto = 0.3;
+
+    long double epsilon = (long double) hmm_epsilon;
 
     int max_iterations = -1;
 
@@ -48,7 +50,9 @@ HMM training\n\
     -P            Use parallel impl (serialized impl, by default).\n\
     <sequence>... training sequences (max: %d)\n\
 \n\n",
-               N, val_auto, hmm_epsilon, model_type, seed, MAX_SEQS
+               N,
+               val_auto,
+               epsilon, model_type, seed, MAX_SEQS
         );
         return 0;
     }
@@ -77,7 +81,7 @@ HMM training\n\
                 }
                 break;
             case 'e':
-                if (sscanf(optarg, "%Lf", &hmm_epsilon) == 0) {
+                if (sscanf(optarg, "%Lf", &epsilon) == 0) {
                     fprintf(stderr, "invalid epsilon value.\n");
                     return 1;
                 }
@@ -125,8 +129,8 @@ HMM training\n\
         model_type,
         sequence_filenames,
         num_sequences,
-        hmm_epsilon,
-        val_auto,
+        (prob_t) epsilon,
+        (prob_t) val_auto,
         max_iterations,
         use_par,
         0  // hmm_learn_callback_t

@@ -48,12 +48,12 @@ static void _report_results(FILE *file, const char *prefix) {
            model_type == 2 ? "cascade-2" : "cascade-3");
     fprintf(file, "%s restriction: ", prefix);
     if ((prob_t) 0. == hmm_epsilon) fprintf(file, "No");
-    else fprintf(file, "%Lg", hmm_epsilon);
+    else fprintf(file, "%Lg", (long double) hmm_epsilon);
     fprintf(file, "\n");
     fprintf(file, "%s     #sequences: %d\n",  prefix, num_seqs);
-    fprintf(file, "%s     auto value: %Lg\n", prefix, val_auto);
+    fprintf(file, "%s     auto value: %Lg\n", prefix, (long double) val_auto);
     fprintf(file, "%s   #refinements: %d\n",  prefix, num_refinements);
-    fprintf(file, "%s       Σ log(P): %Lg\n", prefix, sum_log_prob);
+    fprintf(file, "%s       Σ log(P): %Lg\n", prefix, (long double) sum_log_prob);
 }
 
 static void report_results(void) {
@@ -87,7 +87,7 @@ static inline prob_t get_sum_log_prob(Hmm *hmm, int num_seqs, Symbol **sequences
     else {
         for (int r = 0; r < num_seqs; ++r) {
             prob_t prob = hmm_log_prob(hmm, sequences[r], T[r]);
-//            printf("{%d: prob=%Le} ", r, prob); fflush(stdout);
+//            printf("{%d: prob=%Le} ", r, (long double) prob); fflush(stdout);
             sum_log_prob += prob;
         }
 //        printf("\n");
@@ -115,7 +115,7 @@ void csv_add_line(int i, prob_t sum_log_prob) {
         return;
     }
 
-    fprintf(file_csv, "%d,%Lg\n", i, sum_log_prob);
+    fprintf(file_csv, "%d,%Lg\n", i, (long double) sum_log_prob);
 }
 
 void csv_close(void) {
@@ -150,7 +150,7 @@ int hmm_learn(
 
     printf("\n--- hmm_learn ---  (use_par=%d)\n", use_par);
     printf("num_sequences = %d\n", num_sequences);
-    printf("epsilon = %Lg\n", hmm_epsilon);
+    printf("epsilon = %Lg\n", (long double) hmm_epsilon);
 
 
     // training sequences:
@@ -187,11 +187,11 @@ int hmm_learn(
     char hmmDir[2048];
     if (max_iterations >= 0) {
         sprintf(hmmDir, "data/hmms/N%d__M%d_t%d__a%Lg_I%d", N, M, model_type,
-                val_auto, max_iterations);
+                (long double) val_auto, max_iterations);
     }
     else {
         sprintf(hmmDir, "data/hmms/N%d__M%d_t%d__a%Lg", N, M, model_type,
-                val_auto);
+                (long double) val_auto);
     }
     mk_dirs(hmmDir);
     #pragma GCC diagnostic ignored "-Wformat-overflow"
@@ -239,8 +239,11 @@ int hmm_learn(
         abs_log_val_auto = fabsl(log_val_auto);
     }
 
-    printf("\nN=%d M=%d type=%d  #sequences = %d  max_T=%d\n", N, M, model_type, num_seqs, max_T);
-    printf("val_auto = %Lg   log=%Lg   max_iterations=%d\n", val_auto, log_val_auto, max_iterations);
+    printf("\nN=%d M=%d type=%d  #sequences = %d  max_T=%d\n",
+            N, M, model_type, num_seqs, max_T);
+    printf("val_auto = %Lg   log=%Lg   max_iterations=%d\n",
+           (long double) val_auto, (long double) log_val_auto,
+           max_iterations);
 
     char csv_filename[2048];
     #pragma GCC diagnostic ignored "-Wformat-overflow"
@@ -261,7 +264,7 @@ int hmm_learn(
     hmm_estimateB(hmm, sequences, T, num_seqs, max_T);
 
     sum_log_prob = get_sum_log_prob(hmm, num_seqs, sequences, T, use_par);
-    //printf("::::: sum_log_prob=%Le\n", sum_log_prob);
+    //printf("::::: sum_log_prob=%Le\n", (long double) sum_log_prob);
     csv_add_line(0, sum_log_prob);
 
     // do training:
@@ -292,22 +295,24 @@ int hmm_learn(
 
         // probabilities post-refinement:
         sum_log_prob = get_sum_log_prob(hmm, num_seqs, sequences, T, use_par);
-        //printf("::::: sum_log_prob=%Le\n", sum_log_prob);
+        //printf("::::: sum_log_prob=%Le\n", (long double) sum_log_prob);
         csv_add_line(num_refinements + 1, sum_log_prob);
 
         // measure and report refinement change:
         const prob_t change = sum_log_prob - sum_log_prob_prev;
 
         if (change < zero) {
-            sprintf(change_str, RED("%+10.6Lg"), change);
+            sprintf(change_str, RED("%+10.6Lg"), (long double) change);
         }
         else {
-            sprintf(change_str, "%+10.6Lg", change);
+            sprintf(change_str, "%+10.6Lg", (long double) change);
         }
         printf(" %3d: Δ = %s  sum_log_prob = %+10.6Lg  prev = %+10.6Lg  '%s'  (%.3fs)\n",
                 num_refinements,
                 change_str,
-                sum_log_prob, sum_log_prob_prev, model_className,
+                (long double) sum_log_prob,
+                (long double) sum_log_prob_prev,
+                model_className,
                 measure_time_now_sec() - measure_ref_start_sec
                 );
 

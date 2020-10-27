@@ -32,14 +32,14 @@ void hmm_adjust_B_epsilon(Hmm *hmm, const char* logMsg) {
             for (int k = 0; k < M; k++) {
                 if (row[k] < 0) {
                     printf(RED("hmm_adjust_B_epsilon: PRE ERROR: Σ B[%d][%d] = %Le < 0 %s\n\n"),
-                            j, k, row[k], logMsg);
+                            j, k, (long double) row[k], logMsg);
                     exit(1);
                 }
                 sum += row[k];
             }
             if (fabsl(sum - 1) > 1e-10) {
                 printf(RED("hmm_adjust_B_epsilon: PRE ERROR: Σ B[%d] = %Le != 1 %s\n\n"),
-                        j, sum, logMsg);
+                        j, (long double) sum, logMsg);
                 //exit(1);
             }
         }
@@ -76,14 +76,16 @@ void hmm_adjust_B_epsilon(Hmm *hmm, const char* logMsg) {
 
                     if (row[k] < hmm_epsilon) {
                         printf(RED("hmm_adjust_B_epsilon: POST ERROR: Σ B[%d][%d] = %Le < ε = %Le %s\n\n"),
-                                j, k, row[k], hmm_epsilon, logMsg);
+                                j, k,
+                                (long double) row[k], (long double) hmm_epsilon,
+                                logMsg);
                         exit(1);
                     }
                     sum += row[k];
                 }
                 if (fabsl(sum - 1) > 1e-10) {
                     printf(RED("hmm_adjust_B_epsilon: POST ERROR: Σ B[%d] = %Le != 1 %s\n\n"),
-                            j, sum, logMsg);
+                            j, (long double) sum, logMsg);
                     exit(1);
                 }
             }

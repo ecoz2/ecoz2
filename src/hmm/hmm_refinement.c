@@ -194,7 +194,7 @@ static inline void generate_gammas(Symbol *O, int T) {
             }
             if (fabsl(sum - 1) > 1e-10) {
                 printf(RED("generate_gammas: ERROR: Σ alpha[%d] = %Le != 1\n\n"),
-                       t, sum);
+                       t, (long double) sum);
             }
         }
     }

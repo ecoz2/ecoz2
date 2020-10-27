@@ -1,3 +1,7 @@
+2020-10
+
+- 0.5.0: allow to indicate `prob_t` type via `#define PROB_T`
+
 2020-08
 
 - matplotlib.use('macosx') so final fig.savefig completes ok on my mac

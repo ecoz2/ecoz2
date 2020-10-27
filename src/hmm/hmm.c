@@ -89,14 +89,14 @@ void hmm_show_model(Hmm *hmm, char *fto) {
     prob_t sum = 0;
     for (int i = 0; i < hmm->N; i++) {
         prob_t p = hmm->pi[i];
-        printf(fto, p);
+        printf(fto, (long double) p);
         sum += p;
     }
     printf(" Σ = ");
-    printf(fto, sum);
+    printf(fto, (long double) sum);
     printf("\n");
     if (fabsl(sum - 1) > 1e-10) {
-        printf(RED("***ERROR** Σ pi = %Le != 1\n\n"), sum);
+        printf(RED("***ERROR** Σ pi = %Le != 1\n\n"), (long double) sum);
     }
 
     printf("\nA =  ");
@@ -104,14 +104,14 @@ void hmm_show_model(Hmm *hmm, char *fto) {
         prob_t sum = 0;
         for (int j = 0; j < hmm->N; j++) {
             prob_t p = hmm->A[i][j];
-            printf(fto, p);
+            printf(fto, (long double) p);
             sum += p;
         }
         printf(" Σ = ");
-        printf(fto, sum);
+        printf(fto, (long double) sum);
         printf("\n");
         if (fabsl(sum - 1) > 1e-10) {
-            printf(RED("***ERROR** Σ A[%d] = %Le != 1\n\n"), i, sum);
+            printf(RED("***ERROR** Σ A[%d] = %Le != 1\n\n"), i, (long double) sum);
         }
     }
 
@@ -120,14 +120,14 @@ void hmm_show_model(Hmm *hmm, char *fto) {
         prob_t sum = 0;
         for (int j = 0; j < hmm->M; j++) {
             prob_t p = hmm->B[i][j];
-            printf(fto, p);
+            printf(fto, (long double) p);
             sum += p;
         }
         printf(" Σ = ");
-        printf(fto, sum);
+        printf(fto, (long double) sum);
         printf("\n");
         if (fabsl(sum - 1) > 1e-10) {
-            printf(RED("***ERROR** Σ B[%d] = %Le != 1\n\n"), i, sum);
+            printf(RED("***ERROR** Σ B[%d] = %Le != 1\n\n"), i, (long double) sum);
         }
     }
 }

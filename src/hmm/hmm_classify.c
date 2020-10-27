@@ -467,7 +467,7 @@ int hmm_classify(
 
                 printf("  %-60s : %Le  : '%s'\n",
                        model_names[model_id],
-                       probs[model_id],
+                       (long double) probs[model_id],
                        models[model_id]->className
                 );
             }
