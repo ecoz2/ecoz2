@@ -165,15 +165,33 @@ def do_plot(signal: Signal,
     ax = plt.subplot(gs[index])
     index += 1
 
-    plot_spectrogram(signal_interval.interval, signal.sample_rate, ax, cmap=args.cmap)
+    window_size = 1024
+    window_offset = 512
+
+    plot_spectrogram(signal_interval.interval,
+                     signal.sample_rate,
+                     ax,
+                     window_size=window_size,
+                     window_offset=window_offset,
+                     cmap=args.cmap
+                     )
+
     if len(times) <= args.msfd:
         plot_vertical_lines(times, elapsed_times, args)
-    plt.title('Spectrogram')
+
+    plt.title('Spectrogram (${}/{}$)'.format(window_size, window_offset))
 
     if args.lpc:
         ax = plt.subplot(gs[index])
         index += 1
-        plot_lpc_spectrogram(signal_interval.interval, signal.sample_rate, args.lpc, ax, cmap=args.cmap)
+        plot_lpc_spectrogram(signal_interval.interval,
+                             signal.sample_rate,
+                             args.lpc,
+                             ax,
+                             window_size=window_size,
+                             window_offset=window_offset,
+                             cmap=args.cmap
+                             )
         plt.title('LPC Spectrogram ($P = {}$)'.format(args.lpc))
         # TODO plot_vertical_lines
 
