@@ -74,7 +74,10 @@ def do_plot(signal: Signal,
 
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.3)
-    plt.show()
+
+    if not args.no_plot:
+        plt.show()
+
     if out_file:
         print('Saving {}'.format(out_file))
         fig.savefig(out_file, dpi=120)
@@ -101,6 +104,7 @@ def dispatch_selection(signal: Signal,
 def dispatch_individual_selections(signal: Signal,
                                    segments_df: pd.DataFrame,
                                    selection_numbers,
+                                   any_intervals: bool,
                                    args):
 
     num_dispatched = 0
@@ -118,7 +122,7 @@ def dispatch_individual_selections(signal: Signal,
             dispatch_selection(signal, interval, selection, args)
             num_dispatched += 1
 
-            if 0 < args.max_selections <= num_dispatched:
+            if any_intervals and 0 < args.max_selections <= num_dispatched:
                 print("max-selections {} reached".format(args.max_selections))
                 break
 
@@ -129,6 +133,7 @@ def main(args):
 
     segments_df = load_csv(args.segments, sep='\t')
 
+    any_intervals = False
     selection_numbers = []
     regex = re.compile(r'^(\d+)-(\d+)?$')
     for sn in args.selections:
@@ -137,11 +142,13 @@ def main(args):
             start, end = int(match.group(1)), int(match.group(2))
             if start <= end:
                 selection_numbers.extend([*range(start, end + 1)])
+                any_intervals = True
         else:
             selection_numbers.append(int(sn))
 
     selection_numbers = sorted(selection_numbers)
-    dispatch_individual_selections(signal, segments_df, selection_numbers, args)
+    dispatch_individual_selections(signal, segments_df, selection_numbers,
+                                   any_intervals, args)
 
 
 def parse_args():
@@ -174,6 +181,8 @@ def parse_args():
     parser.add_argument('--max-selections', default=5, type=int, metavar='number',
                         help='Maximum number of selections to dispatch. '
                              'Useful when specifying selection ranges.')
+
+    parser.add_argument('--no-plot', action='store_true', help='Just save image, do not plot')
 
     parser.add_argument('--out-prefix', metavar='prefix',
                         help='Prefix to name output plot file.')
