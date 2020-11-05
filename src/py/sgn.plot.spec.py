@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import pandas as pd
 import numpy as np
+import re
+
 
 from ecoz2_misc import \
     Signal, Selection, \
@@ -49,7 +51,6 @@ def do_plot(signal: Signal,
                      ax,
                      window_size=window_size,
                      window_offset=window_offset,
-                     cmap=args.cmap
                      )
 
     title = '#{} "{}": '.format(
@@ -68,7 +69,6 @@ def do_plot(signal: Signal,
                              ax,
                              window_size=window_size,
                              window_offset=window_offset,
-                             cmap=args.cmap
                              )
         plt.title('LPC Spectrogram ($P = {}$)'.format(args.lpc))
 
@@ -87,8 +87,8 @@ def dispatch_selection(signal: Signal,
 
     out_file = None
     if args.out_prefix:
-        out_file = '{}sgn.plot.spec_{}.png'.format(
-            args.out_prefix, selection.selection)
+        out_file = '{}sgn.plot.spec_{}_{}.png'.format(
+            args.out_prefix, selection.selection, selection.type_)
 
     do_plot(signal,
             interval,
@@ -102,17 +102,25 @@ def dispatch_individual_selections(signal: Signal,
                                    segments_df: pd.DataFrame,
                                    selection_numbers,
                                    args):
-    for i, selection_number in enumerate(selection_numbers):
-        print(" {:3} sel={}".format(i, selection_number))
+
+    num_dispatched = 0
+    for selection_number in selection_numbers:
+        interval = None
 
         selection = get_selection(segments_df, selection_number)
-        print('selection = {}'.format(selection))
+        # print('selection = {}'.format(selection))
 
-        if selection:
+        if selection and (args.class_name is None or args.class_name == selection.type_):
             interval = get_signal_interval_from_selection(signal, selection)
-            if interval is not None:
-                dispatch_selection(signal, interval, selection, args)
 
+        if interval is not None:
+            print(" sel={}: '{}'".format(selection_number, selection.type_))
+            dispatch_selection(signal, interval, selection, args)
+            num_dispatched += 1
+
+            if 0 < args.max_selections <= num_dispatched:
+                print("max-selections {} reached".format(args.max_selections))
+                break
 
 
 def main(args):
@@ -121,8 +129,18 @@ def main(args):
 
     segments_df = load_csv(args.segments, sep='\t')
 
-    selection_numbers = [int(sn) for sn in args.selections]
+    selection_numbers = []
+    regex = re.compile(r'^(\d+)-(\d+)?$')
+    for sn in args.selections:
+        match = regex.match(sn)
+        if match:
+            start, end = int(match.group(1)), int(match.group(2))
+            if start <= end:
+                selection_numbers.extend([*range(start, end + 1)])
+        else:
+            selection_numbers.append(int(sn))
 
+    selection_numbers = sorted(selection_numbers)
     dispatch_individual_selections(signal, segments_df, selection_numbers, args)
 
 
@@ -130,33 +148,32 @@ def parse_args():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description='Plot classification results',
+        description='Plot spectrograms for given selections',
         formatter_class=argparse.RawTextHelpFormatter
     )
 
     parser.add_argument('--signal', metavar='wav',
-                        help='Associated sound file (spectrogram of which is shown).')
+                        help='Sound file.')
 
     parser.add_argument('--segments', required=True, metavar='file',
                         help='CSV file with segments.')
 
     parser.add_argument('--selections', nargs='+',
-                        help='Selection numbers to display')
+                        help='Selection numbers to display. '
+                             'Each element a single number or a start-end interval. '
+                             'Using this in combination with --class and --max-selections '
+                             'may be convenient.')
 
     parser.add_argument('--lpc', type=int, metavar='P',
                         help='Order of prediction to display LPC spectra')
 
-    parser.add_argument('--cmap', type=str, metavar='cm',
-                        help='Name of color map for spectra')
+    parser.add_argument('--class', dest='class_name', metavar='name',
+                        help='Only dispatch given class. '
+                             'Useful when specifying selection ranges.')
 
-    parser.add_argument('--delta-begin-seconds', metavar='secs', default=0,
-                        help='Increment from first selection time to visualize (default, 0).')
-
-    parser.add_argument('--max-seconds', metavar='secs', default=3 * 60,
-                        help='Max seconds to visualize (default, 3min).')
-
-    parser.add_argument('--msfd', default=100, type=int, metavar='number',
-                        help='Maximum number of selections for detailed plot (default 100)')
+    parser.add_argument('--max-selections', default=5, type=int, metavar='number',
+                        help='Maximum number of selections to dispatch. '
+                             'Useful when specifying selection ranges.')
 
     parser.add_argument('--out-prefix', metavar='prefix',
                         help='Prefix to name output plot file.')

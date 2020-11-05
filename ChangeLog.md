@@ -6,8 +6,8 @@
         sgn.plot.spec.py --lpc 20 \
             --signal ../MARS_20161221_000046_SongSession_16kHz_HPF5Hz.wav \
             --segments ../exerc01/MARS_20161221_000046_SongSession_16kHz_HPF5HzNorm_labels.csv \
-            --selection 55 \
-          --out-prefix=./
+            --selection 55 21-22  \
+          --out-prefix=../../ecoz2/src/py/
 
 2020-10
 

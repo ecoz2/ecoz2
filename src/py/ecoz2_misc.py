@@ -89,7 +89,7 @@ def short_term_lpc(y: np.ndarray,
 
     def windows():
         num_windows = 1 + (len(y) - window_size) // window_offset
-        print('num_windows = {}'.format(num_windows))
+        print('short_term_lpc: num_windows = {}'.format(num_windows))
         for w in range(0, num_windows * window_offset, window_offset):
             yield y[w: w + window_size]
 
