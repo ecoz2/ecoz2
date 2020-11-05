@@ -43,14 +43,11 @@ def do_plot(signal: Signal,
 
     ax = plt.subplot(gs[index])
 
-    window_size = 1024
-    window_offset = 512
-
     plot_spectrogram(interval,
                      signal.sample_rate,
                      ax,
-                     window_size=window_size,
-                     window_offset=window_offset,
+                     window_size=args.window_size,
+                     window_offset=args.window_offset,
                      )
 
     if args.title:
@@ -58,7 +55,8 @@ def do_plot(signal: Signal,
     else:
         title = '"{}" #{}\n\n'.format(selection.selection, selection.type_)
 
-    title += 'Spectrogram (${}/{}$)'.format(window_size, window_offset)
+    title += 'Spectrogram (${}/{}$)'.format(
+        args.window_size, args.window_offset)
     plt.title(title)
 
     if args.lpc:
@@ -68,10 +66,12 @@ def do_plot(signal: Signal,
                              signal.sample_rate,
                              args.lpc,
                              ax,
-                             window_size=window_size,
-                             window_offset=window_offset,
+                             window_size=args.lpc_window_size,
+                             window_offset=args.lpc_window_offset,
+                             num_points_per_window=args.lpc_num_points_per_window,
                              )
-        plt.title('LPC Spectrogram ($P = {}$)'.format(args.lpc))
+        plt.title('LPC Spectrogram ($P = {}, {}/{}/{}$)'.format(
+            args.lpc, args.lpc_window_size, args.lpc_window_offset, args.lpc_num_points_per_window))
 
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.3)
@@ -175,8 +175,23 @@ def parse_args():
                              'Using this in combination with --class and --max-selections '
                              'may be convenient.')
 
+    parser.add_argument('--window-size', type=int, default=1024, metavar='#',
+                        help='Window size for DFT analysis')
+
+    parser.add_argument('--window-offset', type=int, default=512, metavar='#',
+                        help='Window offset for DFT analysis')
+
     parser.add_argument('--lpc', type=int, metavar='P',
                         help='Order of prediction to display LPC spectra')
+
+    parser.add_argument('--lpc-window-size', type=int, default=1024, metavar='#',
+                        help='Window size for LPC analysis')
+
+    parser.add_argument('--lpc-window-offset', type=int, default=512, metavar='#',
+                        help='Window offset for LPC analysis')
+
+    parser.add_argument('--lpc-num-points-per-window', type=int, default=512, metavar='#',
+                        help='Number of points for DFT on each LPC analysis window')
 
     parser.add_argument('--class', dest='class_name', metavar='name',
                         help='Only dispatch given class. '

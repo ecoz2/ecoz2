@@ -83,6 +83,7 @@ def short_term_lpc(y: np.ndarray,
                    sample_rate: float,
                    window_size: int,
                    window_offset: int,
+                   num_points_per_window: int,
                    prediction_order: int,
                    ):
     """Short-term LPC"""
@@ -98,8 +99,8 @@ def short_term_lpc(y: np.ndarray,
 
     def lpc_and_envelope(window):
         lpc_coeffs = lpc(window)
-        abs = np.abs(np.fft.rfft(a=lpc_coeffs, n=1024))
-        ft = librosa.amplitude_to_db(abs, ref=np.max)
+        abs_val = np.abs(np.fft.rfft(a=lpc_coeffs, n=num_points_per_window))
+        ft = librosa.amplitude_to_db(abs_val, ref=np.max)
         return ft
 
     res = np.array([lpc_and_envelope(window) for window in windows()])
@@ -112,6 +113,7 @@ def plot_lpc_spectrogram(interval: np.ndarray,
                          ax,
                          window_size=1024,
                          window_offset=512,
+                         num_points_per_window=512,
                          cmap=None
                          ):
 
@@ -119,6 +121,7 @@ def plot_lpc_spectrogram(interval: np.ndarray,
                           sample_rate=sample_rate,
                           window_size=window_size,
                           window_offset=window_offset,
+                          num_points_per_window=num_points_per_window,
                           prediction_order=prediction_order)
 
     ax.imshow(lpcs,
