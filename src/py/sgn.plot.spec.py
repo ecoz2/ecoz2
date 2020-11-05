@@ -53,10 +53,11 @@ def do_plot(signal: Signal,
                      window_offset=window_offset,
                      )
 
-    title = '#{} "{}": '.format(
-        selection.selection,
-        selection.type_,
-    )
+    if args.title:
+        title = '{}\n\n'.format(args.title)
+    else:
+        title = '"{}" #{}\n\n'.format(selection.selection, selection.type_)
+
     title += 'Spectrogram (${}/{}$)'.format(window_size, window_offset)
     plt.title(title)
 
@@ -90,8 +91,11 @@ def dispatch_selection(signal: Signal,
 
     out_file = None
     if args.out_prefix:
-        out_file = '{}sgn.plot.spec_{}_{}.png'.format(
-            args.out_prefix, selection.type_, selection.selection)
+        name = args.out_name
+        if not name:
+            name = 'sgn.plot.spec_{}_{}'.format(selection.type_, selection.selection)
+
+        out_file = '{}{}.png'.format(args.out_prefix, name)
 
     do_plot(signal,
             interval,
@@ -184,8 +188,14 @@ def parse_args():
 
     parser.add_argument('--no-plot', action='store_true', help='Just save image, do not plot')
 
+    parser.add_argument('--title', metavar='str',
+                        help='Plot title')
+
     parser.add_argument('--out-prefix', metavar='prefix',
                         help='Prefix to name output plot file.')
+
+    parser.add_argument('--out-name', metavar='prefix',
+                        help='Name for the output plot file.')
 
     args = parser.parse_args()
 
