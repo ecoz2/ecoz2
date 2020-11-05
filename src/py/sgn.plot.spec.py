@@ -25,16 +25,16 @@ from ecoz2_misc import \
 
 def do_plot(signal: Signal,
             interval: np.ndarray,
-            title: str,
+            selection: Selection,
             out_file: str or None,
             args,
             ):
 
-    fig = plt.figure(figsize=(9, 9))
-
     if args.lpc:
+        fig = plt.figure(figsize=(8, 8))
         gs = gridspec.GridSpec(2, 1, height_ratios=[1, 1])
     else:
+        fig = plt.figure(figsize=(8, 4))
         gs = gridspec.GridSpec(1, 1, height_ratios=[1])
 
     index = 0
@@ -52,7 +52,12 @@ def do_plot(signal: Signal,
                      cmap=args.cmap
                      )
 
-    plt.title('Spectrogram (${}/{}$)'.format(window_size, window_offset))
+    title = '#{} "{}": '.format(
+        selection.selection,
+        selection.type_,
+    )
+    title += 'Spectrogram (${}/{}$)'.format(window_size, window_offset)
+    plt.title(title)
 
     if args.lpc:
         index += 1
@@ -66,10 +71,6 @@ def do_plot(signal: Signal,
                              cmap=args.cmap
                              )
         plt.title('LPC Spectrogram ($P = {}$)'.format(args.lpc))
-        # TODO plot_vertical_lines
-
-    else:
-        plt.title(title)
 
     plt.tight_layout()
     plt.subplots_adjust(hspace=0.3)
@@ -84,8 +85,6 @@ def dispatch_selection(signal: Signal,
                        selection: Selection,
                        args):
 
-    title = 'Selection number: {}'.format(selection.selection)
-
     out_file = None
     if args.out_prefix:
         out_file = '{}sgn.plot.spec_{}.png'.format(
@@ -93,7 +92,7 @@ def dispatch_selection(signal: Signal,
 
     do_plot(signal,
             interval,
-            title,
+            selection,
             out_file,
             args
             )
