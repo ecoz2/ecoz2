@@ -88,7 +88,7 @@ def dispatch_selection(signal: Signal,
     out_file = None
     if args.out_prefix:
         out_file = '{}sgn.plot.spec_{}_{}.png'.format(
-            args.out_prefix, selection.selection, selection.type_)
+            args.out_prefix, selection.type_, selection.selection)
 
     do_plot(signal,
             interval,
