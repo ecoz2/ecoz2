@@ -13,6 +13,7 @@ if platform.system() == 'Darwin':
 
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
+import numpy as np
 
 from ecoz2_misc import *
 
