@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.8
+#!/usr/bin/env python3
 # coding=utf-8
 
 # the following as I started having issues with the final fig.savefig on my mac
@@ -427,7 +427,7 @@ def parse_args():
     parser.add_argument('--class', dest='class_name', metavar='name',
                         help='Only dispatch given class')
 
-    parser.add_argument('--msfd', default=100, metavar='number',
+    parser.add_argument('--msfd', default=100, type=int, metavar='number',
                         help='Maximum number of selections for detailed plot (default 100)')
 
     parser.add_argument('--out-prefix', metavar='prefix',
