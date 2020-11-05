@@ -1,3 +1,14 @@
+2020-11
+
+- add sgn.plot.spec.py.
+  As used elsewhere:
+  
+        sgn.plot.spec.py --lpc 20 \
+            --signal ../MARS_20161221_000046_SongSession_16kHz_HPF5Hz.wav \
+            --segments ../exerc01/MARS_20161221_000046_SongSession_16kHz_HPF5HzNorm_labels.csv \
+            --selection 55 \
+          --out-prefix=./
+
 2020-10
 
 - 0.5.1: display `sizeof(prob_t)` in hmm_learn
