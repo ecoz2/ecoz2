@@ -1,6 +1,7 @@
 #include <stdlib.h>
 //#include <malloc.h> -> No such file or directory, on macos-latest (github actions)
 #include <string.h>
+#include <assert.h>
 
 #include "lpc.h"
 #include "vq.h"
@@ -15,6 +16,8 @@ static sample_t codebook[MAX_CODEBOOK_SIZE_IN_VALUES];
 static sample_t reflections[MAX_CODEBOOK_SIZE_IN_VALUES];
 
 static inline void init_max_codebook_and_reflections(int P) {
+    assert(P <= MAX_PREDICTION_ORDER);
+
     sample_t *raa = codebook;
     sample_t *refl = reflections;
     const int num_values = MAX_CODEBOOK_SIZE * (1 + P);
