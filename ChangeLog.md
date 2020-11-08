@@ -1,5 +1,7 @@
 2020-11
 
+- 0.5.2 increase MAX_PREDICTION_ORDER to 70
+
 - add sgn.plot.spec.py.
   As used elsewhere:
   

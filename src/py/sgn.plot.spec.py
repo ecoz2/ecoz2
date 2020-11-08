@@ -53,7 +53,7 @@ def do_plot(signal: Signal,
     if args.title:
         title = '{}\n\n'.format(args.title)
     else:
-        title = '"{}" #{}\n\n'.format(selection.selection, selection.type_)
+        title = "'{}' #{}\n\n".format(selection.type_, selection.selection)
 
     title += 'Spectrogram (${}/{}$)'.format(
         args.window_size, args.window_offset)
