@@ -107,8 +107,10 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
         return 0;
     }
 
-    fprintf(stderr, "lpa_on_signal: P=%d numSamples=%ld sampleRate=%ld winSize=%d offset=%d T=%d\n",
-           P, numSamples, sampleRate, winSize, offset, T);
+    if (verbose) {
+        printf("lpa_on_signal: P=%d numSamples=%ld sampleRate=%ld winSize=%d offset=%d T=%d\n",
+               P, numSamples, sampleRate, winSize, offset, T);
+    }
 
     sample_t hamming[winSize];
     create_hamming(hamming, winSize);
@@ -147,7 +149,9 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
             }
         }
     }
-    fprintf(stderr, "lpa_on_signal:  %d total frames processed\n", T);
+    if (verbose) {
+        printf("lpa_on_signal:  %d total frames processed\n", T);
+    }
 
     return predictor;
 }
