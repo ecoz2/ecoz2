@@ -52,6 +52,8 @@ int main(int argc, char **argv) {
 
     float mintrpt = default_mintrpt;
 
+    int verbose = 1;
+
     int opc;
     while (EOF != (opc = getopt(argc, argv, "P:W:O:m:s:X:"))) {
         switch (opc) {
@@ -116,6 +118,7 @@ int main(int argc, char **argv) {
             split,
             sgn_filenames,
             num_signals,
-            mintrpt
+            mintrpt,
+            verbose
     );
 }

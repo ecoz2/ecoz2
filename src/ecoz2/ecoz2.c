@@ -29,7 +29,7 @@
 #endif
 
 const char *ecoz2_version() {
-    return "0.5.3";
+    return "0.5.4";
 }
 
 static long last_seed_used = -1;
@@ -61,7 +61,8 @@ int ecoz2_lpc_signals(
         float split,
         char *sgn_filenames[],
         int num_signals,
-        float mintrpt
+        float mintrpt,
+        int verbose
         ) {
 
     return lpc_signals(
@@ -72,7 +73,8 @@ int ecoz2_lpc_signals(
             split,
             sgn_filenames,
             num_signals,
-            mintrpt
+            mintrpt,
+            verbose
     );
 }
 

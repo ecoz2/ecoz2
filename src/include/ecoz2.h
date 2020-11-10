@@ -28,7 +28,8 @@ int ecoz2_lpc_signals(
         float split,
         char *sgn_filenames[],
         int num_signals,
-        float mintrpt   // min time in secs to report processing time per signal
+        float mintrpt,   // min time in secs to report processing time per signal
+        int verbose
         );
 
 /**

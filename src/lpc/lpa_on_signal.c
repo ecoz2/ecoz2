@@ -78,7 +78,7 @@ static inline void apply_hamming(sample_t *hamming, sample_t *frame, int numSamp
     }
 }
 
-Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn) {
+Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn, int verbose) {
     sample_t *signal = sgn->samples;
     const long numSamples = sgn->numSamples;
     const long sampleRate = sgn->sampleRate;
@@ -107,7 +107,7 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
         return 0;
     }
 
-    printf("lpa_on_signal: P=%d numSamples=%ld sampleRate=%ld winSize=%d offset=%d T=%d\n",
+    fprintf(stderr, "lpa_on_signal: P=%d numSamples=%ld sampleRate=%ld winSize=%d offset=%d T=%d\n",
            P, numSamples, sampleRate, winSize, offset, T);
 
     sample_t hamming[winSize];
@@ -147,7 +147,7 @@ Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn
             }
         }
     }
-    printf("  %d total frames processed\n", T);
+    fprintf(stderr, "lpa_on_signal:  %d total frames processed\n", T);
 
     return predictor;
 }

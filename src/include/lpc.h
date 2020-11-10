@@ -18,7 +18,8 @@ int lpc_signals(
         float split,
         char *sgn_filenames[],
         int num_signals,
-        float mintrpt   // min time in secs to report processing time per signal
+        float mintrpt,   // min time in secs to report processing time per signal
+        int verbose
         );
 
 
@@ -73,7 +74,7 @@ int lpca_rc(int P,          // prediction order
  * @param sgn             The signal
  * @return                Resulting predictor
  */
-Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn);
+Predictor *lpa_on_signal(int P, int windowLengthMs, int offsetLengthMs, Sgn *sgn, int verbose);
 
 /**
  * Gets the autocorrelation vectors (raas) corresponding to
