@@ -1,7 +1,7 @@
 2020-11
 
+- 0.5.5 increase MAX_PREDICTION_ORDER to 100
 - 0.5.4 verbose option of lpc analysis
-
 - 0.5.2 increase MAX_PREDICTION_ORDER to 70
 
 - add sgn.plot.spec.py.

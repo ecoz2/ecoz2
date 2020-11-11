@@ -29,7 +29,7 @@
 #endif
 
 const char *ecoz2_version() {
-    return "0.5.4";
+    return "0.5.5";
 }
 
 static long last_seed_used = -1;
