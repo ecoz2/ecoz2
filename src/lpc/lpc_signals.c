@@ -61,7 +61,7 @@ int lpc_signals(
 
     // process the collected classes:
 
-    printf("Number of classes: %ld\n", list_size(byClasses));
+    printf("lpc_signals: number of classes: %ld\n", list_size(byClasses));
 
     const long numClasses = list_size(byClasses);
     for (long i = 0; i < numClasses; i++) {
@@ -84,11 +84,14 @@ int lpc_signals(
 
         for (long j = 0; j < numSignals; j++) {
             char *sgn_filename = (char *) list_elementAt(e->sgn_filenames, j);
-            printf("  %s\n", sgn_filename);
+
+            if (verbose) {
+                printf("  %s\n", sgn_filename);
+            }
 
             Sgn *sgn = sgn_load(sgn_filename);
             if (!sgn) {
-                printf("%s: error loading signal\n", sgn_filename);
+                fprintf(stderr, "%s: error loading signal\n", sgn_filename);
                 continue;
             }
 
@@ -99,13 +102,13 @@ int lpc_signals(
             Predictor *predictor = lpa_on_signal(P, windowLengthMs, offsetLengthMs, sgn, verbose);
             const double measure_end_sec = measure_time_now_sec();
             const double measure_elapsed_sec = measure_end_sec - measure_start_sec;
-            if (measure_elapsed_sec >= mintrpt) {
+            if (measure_elapsed_sec >= mintrpt && verbose) {
                 printf("processing took %.2fs\n", measure_elapsed_sec);
             }
 
             if (!predictor) {
                 sgn_destroy(sgn);
-                printf("cannot create lpc predictor\n");
+                fprintf(stderr, "cannot create lpc predictor\n");
                 continue;
             }
 
@@ -125,15 +128,18 @@ int lpc_signals(
             strcpy(predictor->className, e->className);
 
             if (prd_save(predictor, prd_filename)) {
-                printf("%s: error saving predictor\n", prd_filename);
+                fprintf(stderr, "%s: error saving predictor\n", prd_filename);
             }
-            else {
+            else if (verbose) {
                 printf("%s: '%s': predictor saved\n", prd_filename, predictor->className);
             }
 
             prd_destroy(predictor);
             sgn_destroy(sgn);
-            printf("\n");
+
+            if (verbose) {
+                printf("\n");
+            }
         }
     }
 
