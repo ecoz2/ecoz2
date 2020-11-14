@@ -7,7 +7,7 @@
 #ifdef PROB_T
     typedef PROB_T prob_t;
 #else
-    typedef long double prob_t;
+    typedef double prob_t;
 #endif
 
 #endif
