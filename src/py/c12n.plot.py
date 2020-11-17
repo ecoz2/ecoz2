@@ -10,6 +10,8 @@ if platform.system() == 'Darwin':
     matplotlib.use('macosx', force=True)
     print('to : {}'.format(matplotlib.get_backend()))
     # with this, fig.savefig completes ok.
+# TODO: instead of the above, maybe `cat "backend: TkAgg" > ~/.matplotlib/matplotlibrc`
+#  https://stackoverflow.com/q/34977388/830737
 
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
