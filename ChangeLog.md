@@ -1,5 +1,9 @@
 2020-11
 
+- fix conflicting loop variable name `i` in `hmm_classify`, used 
+  when ordering candidates in a mis-classification, but messing up
+  the outer `i` variable used to loop over the sequences.
+ 
 - 0.6.0 preliminaries for `ecoz2_hmm_classify_predictors`
 
 - 0.5.5 set `double` as default `prob_t`

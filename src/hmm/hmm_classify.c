@@ -495,10 +495,10 @@ int hmm_classify(
         }
         else {
             // update order of recognized candidate:
-            for (int i = 1; i < num_models; i++) {
-                if (ordp[num_models - 1 - i] == classId) {
-                    result[TOTAL][i + 1]++;
-                    result[classId][i + 1]++;
+            for (int r = 1; r < num_models; r++) {
+                if (ordp[num_models - 1 - r] == classId) {
+                    result[TOTAL][r + 1]++;
+                    result[classId][r + 1]++;
                     break;
                 }
             }
