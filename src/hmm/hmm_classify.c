@@ -353,7 +353,7 @@ int hmm_classify(
 
     static HmmProb *hmmprob_objects[MAX_MODELS];
 
-    printf("\nLoading models:\n");
+    printf("\nLoading HMM models:\n");
 
     // load first model:
 

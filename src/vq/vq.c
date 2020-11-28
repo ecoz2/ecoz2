@@ -198,8 +198,9 @@ SeqProvider *seq_provider_create(
         // load codebooks:
         sp->codebooks = (Codebook **) calloc(num_models, sizeof(Codebook *));
         int num_vecs = -1;
+        printf("\nLoading codebooks:\n");
         for (int i = 0; i < sp->num_codebooks; ++i) {
-            printf("loading %s\n", sp->cb_filenames[i]);
+            printf("%2d: %s\n", i, sp->cb_filenames[i]);
             sp->codebooks[i] = cbook_load(sp->cb_filenames[i]);
             assert(sp->codebooks[i]);
             if (num_vecs < 0) {
@@ -212,10 +213,12 @@ SeqProvider *seq_provider_create(
         }
 
         sp->next_seq.sequences = (Symbol **) calloc(num_models, sizeof(Symbol *));
+        sp->next_seq.dists = (sample_t *) calloc(num_models, sizeof(sample_t));
     }
 
     sp->next_index = 0;
 
+    //printf("\nSeqProvider created.\n");
     return sp;
 }
 
@@ -272,7 +275,8 @@ static NextSeq *_seq_provider_get_next_direct_sequence(SeqProvider *sp) {
 
 static NextSeq *_seq_provider_get_next_predictor(SeqProvider *sp) {
     // load next predictor:
-    char *filename = sp->prd_filenames[sp->next_index];
+    char *filename = sp->prd_filenames[sp->next_index++];
+    //printf("loading predictor %s\n", filename);
     Predictor *prd = prd_load(filename);
     if (!prd) {
         fprintf(stderr, "%s: error loading predictor.\n", filename);
@@ -281,15 +285,23 @@ static NextSeq *_seq_provider_get_next_predictor(SeqProvider *sp) {
     strcpy(sp->next_seq.prd_class_name, prd->className);
     const int T = sp->next_seq.T = prd->T;
 
+    //printf("quantizing: class name: %s  T=%d\n", sp->next_seq.prd_class_name, T);
+
     // quantization with each of the codebooks:
     for (int i = 0; i < sp->num_codebooks; ++i) {
         sp->next_seq.sequences[i] = seq_create(T);
         assert(sp->next_seq.sequences[i]);
 
-        sp->next_seq.dists[i] = cbook_quantize(sp->codebooks[i], prd, sp->next_seq.sequences[i]);
+        //printf("  quantizing with codebook: %s\n", sp->cb_filenames[i]);
+
+        sample_t dist = cbook_quantize(sp->codebooks[i], prd, sp->next_seq.sequences[i]);
+        //printf("  done: distortion: %f\n", dist);
+        sp->next_seq.dists[i] = dist;
     }
 
     prd_destroy(prd);
+
+    //printf("done quantizing.\n");
 
     return &sp->next_seq;
 }
