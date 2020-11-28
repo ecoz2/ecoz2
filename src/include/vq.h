@@ -126,4 +126,38 @@ void report_cbook(char *, int, sample_t, sample_t, sample_t, int, int *, sample_
 
 void close_report(void);
 
+
+///////////////////////////////////////
+
+typedef struct {
+    const char *seq_filename;
+    Symbol *sequence;
+    char seq_class_name[MAX_CLASS_NAME_LEN];
+    int T;
+    int M;
+} NextSeq;
+
+typedef struct {
+    int Mcmp;
+    char **seq_filenames;
+    int num_sequences;
+    int next_index;
+    NextSeq next_seq;
+} SeqProvider;
+
+// TODO alternatively, accept predictors and codebooks
+// to provide corresponding sequences
+
+SeqProvider *seq_provider_create(
+        int Mcmp,
+        char **seq_filenames,
+        unsigned num_seq_filenames
+        );
+
+int seq_provider_has_next(SeqProvider *sp);
+
+NextSeq *seq_provider_get_next(SeqProvider *sp);
+
+void seq_provider_destroy(SeqProvider *sp);
+
 #endif

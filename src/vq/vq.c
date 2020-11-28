@@ -155,3 +155,64 @@ sample_t cbook_quantize(Codebook *cbook, Predictor *prd, Symbol *seq) {
     assert(cbook->P == prd->P);
     return quantize(cbook->raas, cbook->num_vecs, prd, seq);
 }
+
+
+///////////////////////////////////////
+
+SeqProvider *seq_provider_create(
+        int Mcmp,
+        char **seq_filenames,
+        unsigned num_seq_filenames
+        ) {
+
+    assert(0 < num_seq_filenames);
+    SeqProvider *sp = (SeqProvider *) calloc(1, sizeof(SeqProvider));
+    assert(sp);
+
+    sp->Mcmp = Mcmp;
+    sp->seq_filenames = seq_filenames;
+    sp->num_sequences = (int) num_seq_filenames;
+    sp->next_index = 0;
+    memset(&sp->next_seq, 0, sizeof(sp->next_seq));
+
+    return sp;
+}
+
+int seq_provider_has_next(SeqProvider *sp) {
+    return sp->next_index < sp->num_sequences;
+}
+
+NextSeq *seq_provider_get_next(SeqProvider *sp) {
+    assert (sp->next_index < sp->num_sequences);
+
+    if (sp->next_seq.sequence) {
+        free(sp->next_seq.sequence);
+        sp->next_seq.sequence = 0;
+    }
+
+    sp->next_seq.seq_filename = sp->seq_filenames[sp->next_index++];
+
+    sp->next_seq.sequence = seq_load(sp->next_seq.seq_filename,
+            &sp->next_seq.T, &sp->next_seq.M, sp->next_seq.seq_class_name);
+
+    if (!sp->next_seq.sequence) {
+        fprintf(stderr, "%s: error loading sequence.\n", sp->next_seq.seq_filename);
+        return 0;
+    }
+
+    if (sp->Mcmp != sp->next_seq.M) {
+        fprintf(stderr, "%s: conformity error.\n", sp->next_seq.seq_filename);
+        free(sp->next_seq.sequence);
+        sp->next_seq.sequence = 0;
+        return 0;
+    }
+
+    return &sp->next_seq;
+}
+
+void seq_provider_destroy(SeqProvider *sp) {
+    if (sp->next_seq.sequence) {
+        free(sp->next_seq.sequence);
+    }
+    free(sp);
+}

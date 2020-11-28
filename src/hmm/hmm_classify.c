@@ -4,6 +4,7 @@
 #include "hmm.h"
 #include "utl.h"
 #include "list.h"
+#include "vq.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -327,17 +328,11 @@ int hmm_classify(
         ) {
 
     assert(0 < num_model_names && num_model_names < MAX_MODELS);
-    assert(0 < num_seq_filenames);
 
     num_models = num_model_names;
     show_ranked = show_ranked_;
 
-    // sequence length
-    int T;
-
     // codebook size
-    int M;
-
     // to verify conformance
     int Mcmp;
 
@@ -346,12 +341,6 @@ int hmm_classify(
 
     // probabilities in increasing order
     int ordp[MAX_MODELS] = {0};
-
-    // sequence to be classified
-    Symbol *sequence = 0;
-
-    // className of the sequence
-    char seq_class_name[MAX_CLASS_NAME_LEN];
 
     static HmmProb *hmmprob_objects[MAX_MODELS];
 
@@ -394,29 +383,27 @@ int hmm_classify(
 
     init_results();
 
-    c12n_prepare(classification_filename, Mcmp, num_seq_filenames);
+    SeqProvider *sp = seq_provider_create(
+            Mcmp,
+            seq_filenames,
+            num_seq_filenames
+    );
+
+    c12n_prepare(classification_filename, Mcmp, sp->num_sequences);
 
     printf("\n");
 
     const double measure_start_sec = measure_time_now_sec();
 
-    for (unsigned i = 0; i < num_seq_filenames; ++i) {
-        const char *seq_filename = seq_filenames[i];
-        sequence = seq_load(seq_filename, &T, &M, seq_class_name);
-        if (!sequence) {
-            fprintf(stderr, "%s: error loading sequence.\n", seq_filename);
-            continue;
-        }
-        if (Mcmp != M) {
-            fprintf(stderr, "%s: conformity error.\n", seq_filename);
-            free(sequence);
+    while (seq_provider_has_next(sp)) {
+        NextSeq *next_seq = seq_provider_get_next(sp);
+        if (!next_seq) {
             continue;
         }
 
-        const int classId = get_classId(seq_class_name);
+        const int classId = get_classId(next_seq->seq_class_name);
 
         if (classId < 0) {
-            free(sequence);
             continue;
         }
 
@@ -427,7 +414,8 @@ int hmm_classify(
 #pragma omp parallel for
 #endif
         for (int r = 0; r < num_models; r++) {
-            probs[r] = hmmprob_log_prob(hmmprob_objects[r], sequence, T);
+            probs[r] = hmmprob_log_prob(hmmprob_objects[r],
+                                        next_seq->sequence, next_seq->T);
         }
 
         _sort_probs(probs, ordp, num_models);
@@ -446,7 +434,7 @@ int hmm_classify(
         const int do_show_ranked = show_ranked && !correct;
 
         if (do_show_ranked) {
-            printf("\n%s: '%s'\n", seq_filename, seq_class_name);
+            printf("\n%s: '%s'\n", next_seq->seq_filename, next_seq->seq_class_name);
         }
 
         int best_rank = 1;
@@ -504,10 +492,12 @@ int hmm_classify(
             }
         }
 
-        c12n_add_case(seq_filename, seq_class_name, correct, best_rank, ranked_model_ids);
-
-        free(sequence);
+        c12n_add_case(next_seq->seq_filename, next_seq->seq_class_name,
+                correct, best_rank, ranked_model_ids);
     }
+
+    seq_provider_destroy(sp);
+
     const double measure_elapsed_sec = measure_time_now_sec() - measure_start_sec;
 
     c12n_close();

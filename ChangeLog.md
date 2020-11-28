@@ -1,5 +1,7 @@
 2020-11
 
+- 0.6.1 introduce SeqProvider as preparation to then be able to specify
+  predictors for classification 
 - fix conflicting loop variable name `i` in `hmm_classify`, used 
   when ordering candidates in a mis-classification, but messing up
   the outer `i` variable used to loop over the sequences.
