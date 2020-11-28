@@ -405,6 +405,15 @@ int hmm_classify(
 
     const int with_direct_sequences = seq_provider_with_direct_sequences(sp);
 
+    if (!with_direct_sequences) {
+        // check HMM-codebook correspondence
+        for (int r = 0; r < num_models; ++r) {
+            Hmm *hmm = models[r];
+            Codebook *cb = sp->codebooks[r];
+            assert(strcmp(hmm->className, cb->className) == 0);
+        }
+    }
+
     c12n_prepare(classification_filename, Mcmp, sp->num_sequences);
 
     printf("\n");
