@@ -410,6 +410,7 @@ int hmm_classify(
         for (int r = 0; r < num_models; ++r) {
             Hmm *hmm = models[r];
             Codebook *cb = sp->codebooks[r];
+            assert(hmm->M == cb->num_vecs);
             assert(strcmp(hmm->className, cb->className) == 0);
         }
     }
