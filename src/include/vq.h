@@ -130,15 +130,17 @@ void close_report(void);
 ///////////////////////////////////////
 
 typedef struct {
-    // when direct sequences:
+    // for when direct sequences given:
     const char *seq_filename;
     Symbol *sequence;
     char seq_class_name[MAX_CLASS_NAME_LEN];
-    int T;
 
-    // when given codebooks/predictors:
+    int T;  // for either case
+
+    // for when codebooks/predictors given:
+    char prd_class_name[MAX_CLASS_NAME_LEN];
     Symbol **sequences;
-    int *Ts;
+    sample_t *dists;  // corresponding distortions
 } NextSeq;
 
 typedef struct {
@@ -151,6 +153,7 @@ typedef struct {
     // if giving predictors:
     char **cb_filenames;
     int num_codebooks;
+    Codebook **codebooks;
     char **prd_filenames;
     int num_predictors;
 

@@ -421,6 +421,9 @@ int hmm_classify(
 
         if (with_direct_sequences) {
             classId = get_classId(next_seq->seq_class_name);
+            if (classId < 0) {
+                continue;
+            }
 
 #ifdef PAR
 #pragma omp parallel for
@@ -433,9 +436,10 @@ int hmm_classify(
             }
         }
         else {
-
-            // TODO equivalent to
-            //   classId = get_classId(next_seq->seq_class_name);
+            classId = get_classId(next_seq->prd_class_name);
+            if (classId < 0) {
+                continue;
+            }
 
 #ifdef PAR
 #pragma omp parallel for
@@ -445,12 +449,8 @@ int hmm_classify(
                 // resulting from quantizing the given predictor:
                 probs[r] = hmmprob_log_prob(hmmprob_objects[r],
                                             next_seq->sequences[r],
-                                            next_seq->Ts[r]);
+                                            next_seq->T);
             }
-        }
-
-        if (classId < 0) {
-            continue;
         }
 
         result[TOTAL][0]++;

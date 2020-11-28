@@ -195,10 +195,23 @@ SeqProvider *seq_provider_create(
         sp->prd_filenames = prd_filenames;
         sp->num_predictors = num_predictors;
 
-        // TODO load the codebooks here ...
+        // load codebooks:
+        sp->codebooks = (Codebook **) calloc(num_models, sizeof(Codebook *));
+        int num_vecs = -1;
+        for (int i = 0; i < sp->num_codebooks; ++i) {
+            printf("loading %s\n", sp->cb_filenames[i]);
+            sp->codebooks[i] = cbook_load(sp->cb_filenames[i]);
+            assert(sp->codebooks[i]);
+            if (num_vecs < 0) {
+                num_vecs = sp->codebooks[i]->num_vecs;
+            }
+            else {
+                // assert conformity
+                assert(num_vecs == sp->codebooks[i]->num_vecs);
+            }
+        }
 
         sp->next_seq.sequences = (Symbol **) calloc(num_models, sizeof(Symbol *));
-        sp->next_seq.Ts = (int *) calloc(num_models, sizeof(int));
     }
 
     sp->next_index = 0;
@@ -257,10 +270,26 @@ static NextSeq *_seq_provider_get_next_direct_sequence(SeqProvider *sp) {
     return &sp->next_seq;
 }
 
-// TODO
 static NextSeq *_seq_provider_get_next_predictor(SeqProvider *sp) {
+    // load next predictor:
+    char *filename = sp->prd_filenames[sp->next_index];
+    Predictor *prd = prd_load(filename);
+    if (!prd) {
+        fprintf(stderr, "%s: error loading predictor.\n", filename);
+        return 0;
+    }
+    strcpy(sp->next_seq.prd_class_name, prd->className);
+    const int T = sp->next_seq.T = prd->T;
 
-    // TODO quantization of the next predictor using the given codebooks
+    // quantization with each of the codebooks:
+    for (int i = 0; i < sp->num_codebooks; ++i) {
+        sp->next_seq.sequences[i] = seq_create(T);
+        assert(sp->next_seq.sequences[i]);
+
+        sp->next_seq.dists[i] = cbook_quantize(sp->codebooks[i], prd, sp->next_seq.sequences[i]);
+    }
+
+    prd_destroy(prd);
 
     return &sp->next_seq;
 }
@@ -283,8 +312,16 @@ void seq_provider_destroy(SeqProvider *sp) {
     if (sp->next_seq.sequences) {
         free(sp->next_seq.sequences);
     }
-    if (sp->next_seq.Ts) {
-        free(sp->next_seq.Ts);
+    if (sp->next_seq.dists) {
+        free(sp->next_seq.dists);
+    }
+    if (sp->codebooks) {
+        for (int i = 0; i < sp->num_codebooks; ++i) {
+            if (sp->codebooks[i]) {
+                free(sp->codebooks[i]);
+            }
+        }
+        free(sp->codebooks);
     }
     free(sp);
 }
