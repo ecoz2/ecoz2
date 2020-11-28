@@ -102,8 +102,15 @@ int main(int argc, char *argv[]) {
     return hmm_classify(
             model_names,
             num_models,
+
             seq_filenames,
             num_seq_filenames,
+
+            0,
+            0,
+            0,
+            0,
+
             show_ranked,
             classification_filename
             );

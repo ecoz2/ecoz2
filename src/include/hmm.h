@@ -56,8 +56,17 @@ int hmm_learn(
 int hmm_classify(
         char **model_names,
         unsigned num_model_names,
+
+        // if giving sequences directly:
         char **seq_filenames,
         unsigned num_seq_filenames,
+
+        // if giving predictors:
+        char **cb_filenames,
+        int num_codebooks,
+        char **prd_filenames,
+        int num_predictors,
+
         int show_ranked_,
         const char*classification_filename
         );

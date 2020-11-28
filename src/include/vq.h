@@ -130,33 +130,52 @@ void close_report(void);
 ///////////////////////////////////////
 
 typedef struct {
+    // when direct sequences:
     const char *seq_filename;
     Symbol *sequence;
     char seq_class_name[MAX_CLASS_NAME_LEN];
     int T;
-    int M;
+
+    // when given codebooks/predictors:
+    Symbol **sequences;
+    int *Ts;
 } NextSeq;
 
 typedef struct {
     int Mcmp;
+
+    // if giving sequences directly:
     char **seq_filenames;
     int num_sequences;
+
+    // if giving predictors:
+    char **cb_filenames;
+    int num_codebooks;
+    char **prd_filenames;
+    int num_predictors;
+
     int next_index;
     NextSeq next_seq;
 } SeqProvider;
 
-// TODO alternatively, accept predictors and codebooks
-// to provide corresponding sequences
-
 SeqProvider *seq_provider_create(
+        int num_models,
         int Mcmp,
+
         char **seq_filenames,
-        unsigned num_seq_filenames
+        unsigned num_seq_filenames,
+
+        char **cb_filenames,
+        int num_codebooks,
+        char **prd_filenames,
+        int num_predictors
         );
 
 int seq_provider_has_next(SeqProvider *sp);
 
 NextSeq *seq_provider_get_next(SeqProvider *sp);
+
+int seq_provider_with_direct_sequences(SeqProvider *sp);
 
 void seq_provider_destroy(SeqProvider *sp);
 

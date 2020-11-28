@@ -321,8 +321,17 @@ void c12n_close(void) {
 int hmm_classify(
         char **model_names,
         unsigned num_model_names,
+
+        // if giving sequences directly:
         char **seq_filenames,
         unsigned num_seq_filenames,
+
+        // if giving predictors:
+        char **cb_filenames,
+        int num_codebooks,
+        char **prd_filenames,
+        int num_predictors,
+
         int show_ranked_,
         const char *classification_filename
         ) {
@@ -384,10 +393,17 @@ int hmm_classify(
     init_results();
 
     SeqProvider *sp = seq_provider_create(
+            num_models,
             Mcmp,
             seq_filenames,
-            num_seq_filenames
+            num_seq_filenames,
+            cb_filenames,
+            num_codebooks,
+            prd_filenames,
+            num_predictors
     );
+
+    const int with_direct_sequences = seq_provider_with_direct_sequences(sp);
 
     c12n_prepare(classification_filename, Mcmp, sp->num_sequences);
 
@@ -401,7 +417,37 @@ int hmm_classify(
             continue;
         }
 
-        const int classId = get_classId(next_seq->seq_class_name);
+        int classId = -1;
+
+        if (with_direct_sequences) {
+            classId = get_classId(next_seq->seq_class_name);
+
+#ifdef PAR
+#pragma omp parallel for
+#endif
+            for (int r = 0; r < num_models; r++) {
+                // probabilities for the given sequence:
+                probs[r] = hmmprob_log_prob(hmmprob_objects[r],
+                                            next_seq->sequence,
+                                            next_seq->T);
+            }
+        }
+        else {
+
+            // TODO equivalent to
+            //   classId = get_classId(next_seq->seq_class_name);
+
+#ifdef PAR
+#pragma omp parallel for
+#endif
+            for (int r = 0; r < num_models; r++) {
+                // probabilities for the corresponding sequences
+                // resulting from quantizing the given predictor:
+                probs[r] = hmmprob_log_prob(hmmprob_objects[r],
+                                            next_seq->sequences[r],
+                                            next_seq->Ts[r]);
+            }
+        }
 
         if (classId < 0) {
             continue;
@@ -409,14 +455,6 @@ int hmm_classify(
 
         result[TOTAL][0]++;
         result[classId][0]++;
-
-#ifdef PAR
-#pragma omp parallel for
-#endif
-        for (int r = 0; r < num_models; r++) {
-            probs[r] = hmmprob_log_prob(hmmprob_objects[r],
-                                        next_seq->sequence, next_seq->T);
-        }
 
         _sort_probs(probs, ordp, num_models);
 

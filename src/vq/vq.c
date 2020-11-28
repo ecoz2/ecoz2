@@ -160,59 +160,131 @@ sample_t cbook_quantize(Codebook *cbook, Predictor *prd, Symbol *seq) {
 ///////////////////////////////////////
 
 SeqProvider *seq_provider_create(
+        int num_models,
         int Mcmp,
+
         char **seq_filenames,
-        unsigned num_seq_filenames
+        unsigned num_seq_filenames,
+
+        char **cb_filenames,
+        int num_codebooks,
+        char **prd_filenames,
+        int num_predictors
         ) {
 
-    assert(0 < num_seq_filenames);
+    assert(num_models > 0);
+    assert((seq_filenames != 0) != (cb_filenames != 0));
+
     SeqProvider *sp = (SeqProvider *) calloc(1, sizeof(SeqProvider));
     assert(sp);
 
-    sp->Mcmp = Mcmp;
-    sp->seq_filenames = seq_filenames;
-    sp->num_sequences = (int) num_seq_filenames;
-    sp->next_index = 0;
     memset(&sp->next_seq, 0, sizeof(sp->next_seq));
+
+    sp->Mcmp = Mcmp;
+
+    if (seq_filenames) {
+        assert(num_seq_filenames > 0);
+        sp->seq_filenames = seq_filenames;
+        sp->num_sequences = (int) num_seq_filenames;
+    }
+    else {
+        assert(num_codebooks == num_models);
+        assert(num_predictors > 0);
+        sp->cb_filenames = cb_filenames;
+        sp->num_codebooks = num_codebooks;
+        sp->prd_filenames = prd_filenames;
+        sp->num_predictors = num_predictors;
+
+        // TODO load the codebooks here ...
+
+        sp->next_seq.sequences = (Symbol **) calloc(num_models, sizeof(Symbol *));
+        sp->next_seq.Ts = (int *) calloc(num_models, sizeof(int));
+    }
+
+    sp->next_index = 0;
 
     return sp;
 }
 
-int seq_provider_has_next(SeqProvider *sp) {
-    return sp->next_index < sp->num_sequences;
+int seq_provider_with_direct_sequences(SeqProvider *sp) {
+    return sp->seq_filenames != 0;
 }
 
-NextSeq *seq_provider_get_next(SeqProvider *sp) {
-    assert (sp->next_index < sp->num_sequences);
+int seq_provider_has_next(SeqProvider *sp) {
+    if (sp->seq_filenames) {
+        return sp->next_index < sp->num_sequences;
+    }
+    else {
+        return sp->next_index < sp->num_predictors;
+    }
+}
 
+static void _seq_provider_destroy_next_seq(SeqProvider *sp) {
     if (sp->next_seq.sequence) {
         free(sp->next_seq.sequence);
         sp->next_seq.sequence = 0;
     }
 
+    // release the members of this list, but not the list itself:
+    if (sp->next_seq.sequences) {
+        for (int r = 0; r < sp->num_codebooks; ++r) {
+            if (sp->next_seq.sequences[r]) {
+                free(sp->next_seq.sequences[r]);
+                sp->next_seq.sequences[r] = 0;
+            }
+        }
+    }
+}
+
+static NextSeq *_seq_provider_get_next_direct_sequence(SeqProvider *sp) {
     sp->next_seq.seq_filename = sp->seq_filenames[sp->next_index++];
 
+    int M;
     sp->next_seq.sequence = seq_load(sp->next_seq.seq_filename,
-            &sp->next_seq.T, &sp->next_seq.M, sp->next_seq.seq_class_name);
+                                     &sp->next_seq.T, &M, sp->next_seq.seq_class_name);
 
     if (!sp->next_seq.sequence) {
         fprintf(stderr, "%s: error loading sequence.\n", sp->next_seq.seq_filename);
         return 0;
     }
 
-    if (sp->Mcmp != sp->next_seq.M) {
+    if (sp->Mcmp != M) {
         fprintf(stderr, "%s: conformity error.\n", sp->next_seq.seq_filename);
-        free(sp->next_seq.sequence);
-        sp->next_seq.sequence = 0;
+        _seq_provider_destroy_next_seq(sp);
         return 0;
     }
 
     return &sp->next_seq;
 }
 
+// TODO
+static NextSeq *_seq_provider_get_next_predictor(SeqProvider *sp) {
+
+    // TODO quantization of the next predictor using the given codebooks
+
+    return &sp->next_seq;
+}
+
+NextSeq *seq_provider_get_next(SeqProvider *sp) {
+    _seq_provider_destroy_next_seq(sp);
+
+    if (sp->seq_filenames) {
+        assert (sp->next_index < sp->num_sequences);
+        return _seq_provider_get_next_direct_sequence(sp);
+    }
+    else {
+        assert (sp->next_index < sp->num_predictors);
+        return _seq_provider_get_next_predictor(sp);
+    }
+}
+
 void seq_provider_destroy(SeqProvider *sp) {
-    if (sp->next_seq.sequence) {
-        free(sp->next_seq.sequence);
+    _seq_provider_destroy_next_seq(sp);
+    if (sp->next_seq.sequences) {
+        free(sp->next_seq.sequences);
+    }
+    if (sp->next_seq.Ts) {
+        free(sp->next_seq.Ts);
     }
     free(sp);
 }

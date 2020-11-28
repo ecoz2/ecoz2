@@ -230,8 +230,15 @@ int ecoz2_hmm_classify(
     return hmm_classify(
             model_names,
             num_model_names,
+
             seq_filenames,
             num_seq_filenames,
+
+            0,  // no predictor stuff
+            0,
+            0,
+            0,
+
             show_ranked,
             classification_filename
     );
@@ -248,8 +255,21 @@ int ecoz2_hmm_classify_predictors(
         const char *classification_filename
         ) {
 
-    fprintf(stderr, "WARN: ecoz2_hmm_classify_predictors not implemented yet");
-    return 1;
+    return hmm_classify(
+            model_names,
+            num_model_names,
+
+            0,  // no direct sequences
+            0,
+
+            cb_filenames,
+            num_codebooks,
+            prd_filenames,
+            num_predictors,
+
+            show_ranked,
+            classification_filename
+    );
 }
 
 int ecoz2_hmm_show(

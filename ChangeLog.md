@@ -2,6 +2,9 @@
 
 - 0.6.1 introduce SeqProvider as preparation to then be able to specify
   predictors for classification 
+    - preparing for dispatching predictors for HMM classification 
+    - TODO _seq_provider_get_next_predictor
+  
 - fix conflicting loop variable name `i` in `hmm_classify`, used 
   when ordering candidates in a mis-classification, but messing up
   the outer `i` variable used to loop over the sequences.
