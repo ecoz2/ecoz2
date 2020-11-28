@@ -275,16 +275,16 @@ static NextSeq *_seq_provider_get_next_direct_sequence(SeqProvider *sp) {
 
 static NextSeq *_seq_provider_get_next_predictor(SeqProvider *sp) {
     // load next predictor:
-    const char *filename = sp->prd_filenames[sp->next_index++];
-    Predictor *prd = prd_load(filename);
+    sp->next_seq.prd_filename = sp->prd_filenames[sp->next_index++];
+    Predictor *prd = prd_load(sp->next_seq.prd_filename);
     if (!prd) {
-        fprintf(stderr, "%s: error loading predictor.\n", filename);
+        fprintf(stderr, "%s: error loading predictor.\n", sp->next_seq.prd_filename);
         return 0;
     }
     strcpy(sp->next_seq.prd_class_name, prd->className);
     const int T = sp->next_seq.T = prd->T;
 
-    //printf("quantizing %s: class=%s  T=%d\n", filename, sp->next_seq.prd_class_name, T);
+    //printf("quantizing %s: class=%s  T=%d\n", sp->next_seq.prd_filename, sp->next_seq.prd_class_name, T);
 
     // quantization with each of the codebooks:
     for (int i = 0; i < sp->num_codebooks; ++i) {

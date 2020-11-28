@@ -472,7 +472,12 @@ int hmm_classify(
         const int do_show_ranked = show_ranked && !correct;
 
         if (do_show_ranked) {
-            printf("\n%s: '%s'\n", next_seq->seq_filename, next_seq->seq_class_name);
+            if (with_direct_sequences) {
+                printf("\n%s: '%s'\n", next_seq->seq_filename, next_seq->seq_class_name);
+            }
+            else {
+                printf("\n%s: '%s'\n", next_seq->prd_filename, next_seq->prd_class_name);
+            }
         }
 
         int best_rank = 1;
@@ -530,8 +535,14 @@ int hmm_classify(
             }
         }
 
-        c12n_add_case(next_seq->seq_filename, next_seq->seq_class_name,
-                correct, best_rank, ranked_model_ids);
+        if (with_direct_sequences) {
+            c12n_add_case(next_seq->seq_filename, next_seq->seq_class_name,
+                    correct, best_rank, ranked_model_ids);
+        }
+        else {
+            c12n_add_case(next_seq->prd_filename, next_seq->prd_class_name,
+                    correct, best_rank, ranked_model_ids);
+        }
     }
 
     seq_provider_destroy(sp);

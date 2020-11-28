@@ -138,6 +138,7 @@ typedef struct {
     int T;  // for either case
 
     // for when codebooks/predictors given:
+    const char *prd_filename;
     char prd_class_name[MAX_CLASS_NAME_LEN];
     Symbol **sequences;
     sample_t *dists;  // corresponding distortions
