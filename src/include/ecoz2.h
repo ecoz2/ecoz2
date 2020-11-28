@@ -124,6 +124,17 @@ int ecoz2_hmm_classify(
         const char *classification_filename
         );
 
+int ecoz2_hmm_classify_predictors(
+        char **model_names,
+        unsigned num_model_names,
+        char **cb_filenames,
+        int num_codebooks,
+        char **prd_filenames,
+        int num_predictors,
+        int show_ranked,
+        const char *classification_filename
+        );
+
 int ecoz2_hmm_show(
         char *filename,
         char *format

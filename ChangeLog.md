@@ -1,5 +1,7 @@
 2020-11
 
+- 0.6.0 preliminaries for `ecoz2_hmm_classify_predictors`
+
 - 0.5.5 set `double` as default `prob_t`
 
 - 0.5.5 increase MAX_PREDICTION_ORDER to 200

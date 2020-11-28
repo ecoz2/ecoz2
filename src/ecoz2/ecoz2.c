@@ -29,7 +29,7 @@
 #endif
 
 const char *ecoz2_version() {
-    return "0.5.5";
+    return "0.6.0";
 }
 
 static long last_seed_used = -1;
@@ -235,6 +235,21 @@ int ecoz2_hmm_classify(
             show_ranked,
             classification_filename
     );
+}
+
+int ecoz2_hmm_classify_predictors(
+        char **model_names,
+        unsigned num_model_names,
+        char **cb_filenames,
+        int num_codebooks,
+        char **prd_filenames,
+        int num_predictors,
+        int show_ranked,
+        const char *classification_filename
+        ) {
+
+    fprintf(stderr, "WARN: ecoz2_hmm_classify_predictors not implemented yet");
+    return 1;
 }
 
 int ecoz2_hmm_show(
