@@ -231,7 +231,8 @@ int hmm_learn(
         else {
             if (strcmp(model_className, sequence_className)) {
                 printf("WARNING: model '%s' trained with sequence '%s'\n",
-                       model_className, sequence_className)
+                       model_className, sequence_className
+                       );
             }
             if (max_T < T[num_seqs]) {
                 max_T = T[num_seqs];
