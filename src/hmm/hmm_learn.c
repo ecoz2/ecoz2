@@ -229,6 +229,10 @@ int hmm_learn(
             free(sequences[num_seqs]);
         }
         else {
+            if (strcmp(model_className, sequence_className)) {
+                printf("WARNING: model '%s' trained with sequence '%s'\n",
+                       model_className, sequence_className)
+            }
             if (max_T < T[num_seqs]) {
                 max_T = T[num_seqs];
             }

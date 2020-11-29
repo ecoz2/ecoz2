@@ -1,5 +1,6 @@
 2020-11
 
+- warning if hmm model trained with sequence of different class name
 - 0.6.1 introduce SeqProvider as preparation to then be able to specify
   predictors for classification 
     - complete dispatching predictors for HMM classification 

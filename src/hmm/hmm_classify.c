@@ -73,7 +73,7 @@ static int not_loaded_model_reported(const char *className) {
 static int get_classId(const char *className) {
     for (int i = 0; i < num_models; i++) {
         if (0 == strcmp(className, models[i]->className)) {
-            //printf("::get_classId: className=%s => %d", className, i);
+            //printf("::get_classId: className=%s => %d\n", className, i);
             return i;
         }
     }
