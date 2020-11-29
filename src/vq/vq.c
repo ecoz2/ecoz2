@@ -226,6 +226,15 @@ int seq_provider_with_direct_sequences(SeqProvider *sp) {
     return sp->seq_filenames != 0;
 }
 
+int seq_provider_num_instances(SeqProvider *sp) {
+    if (seq_provider_with_direct_sequences(sp)) {
+        return sp->num_sequences;
+    }
+    else {
+        return sp->num_predictors;
+    }
+}
+
 int seq_provider_has_next(SeqProvider *sp) {
     if (sp->seq_filenames) {
         return sp->next_index < sp->num_sequences;

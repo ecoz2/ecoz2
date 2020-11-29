@@ -175,6 +175,8 @@ SeqProvider *seq_provider_create(
         int num_predictors
         );
 
+int seq_provider_num_instances(SeqProvider *sp);
+
 int seq_provider_has_next(SeqProvider *sp);
 
 NextSeq *seq_provider_get_next(SeqProvider *sp);

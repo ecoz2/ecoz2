@@ -73,6 +73,7 @@ static int not_loaded_model_reported(const char *className) {
 static int get_classId(const char *className) {
     for (int i = 0; i < num_models; i++) {
         if (0 == strcmp(className, models[i]->className)) {
+            //printf("::get_classId: className=%s => %d", className, i);
             return i;
         }
     }
@@ -404,6 +405,7 @@ int hmm_classify(
     );
 
     const int with_direct_sequences = seq_provider_with_direct_sequences(sp);
+    const int num_instances = seq_provider_num_instances(sp);
 
     if (!with_direct_sequences) {
         // check HMM-codebook correspondence
@@ -415,7 +417,7 @@ int hmm_classify(
         }
     }
 
-    c12n_prepare(classification_filename, Mcmp, sp->num_sequences);
+    c12n_prepare(classification_filename, Mcmp, num_instances);
 
     printf("\n");
 
