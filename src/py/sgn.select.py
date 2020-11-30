@@ -142,12 +142,14 @@ def do_plot(wav_filename, interval, off_length_ms,
             stft = librosa.amplitude_to_db(stft, ref=np.max)
             return stft
 
-        def spectrogram(stft):
+        def spectrogram(stft, offset):
             display.specshow(stft, y_axis='mel', x_axis='time', sr=sample_rate,
+                             hop_length=offset,
                              cmap='Blues', fmin=0, fmax=16000)
 
-        stft = compute_stft(1024, 512)
-        spectrogram(stft)
+        offset = 512
+        stft = compute_stft(1024, offset)
+        spectrogram(stft, offset)
 
     def plot_quantization_and_distortion(fig):
         sequence = get_codewords_and_min_dists(sample_rate, off_length_ms,

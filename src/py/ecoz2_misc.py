@@ -72,6 +72,7 @@ def plot_spectrogram(interval: np.ndarray,
     def spectrogram(stft):
         display.specshow(stft, y_axis='mel', x_axis='time',
                          sr=sample_rate,
+                         hop_length=window_offset,
                          cmap=cmap or 'Blues',
                          fmin=fmin, fmax=fmax,
                          ax=ax)
